@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  createNotification,
   deleteNotifications,
   getAllNotifications,
   updateNotification,
@@ -11,7 +12,8 @@ import StatsCard from "./components/StatsCard";
 import FilterBar from "./components/FilterBar";
 import NotificationList from "./components/NotificationList";
 import type { Notification } from "../../../types/Notification";
-
+import DeleteConfirmModal from "./components/DeleteModal";
+import CreateNotificationModal from "./components/CreateModal";
 export default function Notifications() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRead, setFilterRead] = useState("All");
@@ -40,13 +42,16 @@ export default function Notifications() {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, seen }: { id: BigInteger; seen: boolean }) =>
-      updateNotification(id, { seen: !seen }),
+      updateNotification(String(id), { seen: !seen }), // Ép kiểu về string ở đây
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["getAllNotifications"] });
       queryClient.invalidateQueries({ queryKey: ["getReadNotifications"] });
       queryClient.invalidateQueries({ queryKey: ["getUnreadNotifications"] });
     },
   });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedIdToDelete, setSelectedIdToDelete] =
+    useState<BigInteger | null>(null);
 
   const deleteMutation = useMutation({
     mutationFn: deleteNotifications,
@@ -55,6 +60,22 @@ export default function Notifications() {
     },
     onError: (err) => {
       console.error("Delete error", err);
+    },
+  });
+  const [showCreateModal, setShowCreateModal] = useState(false);
+
+  const createMutation = useMutation({
+    mutationFn: ({ userId, message }: { userId: number; message: string }) =>
+      createNotification({ user_id: userId, message }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["getAllNotifications"] });
+      setShowCreateModal(false);
+      queryClient.invalidateQueries({ queryKey: ["getAllNotifications"] });
+      queryClient.invalidateQueries({ queryKey: ["getReadNotifications"] });
+      queryClient.invalidateQueries({ queryKey: ["getUnreadNotifications"] });
+    },
+    onError: (err) => {
+      console.error("Create notification error", err);
     },
   });
 
@@ -72,23 +93,22 @@ export default function Notifications() {
 
     return matchSearch && matchRead;
   });
-
   const handleToggleRead = (id: BigInteger, seen: boolean) => {
+    console.log("Toggle:", id, seen);
     updateMutation.mutate({
       id,
-      seen: !seen,
+      seen,
     });
   };
 
   const handleDelete = (id: BigInteger) => {
-    deleteMutation.mutate({
-      ids: [id],
-    });
+    setSelectedIdToDelete(id);
+    setShowDeleteModal(true); // show modal
   };
 
   return (
     <div className="space-y-6">
-      <Header />
+      <Header setShowCreateModal={setShowCreateModal} />
       <StatsCard
         totalLength={isTotalLoading ? 0 : notifications.length}
         totalUnreadLength={
@@ -109,6 +129,26 @@ export default function Notifications() {
         notifications={filteredNotifications}
         handleToggleRead={(id, seen) => handleToggleRead(id, seen)}
         handleDelete={handleDelete}
+        isUpdating={updateMutation.isPending}
+      />
+
+      <DeleteConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={() => {
+          if (selectedIdToDelete !== null) {
+            deleteMutation.mutate({ ids: [selectedIdToDelete] });
+          }
+        }}
+        isPending={deleteMutation.isPending}
+      />
+      <CreateNotificationModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreate={(data) => {
+          createMutation.mutate(data);
+        }}
+        isCreating={createMutation.isPending}
       />
     </div>
   );

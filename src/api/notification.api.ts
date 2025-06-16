@@ -1,5 +1,6 @@
 import { axiosClient } from "../lib/axios";
 import type {
+  CreateNotificationRequest,
   DeleteNotificationsRequest,
   GetAllNotificationsResponse,
   UpdateNotificationRequest,
@@ -27,11 +28,19 @@ export const getNotificationsByUserId = async (
   return res?.data;
 };
 
+export const createNotification = async (
+  data: CreateNotificationRequest
+): Promise<Notification> => {
+  const res = await axiosClient.post(`/notifications`, data);
+  return res?.data;
+};
+
 export const updateNotification = async (
-  notificationId: BigInteger,
+  notificationId: string,
   data: UpdateNotificationRequest
 ): Promise<UpdateNotificationResponse> => {
   const res = await axiosClient.put(`/notifications/${notificationId}`, data);
+  console.log(data);
   return res?.data;
 };
 

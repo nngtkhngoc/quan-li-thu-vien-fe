@@ -25,6 +25,11 @@ export type DeleteNotificationResponse = {
   data: null;
 };
 
+export type CreateNotificationRequest = {
+  user_id: number;
+  message: string;
+};
+
 export type UpdateNotificationRequest = {
   message?: string;
   seen?: boolean;
