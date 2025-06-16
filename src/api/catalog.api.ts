@@ -7,7 +7,7 @@ import type {
 
 // Get all catalogs
 export const getAllCatalogs = async (): Promise<CatalogResponse[]> => {
-  const response = await axiosClient.get("/api/catalogs");
+  const response = await axiosClient.get("/catalogs");
   return response.data;
 };
 
@@ -15,7 +15,7 @@ export const getAllCatalogs = async (): Promise<CatalogResponse[]> => {
 export const createCatalog = async (
   data: CreateCatalogRequest
 ): Promise<CatalogResponse> => {
-  const response = await axiosClient.post("/api/catalogs", data);
+  const response = await axiosClient.post("/catalogs", data);
   return response.data;
 };
 
@@ -24,12 +24,12 @@ export const updateCatalog = async (
   id: number,
   data: UpdateCatalogRequest
 ): Promise<CatalogResponse> => {
-  const response = await axiosClient.put(`/api/catalogs/${id}`, data);
+  const response = await axiosClient.put(`/catalogs/${id}`, data);
   return response.data;
 };
 
 // Delete catalog
 export const deleteCatalog = async (id: number): Promise<CatalogResponse> => {
-  const response = await axiosClient.delete(`/api/catalogs/${id}`);
+  const response = await axiosClient.delete(`/catalogs/${id}`);
   return response.data;
 };

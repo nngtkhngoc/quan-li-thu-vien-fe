@@ -2,6 +2,7 @@ import { Outlet } from "react-router";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 import ScrollToTop from "../ScrollToTop";
+import { ToastContainer } from "react-toastify";
 
 export default function Layout() {
   return (
@@ -16,6 +17,7 @@ export default function Layout() {
           <Outlet />
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 }

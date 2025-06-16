@@ -1,3 +1,364 @@
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Search,
+  Plus,
+  Edit,
+  Trash2,
+  Eye,
+  Filter,
+  BookOpen,
+} from "lucide-react";
+import { mockBooks } from "../../data/mockData";
+import { useBook } from "../../hooks/useBook";
+import type { BookResponse } from "../../types/Book";
+import { toast } from "react-toastify";
 export default function Books() {
-  return <div>Books</div>;
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterCategory, setFilterCategory] = useState("All");
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editingBook, setEditingBook] = useState<BookResponse | null>(null);
+
+  const {
+    getBookQuery,
+    updateBookMutation,
+    createBookMutation,
+    deleteBookMutation,
+    getCatalogsQuery,
+  } = useBook("");
+  if (getBookQuery.isLoading || getCatalogsQuery?.isLoading) {
+    return <div className="text-center py-12">Loading books...</div>;
+  }
+  if (!getBookQuery.isLoading) {
+    console.log(getCatalogsQuery.data, "@@@");
+  }
+  const categories = getCatalogsQuery.data;
+  const books = getBookQuery.data.content || mockBooks;
+
+  const filteredBooks = books.filter((book: any) => {
+    const matchesSearch =
+      book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      book.isbn.includes(searchTerm);
+    const matchesCategory =
+      filterCategory === "All" || book.category === filterCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  const handleDelete = (id: string) => {
+    if (window.confirm("Are you sure you want to delete this book?")) {
+      // setBooks(books.filter((book: any) => book.id !== id));
+    }
+  };
+
+  const BookForm = ({
+    book,
+    onSave,
+    onCancel,
+  }: {
+    book?: BookResponse;
+    onSave: (book: Omit<BookResponse, "id">) => void;
+    onCancel: () => void;
+  }) => {
+    const [formData, setFormData] = useState({
+      title: book?.title || "",
+      author: book?.author || "",
+      category: book?.catalog?.name || "Fiction",
+      // availableCopies: book?.availableCopies || 1,
+      description: book?.description || "",
+      image: book?.image || "",
+    });
+
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+
+      const formElement = document.querySelector("#form");
+      const formData = new FormData(formElement as HTMLFormElement);
+      try {
+        if (editingBook) {
+          await updateBookMutation.mutateAsync(formData);
+          toast.success("Cập nhật sách thành công!");
+        } else {
+          await createBookMutation.mutateAsync(formData);
+          toast.success("Thêm sách thành công!");
+        }
+      } catch (error) {
+        console.log(error);
+        if (editingBook) {
+          toast.error("Cập nhật sách thất bại!");
+        } else {
+          toast.error("Thêm sách thất bại!");
+        }
+      }
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-900">
+              {book ? "Chỉnh sửa sách" : "Thêm sách mới"}
+            </h2>
+          </div>
+          <form id="form" onSubmit={handleSubmit} className="p-6 space-y-4">
+            <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
+              <div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Tiêu đề *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    name="title"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Tác giả *
+                  </label>
+                  <input
+                    type="text"
+                    name="author"
+                    required
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  />
+                </div>
+              </div>
+              <div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Thể loại *
+                  </label>
+                  <select
+                    value={formData.category}
+                    name="catalog"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  >
+                    {categories?.map((category: any) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Chọn ảnh bìa
+                  </label>
+                  <input
+                    id="upload-file"
+                    type="file"
+                    className="border border-gray-300 px-3 py-2 w-full rounded-lg"
+                    onChange={() => {
+                      const Url = URL.createObjectURL(
+                        (
+                          document.getElementById(
+                            "upload-file"
+                          ) as HTMLInputElement
+                        ).files![0]
+                      );
+                      document
+                        .querySelector("#image")!
+                        .setAttribute("src", Url);
+                    }}
+                  />
+                </div>
+              </div>
+              <img id="image" src="w-[100px] h-[100px]" alt="ảnh bìa truyện" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Mô tả
+              </label>
+              <textarea
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+                rows={3}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+            <div className="flex justify-end space-x-3 pt-4">
+              <button
+                type="button"
+                onClick={onCancel}
+                className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              >
+                Hủy
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
+              >
+                {book ? "Cập nhật" : "Thêm"} sách
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  };
+
+  const handleSave = () => {};
+  // const handleSave = (bookData: Omit<Book, "id">) => {
+  // if (editingBook) {
+  // setBooks(
+  //   books.map((book) =>
+  //     book.id === editingBook.id
+  //       ? { ...bookData, id: editingBook.id }
+  //       : book
+  //   )
+  // );
+  // setEditingBook(null);
+  // } else {
+  // const newBook = {
+  //     ...bookData,
+  //     id: Date.now().toString(),
+  //     availableCopies: bookData.totalCopies,
+  //   };
+  //   setBooks([...books, newBook]);
+  //   setShowAddModal(false);
+  // }
+  // };
+
+  return (
+    <div className="p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Quản lí sách</h1>
+          <p className="text-gray-600 mt-1">
+            Quản lí và theo dõi sách trong thư viện của bạn.
+          </p>
+        </div>
+        <button
+          onClick={() => setShowAddModal(true)}
+          className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
+        >
+          <Plus className="h-5 w-5 mr-2" />
+          Thêm sách mới
+        </button>
+      </div>
+
+      {/* Search and Filters */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+        <div className="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+            <input
+              type="text"
+              placeholder="Search books by title, author, or ISBN..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+          <div className="flex items-center space-x-2">
+            <Filter className="h-5 w-5 text-gray-400" />
+            <select
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+              className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              {categories?.map((category) => (
+                <option key={category.id} value={category.name}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Books Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {filteredBooks.map((book: any) => (
+          <div
+            key={book.id}
+            className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+          >
+            <div className="aspect-w-3 aspect-h-4 bg-gray-200">
+              <img
+                src={book.image}
+                alt={book.title}
+                className="w-full h-48 object-cover"
+              />
+            </div>
+            <div className="p-4">
+              <h3 className="font-semibold text-gray-900 line-clamp-2 mb-2">
+                {book.title}
+              </h3>
+              <p className="text-sm text-gray-600 mb-2">Bởi {book.author}</p>
+              <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
+                <span className="bg-gray-100 px-2 py-1 rounded">
+                  {book.category}
+                </span>
+                <span>{book.publicationYear}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm mb-4">
+                <span className="text-gray-600">
+                  Số bản sao: {book.availableCopies}/{book.totalCopies}
+                </span>
+                <span
+                  className={`px-2 py-1 rounded text-xs ${
+                    book.availableCopies > 0
+                      ? "bg-emerald-100 text-emerald-800"
+                      : "bg-red-100 text-red-800"
+                  }`}
+                >
+                  {book.availableCopies > 0 ? "Available" : "Out of stock"}
+                </span>
+              </div>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => navigate(`/books/${book.id}/items`)}
+                  className="flex-1 flex items-center justify-center px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg transition-colors text-sm"
+                >
+                  <Eye className="h-4 w-4 mr-1" />
+                  Items
+                </button>
+                <button
+                  onClick={() => setEditingBook(book)}
+                  className="flex items-center justify-center px-3 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-lg transition-colors"
+                >
+                  <Edit className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => handleDelete(book.id)}
+                  className="flex items-center justify-center px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {filteredBooks.length === 0 && (
+        <div className="text-center py-12">
+          <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-500 text-lg">Không tìm thấy sách</p>
+          <p className="text-gray-400">
+            Thử điều chỉnh thanh tìm kiếm và danh sách lọc
+          </p>
+        </div>
+      )}
+
+      {/* Modals */}
+      {showAddModal && (
+        <BookForm onSave={handleSave} onCancel={() => setShowAddModal(false)} />
+      )}
+
+      {editingBook && (
+        <BookForm
+          book={editingBook}
+          onSave={handleSave}
+          onCancel={() => setEditingBook(null)}
+        />
+      )}
+    </div>
+  );
 }
