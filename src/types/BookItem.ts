@@ -1,4 +1,5 @@
 export type BookItemResponse = {
+  id: number;
   status: "AVAILABLE" | "BORROWED";
   book: any;
 };
