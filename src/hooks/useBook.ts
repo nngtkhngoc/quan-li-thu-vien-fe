@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { deleteBook, getBooks, updateBook } from "../api/book.api";
+import { createBook, deleteBook, getBooks, updateBook } from "../api/book.api";
 import { getAllCatalogs } from "../api/catalog.api";
 export const useBook = (query: string) => {
   const queryClient = useQueryClient();
@@ -10,16 +10,22 @@ export const useBook = (query: string) => {
       return await getAllCatalogs();
     },
   });
-
   const getBookQuery = useQuery({
-    queryKey: ["books"],
+    queryKey: ["books", query],
     queryFn: async () => {
       return await getBooks(query);
     },
   });
+
   const updateBookMutation = useMutation({
-    mutationFn: async (formData: FormData) => {
-      return await updateBook(formData);
+    mutationFn: async ({
+      id,
+      formData,
+    }: {
+      id: Number;
+      formData: FormData;
+    }) => {
+      return await updateBook(id, formData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["books"] });
@@ -27,7 +33,7 @@ export const useBook = (query: string) => {
   });
   const createBookMutation = useMutation({
     mutationFn: async (formData: FormData) => {
-      return await updateBook(formData);
+      return await createBook(formData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["books"] });
