@@ -4,10 +4,10 @@ import ScrollToTop from "../ScrollToTop";
 
 export default function Layout() {
   return (
-    <div className="flex font-primary h-screen relative">
+    <div className="flex font-primary min-h-screen relative">
       <ScrollToTop />
       <Sidebar />
-      <div className="w-full min-h-screen bg-gray-50">
+      <div className="w-full min-h-screen bg-gray-50 px-10 py-10">
         <Outlet />
       </div>
     </div>

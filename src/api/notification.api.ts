@@ -28,9 +28,10 @@ export const getNotificationsByUserId = async (
 };
 
 export const updateNotification = async (
+  notificationId: BigInteger,
   data: UpdateNotificationRequest
 ): Promise<UpdateNotificationResponse> => {
-  const res = await axiosClient.put(`/notifications`, data);
+  const res = await axiosClient.put(`/notifications/${notificationId}`, data);
   return res?.data;
 };
 
