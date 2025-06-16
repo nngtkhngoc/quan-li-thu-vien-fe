@@ -7,13 +7,10 @@ import {
   CheckCircle,
   Trash2,
 } from "lucide-react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import {
-  deleteBorrowedBook,
-  getAllBorrowedBooks,
-  updateBorrowedBook,
-} from "../../api/borrow.api";
+import { deleteBorrowedBook, updateBorrowedBook } from "../../api/borrow.api";
+import useBorrow from "../../hooks/useBorrow";
 
 type ChangeStatus = {
   id: number;
@@ -28,10 +25,7 @@ vnStatus.set("RETURNED", "Đã trả");
 vnStatus.set("OVERDUE", "Quá hạn");
 
 export default function Borrows() {
-  const { data: borrows } = useQuery({
-    queryKey: ["borrowed-books"],
-    queryFn: getAllBorrowedBooks,
-  });
+  const { borrows } = useBorrow();
 
   const queryClient = useQueryClient();
   const invalidateQuery = () =>
