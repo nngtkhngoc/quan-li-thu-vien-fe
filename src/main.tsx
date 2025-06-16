@@ -18,7 +18,7 @@ import Books from "./pages/Admin/Books.tsx";
 import BookItems from "./pages/Admin/BookItems.tsx";
 import Borrows from "./pages/Admin/Borrows.tsx";
 import Notifications from "./pages/Admin/Notifications/Notifications.tsx";
-import Reviews from "./pages/Admin/Reviews.tsx";
+import Reviews from "./pages/Admin/Reviews/Reviews.tsx";
 import Reservations from "./pages/Admin/Reservations.tsx";
 import Login from "./pages/Admin/Login.tsx";
 import BookDetailed from "./pages/Client/BookDetailed.tsx";
