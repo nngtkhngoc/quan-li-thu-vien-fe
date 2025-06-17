@@ -3,16 +3,36 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Search, Bell, User, Moon, Menu, X, BookOpen } from "lucide-react";
 import { mockNotifications } from "../../data/mockData";
 import { useUser } from "../../hooks/useUser";
+import { signOut } from "../../api/user.api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 
 const Header: React.FC = () => {
   const { userProfile } = useUser();
+  const { setUserChanged } = useUser();
+
   // const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const queryClient = useQueryClient();
 
   const unreadNotifications = mockNotifications.filter((n) => !n.isRead).length;
+
+  const signOutMutation = useMutation({
+    mutationFn: signOut,
+    onSuccess: () => {
+      setUserChanged(true);
+      queryClient.clear();
+      navigate("/");
+      toast.success("Đăng xuất thành công");
+      setUserChanged(true);
+    },
+    onError: () => {
+      toast.error("Đăng xuất thất bại");
+    },
+  });
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,10 +175,13 @@ const Header: React.FC = () => {
                       </Link>
                       <hr className="my-1 border-gray-200 dark:border-gray-700" />
                       <button
-                        // onClick={logout}
-                        className="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        onClick={() => signOutMutation.mutate()}
+                        disabled={signOutMutation.isPending}
+                        className="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        Sign Out
+                        {signOutMutation.isPending
+                          ? "Đang đăng xuất..."
+                          : "Sign Out"}
                       </button>
                     </div>
                   </div>
