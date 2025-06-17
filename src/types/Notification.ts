@@ -36,5 +36,5 @@ export type UpdateNotificationRequest = {
 };
 
 export type DeleteNotificationsRequest = {
-  ids: BigInteger[];
+  ids: string[];
 };

@@ -46,7 +46,7 @@ export default function NotificationsList({
                     <p
                       className={`text-md font-medium mt-1 ${
                         notification.seen
-                          ? "text-green-700 dark:text-gray-400"
+                          ? "text-gray-700 dark:text-gray-400"
                           : "text-red-600 dark:text-gray-300"
                       }`}
                     >
@@ -63,7 +63,7 @@ export default function NotificationsList({
                   <div className="relative">
                     <button
                       onClick={() => toggleDropdown(Number(notification.id))}
-                      className="p-1 text-gray-400 hover:text-black dark:hover:text-white rounded-full"
+                      className="p-1 text-gray-400 hover:text-black dark:hover:text-white rounded-full cursor-pointer"
                     >
                       <MoreVertical className="h-4 w-4" />
                     </button>
@@ -75,7 +75,7 @@ export default function NotificationsList({
                             onToggleSeen(notification.id, notification.seen);
                             setOpenMenuId(null);
                           }}
-                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer whitespace-nowrap"
                         >
                           {notification.seen
                             ? "Đánh dấu chưa đọc"
@@ -86,7 +86,7 @@ export default function NotificationsList({
                             onDelete(notification.id.toString());
                             setOpenMenuId(null);
                           }}
-                          className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                         >
                           Xóa thông báo
                         </button>
@@ -96,11 +96,13 @@ export default function NotificationsList({
                 </div>
               </div>
 
-              {!notification.seen && (
-                <div className="flex-shrink-0">
-                  <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                </div>
-              )}
+              <div className="flex-shrink-0">
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    notification.seen ? "bg-transparent" : "bg-red-600"
+                  }`}
+                ></div>
+              </div>
             </div>
           </div>
         ))

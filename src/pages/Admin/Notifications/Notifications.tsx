@@ -50,8 +50,9 @@ export default function Notifications() {
     },
   });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedIdToDelete, setSelectedIdToDelete] =
-    useState<BigInteger | null>(null);
+  const [selectedIdToDelete, setSelectedIdToDelete] = useState<string | null>(
+    null
+  );
 
   const deleteMutation = useMutation({
     mutationFn: deleteNotifications,
@@ -102,7 +103,7 @@ export default function Notifications() {
   };
 
   const handleDelete = (id: BigInteger) => {
-    setSelectedIdToDelete(id);
+    setSelectedIdToDelete(id.toString);
     setShowDeleteModal(true); // show modal
   };
 

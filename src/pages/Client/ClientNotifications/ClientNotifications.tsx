@@ -1,21 +1,20 @@
+/* eslint-disable @typescript-eslint/no-wrapper-object-types */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   deleteNotification,
+  deleteNotifications,
   getNotificationsByUserId,
   updateNotification,
 } from "../../../api/notification.api";
 import StatsCard from "../../Admin/Notifications/components/StatsCard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FilterTabs from "./components/FilterTabs";
 import NotificationsList from "./components/NotificationsList";
+import type { Notification } from "../../../types/Notification";
 
 export default function ClientNotifications() {
   const userId = "1";
-  const {
-    data: totalNotifications,
-    isLoading: isTotalLoading,
-    refetch,
-  } = useQuery({
+  const { data: totalNotifications, isLoading: isTotalLoading } = useQuery({
     queryKey: ["getAllNotifications"],
     queryFn: () => getNotificationsByUserId(userId),
   });
@@ -40,17 +39,55 @@ export default function ClientNotifications() {
       queryClient.invalidateQueries({ queryKey: ["getUnreadNotifications"] });
     },
   });
-  // const [showDeleteModal, setShowDeleteModal] = useState(false);
-  // const [selectedIdToDelete, setSelectedIdToDelete] =
-  //   useState<BigInteger | null>(null);
+
+  const markAllAsReadMutation = useMutation({
+    mutationFn: async () => {
+      const unread = unreadNotifications?.data || [];
+      await Promise.all(
+        unread.map((noti) =>
+          updateNotification(String(noti.id), { seen: true })
+        )
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["getAllNotifications"] });
+      queryClient.invalidateQueries({ queryKey: ["getUnreadNotifications"] });
+      queryClient.invalidateQueries({ queryKey: ["getReadNotifications"] });
+    },
+  });
+
+  const [selectedIdsToDelete, setSelectedIdsToDelete] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (totalNotifications) {
+      const allIds = totalNotifications.data.map((notification: Notification) =>
+        notification.id.toString()
+      );
+      setSelectedIdsToDelete(allIds);
+    }
+  }, [totalNotifications]);
 
   const deleteMutation = useMutation({
     mutationFn: deleteNotification,
     onSuccess: () => {
-      refetch();
+      queryClient.invalidateQueries({ queryKey: ["getAllNotifications"] });
+      queryClient.invalidateQueries({ queryKey: ["getReadNotifications"] });
+      queryClient.invalidateQueries({ queryKey: ["getUnreadNotifications"] });
     },
     onError: (err) => {
       console.error("Delete error", err);
+    },
+  });
+
+  const deleteAllMutation = useMutation({
+    mutationFn: (data: { ids: string[] }) => deleteNotifications(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["getAllNotifications"] });
+      queryClient.invalidateQueries({ queryKey: ["getReadNotifications"] });
+      queryClient.invalidateQueries({ queryKey: ["getUnreadNotifications"] });
+    },
+    onError: (err) => {
+      console.error("Delete many error", err);
     },
   });
 
@@ -75,14 +112,31 @@ export default function ClientNotifications() {
           </p>
         </div>
 
-        {(unreadNotifications?.data?.length ?? 0) > 0 && (
+        <div className="flex flex-row gap-2">
           <button
-            // onClick={markAllAsRead}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+            onClick={() =>
+              deleteAllMutation.mutate({ ids: selectedIdsToDelete })
+            }
+            disabled={deleteAllMutation.isPending}
+            className="disabled:bg-gray-500 disabled:cursor-not-allowed px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium cursor-pointer"
           >
-            Đánh dấu tất cả đã đọc
+            {deleteAllMutation.isPending
+              ? "Đang xử lý..."
+              : "Xoá tất cả thông báo"}
           </button>
-        )}
+
+          {(unreadNotifications?.data?.length ?? 0) > 0 && (
+            <button
+              onClick={() => markAllAsReadMutation.mutate()}
+              disabled={markAllAsReadMutation.isPending}
+              className="disabled:bg-gray-500 disabled:cursor-not-allowed px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium cursor-pointer"
+            >
+              {markAllAsReadMutation.isPending
+                ? "Đang xử lý..."
+                : "Đánh dấu tất cả đã đọc"}
+            </button>
+          )}
+        </div>
       </div>
       <StatsCard
         totalLength={isTotalLoading ? 0 : totalNotifications?.data.length || 0}
