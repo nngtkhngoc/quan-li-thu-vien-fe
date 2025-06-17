@@ -4,6 +4,7 @@ import { deleteReviews, getAllReviews } from "../../../api/review.api";
 import { useState } from "react";
 import FilterBar from "./components/FilterBar";
 import ReviewList from "./components/ReviewLists";
+import LoadingSpinner from "../../../components/ui/LoadingSpinner";
 
 export default function Reviews() {
   const {
@@ -42,6 +43,8 @@ export default function Reviews() {
     },
   });
 
+  if (isTotalLoading) return <LoadingSpinner size="lg" />;
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -53,11 +56,7 @@ export default function Reviews() {
         </div>
       </div>
 
-      {isTotalLoading ? (
-        <p>Đang tải...</p>
-      ) : (
-        <StatsCard reviews={totalReviews?.data.items || []} />
-      )}
+      <StatsCard reviews={totalReviews?.data.items || []} />
 
       <FilterBar
         searchTerm={searchTerm}

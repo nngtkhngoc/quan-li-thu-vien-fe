@@ -1,8 +1,9 @@
 export type BookResponse = {
-  id: Number;
-  title: String;
-  description: String;
-  image: String;
+  id: number;
+  title: string;
+  description: string;
+  image: string;
   catalog: any;
-  author: any;
+  author: string;
+  bookItems: any[];
 };

@@ -12,6 +12,7 @@ import FilterTabs from "./components/FilterTabs";
 import NotificationsList from "./components/NotificationsList";
 import type { Notification } from "../../../types/Notification";
 import { useNotification } from "../../../contexts/notificationContext";
+import LoadingSpinner from "../../../components/ui/LoadingSpinner";
 
 export default function ClientNotifications() {
   const userId = "1";
@@ -104,6 +105,10 @@ export default function ClientNotifications() {
       if (filter === "all") return true;
       return filter === "unread" ? !notification.seen : notification.seen;
     }) || [];
+
+  const isLoading = isReadLoading || isTotalLoading || isUnreadLoading;
+
+  if (isLoading) return <LoadingSpinner size="lg" />;
 
   return (
     <div>

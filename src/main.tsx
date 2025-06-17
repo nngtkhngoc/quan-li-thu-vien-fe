@@ -10,7 +10,7 @@ import BookCatalogue from "./pages/Client/BookCatalogue.tsx";
 import BorrowedBooks from "./pages/Client/BorrowedBooks.tsx";
 import ClientNotifications from "./pages/Client/ClientNotifications/ClientNotifications.tsx";
 import ClientReservations from "./pages/Client/ClientReservations.tsx";
-import Auth from "./pages/Client/Auth.tsx";
+import Auth from "./pages/Client/AuthPage/Auth.tsx";
 import Layout from "./components/Admin/Layout.tsx";
 import Dashboard from "./pages/Admin/Dashboard/Dashboard.tsx";
 import Users from "./pages/Admin/Users.tsx";

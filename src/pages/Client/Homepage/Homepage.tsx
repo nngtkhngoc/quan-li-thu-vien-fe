@@ -2,6 +2,7 @@ import { getBooks } from "../../../api/book.api";
 import { getAllReviews } from "../../../api/review.api";
 import { getAllUsers } from "../../../api/user.api";
 import LoadingSpinner from "../../../components/ui/LoadingSpinner";
+import FeaturedBooks from "./components/FeaturedBooks";
 import HeroSection from "./components/HeroSection";
 import StatsSection from "./components/StatsSection";
 
@@ -23,20 +24,24 @@ export default function Homepage() {
     queryFn: () => getAllReviews(),
   });
 
+  const isLoading = isUserLoading || isBookLoading || isReviewLoading;
+
+  if (isLoading) return <LoadingSpinner size="lg" />;
   return (
     <div>
       <HeroSection />
-      {isUserLoading || isBookLoading || isReviewLoading ? (
-        <div className="flex justify-center py-12">
-          <LoadingSpinner size="lg" />
-        </div>
-      ) : (
+
+      <div>
         <StatsSection
           totalBooks={totalBooks?.totalElements ?? 0}
           totalUsers={totalUsers?.length ?? 0}
           totalReviews={totalReviews?.data.totalItems ?? 0}
         />
-      )}
+        <FeaturedBooks
+          featuredBooks={totalBooks.content.slice(0, 3)}
+          loading={false}
+        />
+      </div>
     </div>
   );
 }
