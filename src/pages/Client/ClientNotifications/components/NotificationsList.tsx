@@ -60,7 +60,14 @@ export default function NotificationsList({
                     </p>
                   </div>
 
-                  <div className="relative">
+                  <div className="relative ">
+                    <div className="flex-shrink-0 ml-2">
+                      <div
+                        className={`w-2 h-2 rounded-full ${
+                          notification.seen ? "bg-transparent" : "bg-red-600"
+                        }`}
+                      ></div>
+                    </div>
                     <button
                       onClick={() => toggleDropdown(Number(notification.id))}
                       className="p-1 text-gray-400 hover:text-black dark:hover:text-white rounded-full cursor-pointer"
@@ -94,14 +101,6 @@ export default function NotificationsList({
                     )}
                   </div>
                 </div>
-              </div>
-
-              <div className="flex-shrink-0">
-                <div
-                  className={`w-2 h-2 rounded-full ${
-                    notification.seen ? "bg-transparent" : "bg-red-600"
-                  }`}
-                ></div>
               </div>
             </div>
           </div>

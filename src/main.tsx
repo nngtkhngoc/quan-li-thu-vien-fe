@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import "./index.css";
 import App from "./App.tsx";
-import Homepage from "./pages/Client/Homepage.tsx";
+import Homepage from "./pages/Client/Homepage/Homepage.tsx";
 import BookCatalogue from "./pages/Client/BookCatalogue.tsx";
 import BorrowedBooks from "./pages/Client/BorrowedBooks.tsx";
 import ClientNotifications from "./pages/Client/ClientNotifications/ClientNotifications.tsx";

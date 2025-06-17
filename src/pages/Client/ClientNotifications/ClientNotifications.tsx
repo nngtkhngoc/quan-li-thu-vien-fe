@@ -118,7 +118,7 @@ export default function ClientNotifications() {
           </p>
         </div>
 
-        <div className="flex flex-row gap-2">
+        <div className="flex flex-row gap-2 py-3">
           <button
             onClick={() =>
               deleteAllMutation.mutate({ ids: selectedIdsToDelete })
