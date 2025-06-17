@@ -108,6 +108,7 @@ const Auth: React.FC = () => {
                   required={!isLogin}
                   value={formData.name}
                   onChange={handleInputChange}
+                  autoComplete="name"
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   placeholder="Nhập họ và tên của bạn"
                 />
@@ -130,6 +131,7 @@ const Auth: React.FC = () => {
                   required
                   value={formData.email}
                   onChange={handleInputChange}
+                  autoComplete="email"
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   placeholder="Nhập email của bạn"
                 />
@@ -152,6 +154,7 @@ const Auth: React.FC = () => {
                   required
                   value={formData.password}
                   onChange={handleInputChange}
+                  autoComplete="password"
                   className="w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   placeholder="Nhập mật khẩu của bạn"
                 />
