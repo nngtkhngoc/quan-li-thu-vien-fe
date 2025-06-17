@@ -23,28 +23,9 @@ import {
 } from "lucide-react";
 
 import useBorrow from "../../../hooks/useBorrow";
+import useDashboard from "../../../hooks/useDashboard";
+import { dashboardStats } from "../../../data/mockData";
 
-const dashboardStats = {
-  totalBooks: 847,
-  totalUsers: 1234,
-  activeBorrows: 89,
-  overdueBooks: 12,
-  monthlyBorrows: [
-    { month: "Jan", borrows: 120 },
-    { month: "Feb", borrows: 98 },
-    { month: "Mar", borrows: 145 },
-    { month: "Apr", borrows: 132 },
-    { month: "May", borrows: 156 },
-    { month: "Jun", borrows: 134 },
-  ],
-  categoryDistribution: [
-    { name: "Fiction", value: 35, color: "#4F46E5" },
-    { name: "Technology", value: 25, color: "#059669" },
-    { name: "Science", value: 20, color: "#D97706" },
-    { name: "History", value: 15, color: "#DC2626" },
-    { name: "Other", value: 5, color: "#6B7280" },
-  ],
-};
 const StatCard = ({
   title,
   value,
@@ -87,6 +68,8 @@ const StatCard = ({
 
 export default function Dashboard() {
   const { borrows } = useBorrow();
+  const { dashboard } = useDashboard();
+  console.log(dashboard);
   const overdueBooks = borrows?.filter(borrow => borrow.status === "OVERDUE");
 
   return (
@@ -108,7 +91,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Total Books"
-          value={dashboardStats.totalBooks.toLocaleString()}
+          value={dashboard?.totalBooks.toLocaleString()}
           icon={BookOpen}
           change="+12 this month"
           changeType="positive"
@@ -122,14 +105,14 @@ export default function Dashboard() {
         />
         <StatCard
           title="Active Borrows"
-          value={dashboardStats.activeBorrows}
+          value={dashboard?.activeBorrows}
           icon={ArrowRightLeft}
           change="-3 from yesterday"
           changeType="negative"
         />
         <StatCard
           title="Overdue Books"
-          value={dashboardStats.overdueBooks}
+          value={dashboard?.overdueBooks}
           icon={AlertTriangle}
           change="2 returned today"
           changeType="positive"
@@ -150,7 +133,7 @@ export default function Dashboard() {
             </div>
           </div>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={dashboardStats.monthlyBorrows}>
+            <BarChart data={dashboard?.monthlyBorrows}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="month" stroke="#6b7280" />
               <YAxis stroke="#6b7280" />
@@ -181,7 +164,7 @@ export default function Dashboard() {
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={dashboardStats.categoryDistribution}
+                data={dashboard?.categoryDistribution}
                 cx="50%"
                 cy="50%"
                 outerRadius={100}
@@ -191,8 +174,11 @@ export default function Dashboard() {
                   `${name} ${(percent * 100).toFixed(0)}%`
                 }
               >
-                {dashboardStats.categoryDistribution.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
+                {dashboard?.categoryDistribution.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    // fill={entry.color}
+                  />
                 ))}
               </Pie>
               <Tooltip />
@@ -202,78 +188,6 @@ export default function Dashboard() {
       </div>
 
       {/* Recent Activity & Alerts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Overdue Books Alert */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-800">
-              Overdue Books
-            </h2>
-            <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-              {overdueBooks?.length} items
-            </span>
-          </div>
-          <div className="space-y-3">
-            {overdueBooks?.slice(0, 5).map(borrow => (
-              <div
-                key={borrow.id}
-                className="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200"
-              >
-                <div>
-                  <p className="font-medium text-gray-900">
-                    {borrow.book_item.book.title}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Borrowed by {borrow.user.name}
-                  </p>
-                  <p className="text-xs text-red-600">
-                    Due: {new Date(borrow.return_date).toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
-            ))}
-            {overdueBooks?.length === 0 && (
-              <div className="text-center py-8">
-                <Trophy className="h-12 w-12 text-emerald-400 mx-auto mb-3" />
-                <p className="text-gray-500">No overdue books! Great job!</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            Quick Actions
-          </h2>
-          <div className="grid grid-cols-2 gap-3">
-            <button className="flex flex-col items-center justify-center p-4 bg-indigo-50 hover:bg-indigo-100 rounded-lg border border-indigo-200 transition-colors">
-              <BookOpen className="h-6 w-6 text-indigo-600 mb-2" />
-              <span className="text-sm font-medium text-indigo-700">
-                Add Book
-              </span>
-            </button>
-            <button className="flex flex-col items-center justify-center p-4 bg-emerald-50 hover:bg-emerald-100 rounded-lg border border-emerald-200 transition-colors">
-              <Users className="h-6 w-6 text-emerald-600 mb-2" />
-              <span className="text-sm font-medium text-emerald-700">
-                Add User
-              </span>
-            </button>
-            <button className="flex flex-col items-center justify-center p-4 bg-amber-50 hover:bg-amber-100 rounded-lg border border-amber-200 transition-colors">
-              <ArrowRightLeft className="h-6 w-6 text-amber-600 mb-2" />
-              <span className="text-sm font-medium text-amber-700">
-                New Borrow
-              </span>
-            </button>
-            <button className="flex flex-col items-center justify-center p-4 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 transition-colors">
-              <Trophy className="h-6 w-6 text-purple-600 mb-2" />
-              <span className="text-sm font-medium text-purple-700">
-                New Challenge
-              </span>
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
