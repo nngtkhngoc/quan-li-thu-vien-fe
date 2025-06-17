@@ -18,3 +18,8 @@ export const deleteBook = async (id: Number) => {
   const response = await axiosClient.delete(`/books/${id}`);
   return response.data;
 };
+
+export const getDashboard = async () => {
+  const response = await axiosClient.get(`/books/dashboard`);
+  return response.data;
+};
