@@ -1,6 +1,11 @@
-import { Eye, Plus } from "lucide-react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Plus } from "lucide-react";
 
-export default function Header() {
+export default function Header({
+  setShowCreateModal,
+}: {
+  setShowCreateModal: any;
+}) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
       <div>
@@ -11,15 +16,8 @@ export default function Header() {
       </div>
       <div className="flex space-x-3 mt-4 sm:mt-0">
         <button
-          //   onClick={handleMarkAllRead}
-          className="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
-        >
-          <Eye className="h-5 w-5 mr-2" />
-          Đánh dấu đã đọc
-        </button>
-        <button
-          //   onClick={() => setShowAddModal(true)}
-          className="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
+          onClick={() => setShowCreateModal(true)}
+          className="inline-flex cursor-pointer items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
         >
           <Plus className="h-5 w-5 mr-2" />
           Gửi thông báo
