@@ -6,14 +6,25 @@ import {
   Clock,
   BookOpen,
   XCircle,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   getAllReservations,
   updateReservation,
+  createReservation,
+  deleteReservation,
 } from "../../api/reservation.api";
-import type { UpdateReservationRequest } from "../../types/Reservation";
+import type {
+  UpdateReservationRequest,
+  CreateReservationRequest,
+} from "../../types/Reservation";
+import { getAllUsers } from "../../api/user.api";
+import { getBooks } from "../../api/book.api";
+import { toast } from "react-toastify";
+import type { BookResponse } from "../../types/Book";
 
 export default function Reservations() {
   const { data: reservations, isLoading } = useQuery({
@@ -21,6 +32,17 @@ export default function Reservations() {
     queryFn: getAllReservations,
   });
 
+  const { data: users } = useQuery({
+    queryKey: ["users"],
+    queryFn: getAllUsers,
+  });
+
+  const { data: books } = useQuery({
+    queryKey: ["books"],
+    queryFn: () => getBooks(""),
+  });
+
+  console.log("Books:", books);
   const queryClient = useQueryClient();
   const invalidateQuery = () =>
     queryClient.invalidateQueries({
@@ -29,6 +51,8 @@ export default function Reservations() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
+  const [isCreating, setIsCreating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<number | null>(null);
 
   const {
     mutate: updateReservationMutation,
@@ -43,6 +67,40 @@ export default function Reservations() {
     }) => updateReservation(id, data),
     onSuccess() {
       invalidateQuery();
+      toast.success("Cập nhật đặt trước thành công");
+    },
+    onError() {
+      toast.error("Cập nhật đặt trước thất bại");
+    },
+  });
+
+  const {
+    mutate: createReservationMutation,
+    isPending: isCreatingReservation,
+  } = useMutation({
+    mutationFn: (data: CreateReservationRequest) => createReservation(data),
+    onSuccess() {
+      invalidateQuery();
+      toast.success("Tạo đặt trước thành công");
+      setIsCreating(false);
+    },
+    onError() {
+      toast.error("Tạo đặt trước thất bại");
+    },
+  });
+
+  const {
+    mutate: deleteReservationMutation,
+    isPending: isDeletingReservation,
+  } = useMutation({
+    mutationFn: deleteReservation,
+    onSuccess() {
+      invalidateQuery();
+      toast.success("Xóa đặt trước thành công");
+      setIsDeleting(null);
+    },
+    onError() {
+      toast.error("Xóa đặt trước thất bại");
     },
   });
 
@@ -62,18 +120,27 @@ export default function Reservations() {
     COMPLETED: "Hoàn thành",
   };
 
-  const filteredReservations = reservations?.filter((reservation) => {
-    const matchesSearch =
-      reservation.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      reservation.bookItem.book.title
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      filterStatus === "ALL" ||
-      (filterStatus === "PENDING" && !reservation.returned) ||
-      (filterStatus === "COMPLETED" && reservation.returned);
-    return matchesSearch && matchesStatus;
-  });
+  const filteredReservations = reservations
+    ?.filter((reservation) => {
+      const matchesSearch =
+        reservation.user.name
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        reservation.bookItem.book.title
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+      const matchesStatus =
+        filterStatus === "ALL" ||
+        (filterStatus === "PENDING" && !reservation.returned) ||
+        (filterStatus === "COMPLETED" && reservation.returned);
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      return (
+        new Date(b.reservationDate).getTime() -
+        new Date(a.reservationDate).getTime()
+      );
+    });
 
   const handleStatusChange = (id: number, returned: boolean) => {
     updateReservationMutation({ id, data: { returned } });
@@ -91,6 +158,13 @@ export default function Reservations() {
             Quản lý các yêu cầu đặt trước sách của thành viên
           </p>
         </div>
+        <button
+          onClick={() => setIsCreating(true)}
+          className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          <Plus className="h-5 w-5 mr-2" />
+          Tạo đặt trước
+        </button>
       </div>
 
       {/* Stats Cards */}
@@ -299,6 +373,18 @@ export default function Reservations() {
                               <XCircle className="h-5 w-5" />
                             </button>
                           )}
+                          <button
+                            onClick={() =>
+                              setIsDeleting(reservation.reservation_id)
+                            }
+                            className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-100 transition-colors"
+                            title="Xóa"
+                            disabled={
+                              isUpdatingReservation || isDeletingReservation
+                            }
+                          >
+                            <Trash2 className="h-5 w-5" />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -319,6 +405,116 @@ export default function Reservations() {
           </div>
         )}
       </div>
+
+      {/* Add Create Modal */}
+      {isCreating && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl max-w-md w-full">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">
+                Tạo đặt trước mới
+              </h2>
+            </div>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                createReservationMutation({
+                  user_id: Number(formData.get("userId")),
+                  book_item_id: Number(formData.get("bookItemId")),
+                });
+              }}
+              className="p-6 space-y-4"
+            >
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Người dùng *
+                </label>
+                <select
+                  name="userId"
+                  required
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                >
+                  <option value="">Chọn người dùng</option>
+                  {users?.map((user) => (
+                    <option key={user.id} value={user.id}>
+                      {user.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Sách *
+                </label>
+                <select
+                  name="bookItemId"
+                  required
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                >
+                  <option value="">Chọn sách</option>
+                  {books?.content?.map(
+                    (book: BookResponse) =>
+                      book.bookItems &&
+                      book.bookItems.length > 0 && (
+                        <option
+                          key={Number(book.id)}
+                          value={Number(book?.bookItems[0]?.id)}
+                        >
+                          {book.title}
+                        </option>
+                      )
+                  )}
+                </select>
+              </div>
+              <div className="flex justify-end space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsCreating(false)}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  disabled={isCreatingReservation}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:bg-gray-700"
+                >
+                  {isCreatingReservation ? "Đang tạo..." : "Tạo mới"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add Delete Confirmation Modal */}
+      {isDeleting && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl max-w-md w-full">
+            <div className="p-6 border-b border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-800">
+                Bạn chắc chắn muốn xóa đặt trước này?
+              </h3>
+              <div className="flex justify-end space-x-3 pt-4">
+                <button
+                  onClick={() => setIsDeleting(null)}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                >
+                  Hủy
+                </button>
+                <button
+                  onClick={() => deleteReservationMutation(isDeleting)}
+                  disabled={isDeletingReservation}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:bg-gray-700"
+                >
+                  {isDeletingReservation ? "Đang xóa..." : "Xác nhận"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

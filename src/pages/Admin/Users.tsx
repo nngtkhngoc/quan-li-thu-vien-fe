@@ -1,17 +1,22 @@
 import { useState } from "react";
 import { Search, Edit, Trash2, Eye, Users as UsersIcon } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
+import { Pagination } from "antd";
 import { deleteUser, getAllUsers, updateUser } from "../../api/user.api";
 import type { UserResponse, UpdateUserRequest } from "../../types/User";
 
+import { toast } from "react-toastify";
+
 export default function Users() {
+  const queryClient = useQueryClient();
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+
   const { data: users, isLoading } = useQuery({
     queryKey: ["users"],
     queryFn: getAllUsers,
   });
 
-  const queryClient = useQueryClient();
   const invalidateQuery = () =>
     queryClient.invalidateQueries({
       queryKey: ["users"],
@@ -28,7 +33,12 @@ export default function Users() {
         updateUser(id, data),
       onSuccess() {
         invalidateQuery();
+        toast.success("Cập nhật người dùng thành công");
         setIsEditing(null);
+      },
+
+      onError() {
+        toast.error("Cập nhật người dùng thất bại");
       },
     });
 
@@ -37,7 +47,11 @@ export default function Users() {
       mutationFn: deleteUser,
       onSuccess() {
         invalidateQuery();
+        toast.success("Xóa người dùng thành công");
         setIsDeleting(null);
+      },
+      onError() {
+        toast.error("Xóa người dùng thất bại");
       },
     });
 
@@ -50,6 +64,11 @@ export default function Users() {
     return matchesSearch;
   });
 
+  const paginatedUsers = filteredUsers?.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
   const handleUpdate = (data: UpdateUserRequest) => {
     if (!isEditing) return;
     updateUserMutation({ id: isEditing.id, data });
@@ -59,6 +78,91 @@ export default function Users() {
     if (!isDeleting) return;
     deleteUserMutation(isDeleting);
   };
+
+  if (isLoading) {
+    return (
+      <div className="p-6 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Quản lý người dùng
+            </h1>
+            <p className="text-gray-600 mt-1">
+              Quản lý thành viên thư viện và tài khoản của họ
+            </p>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <div className="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4">
+            <div className="flex-1 relative">
+              <div className="h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Người dùng
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Liên hệ
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Vai trò
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Hoạt động
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Thao tác
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i} className="animate-pulse">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="h-10 w-10 bg-gray-200 rounded-full"></div>
+                        <div className="ml-4 space-y-2">
+                          <div className="h-4 bg-gray-200 rounded w-32"></div>
+                          <div className="h-4 bg-gray-200 rounded w-24"></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="h-4 bg-gray-200 rounded w-48"></div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="h-6 bg-gray-200 rounded-full w-20"></div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="h-8 bg-gray-200 rounded w-24"></div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                      <div className="flex justify-end space-x-2">
+                        <div className="h-5 w-5 bg-gray-200 rounded"></div>
+                        <div className="h-5 w-5 bg-gray-200 rounded"></div>
+                        <div className="h-5 w-5 bg-gray-200 rounded"></div>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div className="mt-6">
+          <div className="flex justify-center">
+            <div className="h-8 w-64 bg-gray-200 rounded animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-6">
@@ -73,7 +177,6 @@ export default function Users() {
           </p>
         </div>
       </div>
-
       {/* Search and Filters */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
         <div className="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4">
@@ -89,7 +192,6 @@ export default function Users() {
           </div>
         </div>
       </div>
-
       {/* Users Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
@@ -114,102 +216,70 @@ export default function Users() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {isLoading
-                ? Array.from({ length: 5 }).map((_, i) => (
-                    <tr key={i} className="animate-pulse">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="h-10 w-10 bg-gray-200 rounded-full"></div>
-                          <div className="ml-4 space-y-2">
-                            <div className="h-4 bg-gray-200 rounded w-32"></div>
-                            <div className="h-4 bg-gray-200 rounded w-24"></div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="h-4 bg-gray-200 rounded w-48"></div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="h-6 bg-gray-200 rounded-full w-20"></div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="h-8 bg-gray-200 rounded w-24"></div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <div className="flex justify-end space-x-2">
-                          <div className="h-5 w-5 bg-gray-200 rounded"></div>
-                          <div className="h-5 w-5 bg-gray-200 rounded"></div>
-                          <div className="h-5 w-5 bg-gray-200 rounded"></div>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                : filteredUsers?.map((user) => (
-                    <tr key={user.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">
-                            {user.name}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            Thành viên từ{" "}
-                            {new Date(user.created_at).toLocaleDateString()}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {user.email}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`inline-flex  text-sm font-semibold rounded-full 
-                      }`}
-                        >
-                          {user.role === "ADMIN"
-                            ? "Quản trị viên"
-                            : user.role === "LIBRARIAN"
-                            ? "Thủ thư"
-                            : "Người dùng"}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <div>
-                          <div>Mượn sách: {user.lendings.length}</div>
-                          <div>Đặt trước: {user.reservations.length}</div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex justify-end space-x-2">
-                          <button
-                            onClick={() => setViewingUser(user)}
-                            className="text-gray-600 hover:text-gray-900"
-                            title="Xem chi tiết"
-                            disabled={isPendingUpdate || isPendingDelete}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => setIsEditing(user)}
-                            className="text-indigo-600 hover:text-indigo-900"
-                            title="Chỉnh sửa"
-                            disabled={isPendingUpdate || isPendingDelete}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => setIsDeleting(user.id)}
-                            className="text-red-600 hover:text-red-900"
-                            title="Xóa"
-                            disabled={isPendingUpdate || isPendingDelete}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+              {paginatedUsers?.map((user) => (
+                <tr key={user.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">
+                        {user.name}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        Thành viên từ{" "}
+                        {new Date(user.created_at).toLocaleDateString()}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{user.email}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span
+                      className={`inline-flex  text-sm font-semibold rounded-full 
+                    }`}
+                    >
+                      {user.role === "ADMIN"
+                        ? "Quản trị viên"
+                        : user.role === "LIBRARIAN"
+                        ? "Thủ thư"
+                        : "Người dùng"}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <div>
+                      <div>Mượn sách: {user.lendings.length}</div>
+                      <div>Đặt trước: {user.reservations.length}</div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div className="flex justify-end space-x-2">
+                      <button
+                        onClick={() => setViewingUser(user)}
+                        className="text-gray-600 hover:text-gray-900"
+                        title="Xem chi tiết"
+                        disabled={isPendingUpdate || isPendingDelete}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => setIsEditing(user)}
+                        className="text-indigo-600 hover:text-indigo-900"
+                        title="Chỉnh sửa"
+                        disabled={isPendingUpdate || isPendingDelete}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => setIsDeleting(user.id)}
+                        className="text-red-600 hover:text-red-900"
+                        title="Xóa"
+                        disabled={isPendingUpdate || isPendingDelete}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
@@ -222,7 +292,19 @@ export default function Users() {
           </div>
         )}
       </div>
-
+      {/* Pagination */}
+      {!isLoading && filteredUsers && filteredUsers.length > 0 && (
+        <div className="mt-6">
+          <Pagination
+            total={filteredUsers.length}
+            showSizeChanger={false}
+            pageSize={pageSize}
+            current={currentPage}
+            onChange={setCurrentPage}
+            className="flex justify-center"
+          />
+        </div>
+      )}
       {/* Modals */}
       {isEditing && (
         <UserFormModal
@@ -232,7 +314,6 @@ export default function Users() {
           isPending={isPendingUpdate}
         />
       )}
-
       {isDeleting && (
         <ConfirmModal
           onSave={handleDelete}
@@ -244,7 +325,6 @@ export default function Users() {
           </h3>
         </ConfirmModal>
       )}
-
       {viewingUser && (
         <UserDetailsModal
           user={viewingUser}
