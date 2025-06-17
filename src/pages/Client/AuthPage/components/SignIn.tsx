@@ -25,7 +25,7 @@ export default function SignIn() {
       await signIn({ email, password_hash: password });
 
       nav("/");
-      //window.location.reload();
+      window.location.reload();
     } catch (error: any) {
       console.log(
         "Error in sign in: " + error?.response?.data?.message || "Lỗi hệ thống"
