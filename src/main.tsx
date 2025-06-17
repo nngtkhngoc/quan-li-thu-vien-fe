@@ -24,42 +24,45 @@ import Login from "./pages/Admin/Login.tsx";
 import BookDetailed from "./pages/Client/BookDetailed.tsx";
 import Profile from "./pages/Client/Profile.tsx";
 import Catalogs from "./pages/Admin/Catalogs.tsx";
+import { NotificationProvider } from "./contexts/notificationContext.tsx";
 
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<App />}>
-            <Route index element={<Homepage />} />
-            <Route path="/books" element={<BookCatalogue />} />
-            <Route path="/books/:id" element={<BookDetailed />} />
-            <Route path="/borrowed-books" element={<BorrowedBooks />} />
-            <Route path="/notifications" element={<ClientNotifications />} />
-            <Route path="/reservations" element={<ClientReservations />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/auth" element={<Auth />} />
-          </Route>
+      <NotificationProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<App />}>
+              <Route index element={<Homepage />} />
+              <Route path="/books" element={<BookCatalogue />} />
+              <Route path="/books/:id" element={<BookDetailed />} />
+              <Route path="/borrowed-books" element={<BorrowedBooks />} />
+              <Route path="/notifications" element={<ClientNotifications />} />
+              <Route path="/reservations" element={<ClientReservations />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/auth" element={<Auth />} />
+            </Route>
 
-          <Route path="/admin" element={<Layout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="/admin/users" element={<Users />} />
-            <Route path="/admin/books" element={<Books />} />
-            <Route path="/admin/book-items/:id" element={<BookItems />} />
-            <Route path="/admin/borrows" element={<Borrows />} />
-            <Route path="/admin/notifications" element={<Notifications />} />
-            <Route path="/admin/reviews" element={<Reviews />} />
-            <Route path="/admin/reservations" element={<Reservations />} />
-            <Route path="/admin/catalogs" element={<Catalogs />} />
-          </Route>
+            <Route path="/admin" element={<Layout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="/admin/users" element={<Users />} />
+              <Route path="/admin/books" element={<Books />} />
+              <Route path="/admin/book-items/:id" element={<BookItems />} />
+              <Route path="/admin/borrows" element={<Borrows />} />
+              <Route path="/admin/notifications" element={<Notifications />} />
+              <Route path="/admin/reviews" element={<Reviews />} />
+              <Route path="/admin/reservations" element={<Reservations />} />
+              <Route path="/admin/catalogs" element={<Catalogs />} />
+            </Route>
 
-          <Route path="/admin/login">
-            <Route index element={<Login />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+            <Route path="/admin/login">
+              <Route index element={<Login />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </NotificationProvider>
     </QueryClientProvider>
   </StrictMode>
 );

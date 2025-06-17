@@ -11,9 +11,11 @@ import { useEffect, useState } from "react";
 import FilterTabs from "./components/FilterTabs";
 import NotificationsList from "./components/NotificationsList";
 import type { Notification } from "../../../types/Notification";
+import { useNotification } from "../../../contexts/notificationContext";
 
 export default function ClientNotifications() {
   const userId = "1";
+  const { setChangedNotifications } = useNotification();
   const { data: totalNotifications, isLoading: isTotalLoading } = useQuery({
     queryKey: ["getAllNotifications"],
     queryFn: () => getNotificationsByUserId(userId),
@@ -37,6 +39,7 @@ export default function ClientNotifications() {
       queryClient.invalidateQueries({ queryKey: ["getAllNotifications"] });
       queryClient.invalidateQueries({ queryKey: ["getReadNotifications"] });
       queryClient.invalidateQueries({ queryKey: ["getUnreadNotifications"] });
+      setChangedNotifications(true);
     },
   });
 
@@ -53,6 +56,7 @@ export default function ClientNotifications() {
       queryClient.invalidateQueries({ queryKey: ["getAllNotifications"] });
       queryClient.invalidateQueries({ queryKey: ["getUnreadNotifications"] });
       queryClient.invalidateQueries({ queryKey: ["getReadNotifications"] });
+      setChangedNotifications(true);
     },
   });
 
@@ -73,6 +77,7 @@ export default function ClientNotifications() {
       queryClient.invalidateQueries({ queryKey: ["getAllNotifications"] });
       queryClient.invalidateQueries({ queryKey: ["getReadNotifications"] });
       queryClient.invalidateQueries({ queryKey: ["getUnreadNotifications"] });
+      setChangedNotifications(true);
     },
     onError: (err) => {
       console.error("Delete error", err);
@@ -85,6 +90,7 @@ export default function ClientNotifications() {
       queryClient.invalidateQueries({ queryKey: ["getAllNotifications"] });
       queryClient.invalidateQueries({ queryKey: ["getReadNotifications"] });
       queryClient.invalidateQueries({ queryKey: ["getUnreadNotifications"] });
+      setChangedNotifications(true);
     },
     onError: (err) => {
       console.error("Delete many error", err);

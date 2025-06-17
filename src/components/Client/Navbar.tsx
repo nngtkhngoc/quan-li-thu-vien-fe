@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Search, Bell, User, Moon, Sun, Menu, X, BookOpen } from "lucide-react";
 import { mockNotifications } from "../../data/mockData";
+import { useNotification } from "../../contexts/notificationContext";
 
 const Header: React.FC = () => {
   // const { user, isAuthenticated, logout } = useAuth();
@@ -28,6 +29,8 @@ const Header: React.FC = () => {
     { path: "/catalogue", label: "Books" },
     { path: "/challenges", label: "Challenges" },
   ];
+
+  const { newNotifications } = useNotification();
 
   return (
     <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700 flex flex-row justify-between items-between">
@@ -82,9 +85,9 @@ const Header: React.FC = () => {
               className="relative p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
               <Bell className="h-5 w-5" />
-              {unreadNotifications > 0 && (
+              {newNotifications.length > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {unreadNotifications}
+                  {newNotifications.length}
                 </span>
               )}
             </Link>
