@@ -14,6 +14,7 @@ import NotificationList from "./components/NotificationList";
 import type { Notification } from "../../../types/Notification";
 import DeleteConfirmModal from "./components/DeleteModal";
 import CreateNotificationModal from "./components/CreateModal";
+import LoadingSpinner from "../../../components/ui/LoadingSpinner";
 export default function Notifications() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRead, setFilterRead] = useState("All");
@@ -38,7 +39,7 @@ export default function Notifications() {
     queryKey: ["getReadNotifications"],
     queryFn: () => getAllNotifications({ seen: true }),
   });
-  const queryClient = useQueryClient(); // ✅ fix
+  const queryClient = useQueryClient();
 
   const updateMutation = useMutation({
     mutationFn: ({ id, seen }: { id: BigInteger; seen: boolean }) =>
@@ -50,8 +51,9 @@ export default function Notifications() {
     },
   });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedIdToDelete, setSelectedIdToDelete] =
-    useState<BigInteger | null>(null);
+  const [selectedIdToDelete, setSelectedIdToDelete] = useState<string | null>(
+    null
+  );
 
   const deleteMutation = useMutation({
     mutationFn: deleteNotifications,
@@ -102,9 +104,12 @@ export default function Notifications() {
   };
 
   const handleDelete = (id: BigInteger) => {
-    setSelectedIdToDelete(id);
+    setSelectedIdToDelete(id.toString);
     setShowDeleteModal(true); // show modal
   };
+
+  const isLoading = isReadLoading || isTotalLoading || isUnreadLoading;
+  if (isLoading) return <LoadingSpinner size="lg" />;
 
   return (
     <div className="space-y-6">
