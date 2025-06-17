@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Search,
   Plus,
@@ -13,26 +13,35 @@ import { mockBooks } from "../../data/mockData";
 import { useBook } from "../../hooks/useBook";
 import type { BookResponse } from "../../types/Book";
 import { toast } from "react-toastify";
+import { Pagination } from "antd";
+const size = 8;
 export default function Books() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("All");
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingBook, setEditingBook] = useState<BookResponse | null>(null);
+  const [page, setPage] = useState(0);
+  const [currentParams, setCurrentParams] = useSearchParams();
 
+  const params = new URLSearchParams();
+  params.set("page", page.toString());
+  params.set("size", size.toString());
   const {
     getBookQuery,
     updateBookMutation,
     createBookMutation,
     deleteBookMutation,
     getCatalogsQuery,
-  } = useBook("");
+  } = useBook(params.toString());
+  console.log(getBookQuery.isLoading, "GET BOOK QUERY");
   if (getBookQuery.isLoading || getCatalogsQuery?.isLoading) {
     return <div className="text-center py-12">Loading books...</div>;
   }
   if (!getBookQuery.isLoading) {
     console.log(getCatalogsQuery.data, "@@@");
   }
+  console.log(getBookQuery.data, "BOOKS DATA");
   const categories = getCatalogsQuery.data;
   const books = getBookQuery.data.content || mockBooks;
 
@@ -46,9 +55,15 @@ export default function Books() {
     return matchesSearch && matchesCategory;
   });
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: Number) => {
     if (window.confirm("Are you sure you want to delete this book?")) {
-      // setBooks(books.filter((book: any) => book.id !== id));
+      try {
+        await deleteBookMutation.mutateAsync(id);
+        toast.success("Xóa sách thành công!");
+      } catch (error) {
+        console.error("Error deleting book:", error);
+        toast.error("Xóa sách thất bại!");
+      }
     }
   };
 
@@ -57,19 +72,10 @@ export default function Books() {
     onSave,
     onCancel,
   }: {
-    book?: BookResponse;
+    book?: any;
     onSave: (book: Omit<BookResponse, "id">) => void;
     onCancel: () => void;
   }) => {
-    const [formData, setFormData] = useState({
-      title: book?.title || "",
-      author: book?.author || "",
-      category: book?.catalog?.name || "Fiction",
-      // availableCopies: book?.availableCopies || 1,
-      description: book?.description || "",
-      image: book?.image || "",
-    });
-
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
 
@@ -77,9 +83,14 @@ export default function Books() {
       const formData = new FormData(formElement as HTMLFormElement);
       try {
         if (editingBook) {
-          await updateBookMutation.mutateAsync(formData);
+          console.log("CAP NHAT DANH SACH");
+          await updateBookMutation.mutateAsync({
+            id: editingBook.id,
+            formData,
+          });
           toast.success("Cập nhật sách thành công!");
         } else {
+          console.log("THEM DANH SACH");
           await createBookMutation.mutateAsync(formData);
           toast.success("Thêm sách thành công!");
         }
@@ -92,7 +103,7 @@ export default function Books() {
         }
       }
     };
-
+    console.log(book, "!@#!@#");
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -112,6 +123,7 @@ export default function Books() {
                     type="text"
                     required
                     name="title"
+                    defaultValue={book ? book.title : ""}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                   />
                 </div>
@@ -122,6 +134,7 @@ export default function Books() {
                   <input
                     type="text"
                     name="author"
+                    defaultValue={book ? book.author : ""}
                     required
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                   />
@@ -133,7 +146,7 @@ export default function Books() {
                     Thể loại *
                   </label>
                   <select
-                    value={formData.category}
+                    value={book ? book.category?.name : ""}
                     name="catalog_id"
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                   >
@@ -151,6 +164,7 @@ export default function Books() {
                   <input
                     id="upload-file"
                     type="file"
+                    name="image"
                     className="border border-gray-300 px-3 py-2 w-full rounded-lg"
                     onChange={() => {
                       const Url = URL.createObjectURL(
@@ -161,22 +175,26 @@ export default function Books() {
                         ).files![0]
                       );
                       document
-                        .querySelector("#image")!
+                        .querySelector("#imageTag")!
                         .setAttribute("src", Url);
                     }}
                   />
                 </div>
               </div>
-              <img id="image" src="w-[100px] h-[100px]" alt="ảnh bìa truyện" />
+              <img
+                id="imageTag"
+                className="w-[100px] h-[100px] object-cover rounded-lg object-center"
+                src={book ? book.image : ""}
+                alt="ảnh bìa truyện"
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Mô tả
               </label>
               <textarea
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
+                // name="description"
+                defaultValue={book ? book.description : ""}
                 rows={3}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               />
@@ -262,11 +280,11 @@ export default function Books() {
               onChange={(e) => setFilterCategory(e.target.value)}
               className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             >
-              {categories?.map((category) => (
+              {/* {categories?.map((category) => (
                 <option key={category.id} value={category.name}>
                   {category.name}
                 </option>
-              ))}
+              ))} */}
             </select>
           </div>
         </div>
@@ -299,7 +317,7 @@ export default function Books() {
               </div>
               <div className="flex items-center justify-between text-sm mb-4">
                 <span className="text-gray-600">
-                  Số bản sao: {book.availableCopies}/{book.totalCopies}
+                  Thể loại: {book.catalog?.name || "N/A"}
                 </span>
                 <span
                   className={`px-2 py-1 rounded text-xs ${
@@ -317,7 +335,7 @@ export default function Books() {
                   className="flex-1 flex items-center justify-center px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg transition-colors text-sm"
                 >
                   <Eye className="h-4 w-4 mr-1" />
-                  Items
+                  Xem chi tiết
                 </button>
                 <button
                   onClick={() => setEditingBook(book)}
@@ -346,7 +364,18 @@ export default function Books() {
           </p>
         </div>
       )}
-
+      {/* Pagination */}
+      <Pagination
+        className="flex align-items-center justify-center mt-6"
+        pageSize={size}
+        total={getBookQuery.data.totalElements}
+        current={page + 1}
+        onChange={(currentPage: any) => {
+          setPage(currentPage - 1);
+          params.set("page", (currentPage - 1).toString());
+          setCurrentParams(params);
+        }}
+      />
       {/* Modals */}
       {showAddModal && (
         <BookForm onSave={handleSave} onCancel={() => setShowAddModal(false)} />
