@@ -5,9 +5,23 @@ export type CreateReservationRequest = {
 
 export type ReservationResponse = {
   reservation_id: number;
-  user: any;
-  book_item: any;
-  reservation_date: Date;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+  };
+  bookItem: {
+    id: number;
+    book: {
+      id: number;
+      title: string;
+      author: string;
+      description: string;
+      avg_rating: number;
+    };
+  };
+  reservationDate: Date;
+  expiry_date: Date;
   returned: boolean;
 };
 
