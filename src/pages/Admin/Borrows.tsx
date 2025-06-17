@@ -58,7 +58,7 @@ export default function Borrows() {
     },
   });
 
-  const filteredBorrows = borrows?.filter(borrow => {
+  const filteredBorrows = borrows?.filter((borrow) => {
     const matchesSearch =
       borrow.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       borrow.book_item.book.title
@@ -116,7 +116,7 @@ export default function Borrows() {
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Đang cho mượn</p>
               <p className="text-xl font-semibold text-gray-900">
-                {borrows?.filter(b => b.status === "BORROWED").length}
+                {borrows?.filter((b) => b.status === "BORROWED").length}
               </p>
             </div>
           </div>
@@ -129,7 +129,7 @@ export default function Borrows() {
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Quá hạn</p>
               <p className="text-xl font-semibold text-gray-900">
-                {borrows?.filter(b => b.status === "OVERDUE").length}
+                {borrows?.filter((b) => b.status === "OVERDUE").length}
               </p>
             </div>
           </div>
@@ -142,7 +142,7 @@ export default function Borrows() {
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Đã trả</p>
               <p className="text-xl font-semibold text-gray-900">
-                {borrows?.filter(b => b.status === "RETURNED").length}
+                {borrows?.filter((b) => b.status === "RETURNED").length}
               </p>
             </div>
           </div>
@@ -158,7 +158,7 @@ export default function Borrows() {
               type="text"
               placeholder="Search by user name or book title..."
               value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
@@ -166,10 +166,10 @@ export default function Borrows() {
             <Filter className="h-5 w-5 text-gray-400" />
             <select
               value={filterStatus}
-              onChange={e => setFilterStatus(e.target.value)}
+              onChange={(e) => setFilterStatus(e.target.value)}
               className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             >
-              {statuses.map(status => (
+              {statuses.map((status) => (
                 <option key={status} value={status}>
                   {vnStatus.get(status)}
                 </option>
@@ -201,7 +201,7 @@ export default function Borrows() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredBorrows?.map(borrow => (
+              {filteredBorrows?.map((borrow) => (
                 <tr key={borrow.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>

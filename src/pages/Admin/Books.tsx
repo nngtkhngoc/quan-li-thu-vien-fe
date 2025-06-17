@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import {
   Search,
   Plus,
@@ -14,19 +14,26 @@ import { useBook } from "../../hooks/useBook";
 import type { BookResponse } from "../../types/Book";
 import { toast } from "react-toastify";
 import { Pagination } from "antd";
+import BookItems from "./BookItems";
+import { useBookItem } from "../../hooks/useBookItem";
 const size = 8;
 export default function Books() {
-  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("All");
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingBook, setEditingBook] = useState<BookResponse | null>(null);
   const [page, setPage] = useState(0);
-  const [currentParams, setCurrentParams] = useSearchParams();
+  const [, setCurrentParams] = useSearchParams();
+  const [viewingBook, setViewingBook] = useState<any>(null);
+  const [showBookItemsModal, setShowBookItemsModal] = useState(false);
+  const { getBookItemsByBookIdQuery } = useBookItem(
+    viewingBook ? viewingBook.id || 0 : 0
+  );
 
   const params = new URLSearchParams();
   params.set("page", page.toString());
   params.set("size", size.toString());
+
   const {
     getBookQuery,
     updateBookMutation,
@@ -34,24 +41,31 @@ export default function Books() {
     deleteBookMutation,
     getCatalogsQuery,
   } = useBook(params.toString());
-  console.log(getBookQuery.isLoading, "GET BOOK QUERY");
-  if (getBookQuery.isLoading || getCatalogsQuery?.isLoading) {
+  console.log(
+    getBookItemsByBookIdQuery?.isLoading,
+    viewingBook ? viewingBook.id || 0 : 0,
+    "book items loading"
+  );
+  if (
+    getBookQuery.isLoading ||
+    getCatalogsQuery?.isLoading ||
+    getBookItemsByBookIdQuery?.isLoading
+  ) {
     return <div className="text-center py-12">Loading books...</div>;
   }
-  if (!getBookQuery.isLoading) {
-    console.log(getCatalogsQuery.data, "@@@");
-  }
-  console.log(getBookQuery.data, "BOOKS DATA");
-  const categories = getCatalogsQuery.data;
-  const books = getBookQuery.data.content || mockBooks;
 
+  const categories = getCatalogsQuery.data;
+  let books = getBookQuery.data.content || mockBooks;
+  books = books.sort((a: any, b: any) => {
+    return a.id - b.id;
+  });
   const filteredBooks = books.filter((book: any) => {
     const matchesSearch =
       book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      book.isbn.includes(searchTerm);
-    const matchesCategory =
-      filterCategory === "All" || book.category === filterCategory;
+      book.author.toLowerCase().includes(searchTerm.toLowerCase());
+    // const matchesCategory =
+    // filterCategory === "All" || book.category === filterCategory;
+    const matchesCategory = true;
     return matchesSearch && matchesCategory;
   });
 
@@ -69,7 +83,6 @@ export default function Books() {
 
   const BookForm = ({
     book,
-    onSave,
     onCancel,
   }: {
     book?: any;
@@ -79,11 +92,10 @@ export default function Books() {
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
 
-      const formElement = document.querySelector("#form");
+      const formElement = document.querySelector("#form") as HTMLFormElement;
       const formData = new FormData(formElement as HTMLFormElement);
       try {
         if (editingBook) {
-          console.log("CAP NHAT DANH SACH");
           await updateBookMutation.mutateAsync({
             id: editingBook.id,
             formData,
@@ -94,8 +106,10 @@ export default function Books() {
           await createBookMutation.mutateAsync(formData);
           toast.success("Thêm sách thành công!");
         }
+        setShowAddModal(false);
+        setEditingBook(null);
+        formElement.reset();
       } catch (error) {
-        console.log(error);
         if (editingBook) {
           toast.error("Cập nhật sách thất bại!");
         } else {
@@ -105,7 +119,7 @@ export default function Books() {
     };
     console.log(book, "!@#!@#");
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="fixed inset-0 bg-gray-500/50 bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
           <div className="p-6 border-b border-gray-200">
             <h2 className="text-xl font-semibold text-gray-900">
@@ -146,7 +160,7 @@ export default function Books() {
                     Thể loại *
                   </label>
                   <select
-                    value={book ? book.category?.name : ""}
+                    defaultValue={book ? book.category?.name : ""}
                     name="catalog_id"
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                   >
@@ -210,8 +224,15 @@ export default function Books() {
               <button
                 type="submit"
                 className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
+                disabled={
+                  updateBookMutation.isPending || createBookMutation.isPending
+                }
               >
-                {book ? "Cập nhật" : "Thêm"} sách
+                {updateBookMutation.isPending || createBookMutation.isPending
+                  ? "Đang lưu..."
+                  : book
+                  ? "Cập nhật sách"
+                  : "Thêm sách"}
               </button>
             </div>
           </form>
@@ -331,7 +352,10 @@ export default function Books() {
               </div>
               <div className="flex space-x-2">
                 <button
-                  onClick={() => navigate(`/books/${book.id}/items`)}
+                  onClick={() => {
+                    setShowBookItemsModal(true);
+                    setViewingBook(book);
+                  }}
                   className="flex-1 flex items-center justify-center px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg transition-colors text-sm"
                 >
                   <Eye className="h-4 w-4 mr-1" />
@@ -377,6 +401,15 @@ export default function Books() {
         }}
       />
       {/* Modals */}
+      {showBookItemsModal && (
+        <BookItems
+          setModal={() => {
+            setShowBookItemsModal(false);
+          }}
+          query={viewingBook ? viewingBook.id || 0 : 0}
+          bookItems={getBookItemsByBookIdQuery.data}
+        />
+      )}
       {showAddModal && (
         <BookForm onSave={handleSave} onCancel={() => setShowAddModal(false)} />
       )}
