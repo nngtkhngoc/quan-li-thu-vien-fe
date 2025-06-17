@@ -3,7 +3,7 @@ import { Users, BookOpen, Star } from "lucide-react";
 
 export default function StatsSection({
   totalBooks,
-  totalUsers,
+  // totalUsers,
   totalReviews,
 }: {
   totalBooks: number;
@@ -16,7 +16,7 @@ export default function StatsSection({
       label: "cuốn sách",
       value: totalBooks,
     },
-    { icon: Users, label: "độc giả", value: totalUsers },
+    // { icon: Users, label: "độc giả", value: totalUsers },
     {
       icon: Star,
       label: "đánh giá",
@@ -24,7 +24,7 @@ export default function StatsSection({
     },
   ];
   return (
-    <section className="grid grid-cols-3 gap-6 py-10">
+    <section className="grid grid-cols-2 gap-6 py-10">
       {stats.map(({ icon: Icon, label, value }) => (
         <div
           key={label}

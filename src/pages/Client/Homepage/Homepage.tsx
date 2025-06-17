@@ -4,6 +4,7 @@ import { getAllUsers } from "../../../api/user.api";
 import LoadingSpinner from "../../../components/ui/LoadingSpinner";
 import FeaturedBooks from "./components/FeaturedBooks";
 import HeroSection from "./components/HeroSection";
+import RecentReviews from "./components/RecentReviews";
 import StatsSection from "./components/StatsSection";
 
 import { useQuery } from "@tanstack/react-query";
@@ -40,6 +41,9 @@ export default function Homepage() {
         <FeaturedBooks
           featuredBooks={totalBooks.content.slice(0, 3)}
           loading={false}
+        />
+        <RecentReviews
+          recentReviews={totalReviews?.data.items?.slice(0, 4) ?? []}
         />
       </div>
     </div>
