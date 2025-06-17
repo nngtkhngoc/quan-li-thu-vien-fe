@@ -38,7 +38,7 @@ export default function Notifications() {
     queryKey: ["getReadNotifications"],
     queryFn: () => getAllNotifications({ seen: true }),
   });
-  const queryClient = useQueryClient(); // ✅ fix
+  const queryClient = useQueryClient();
 
   const updateMutation = useMutation({
     mutationFn: ({ id, seen }: { id: BigInteger; seen: boolean }) =>

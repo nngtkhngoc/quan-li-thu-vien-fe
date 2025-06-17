@@ -1,15 +1,15 @@
 import { Outlet } from "react-router";
 import Navbar from "./components/Client/Navbar";
-import Footer from "./components/Client/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
   return (
-    <div className="font-primary">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors font-primary">
       <ScrollToTop />
       <Navbar />
-      <Outlet />
-      <Footer />
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Outlet />
+      </main>
     </div>
   );
 }
