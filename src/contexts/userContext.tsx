@@ -12,6 +12,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     const fetchUserProfile = async () => {
       try {
         const response = await getProfile();
+        console.log("user", response);
         if (response) {
           setUserProfile(response);
         } else {

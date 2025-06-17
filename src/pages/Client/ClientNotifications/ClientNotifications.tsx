@@ -13,23 +13,25 @@ import NotificationsList from "./components/NotificationsList";
 import type { Notification } from "../../../types/Notification";
 import { useNotification } from "../../../contexts/notificationContext";
 import LoadingSpinner from "../../../components/ui/LoadingSpinner";
+import { useUser } from "../../../hooks/useUser";
 
 export default function ClientNotifications() {
-  const userId = "1";
+  const { userProfile } = useUser();
+  const userId = userProfile?.id.toString();
   const { setChangedNotifications } = useNotification();
   const { data: totalNotifications, isLoading: isTotalLoading } = useQuery({
     queryKey: ["getAllNotifications"],
-    queryFn: () => getNotificationsByUserId(userId),
+    queryFn: () => getNotificationsByUserId(userId || ""),
   });
 
   const { data: unreadNotifications, isLoading: isUnreadLoading } = useQuery({
     queryKey: ["getUnreadNotifications"],
-    queryFn: () => getNotificationsByUserId(userId, { seen: false }),
+    queryFn: () => getNotificationsByUserId(userId || "", { seen: false }),
   });
 
   const { data: readNotifications, isLoading: isReadLoading } = useQuery({
     queryKey: ["getReadNotifications"],
-    queryFn: () => getNotificationsByUserId(userId, { seen: true }),
+    queryFn: () => getNotificationsByUserId(userId || "", { seen: true }),
   });
   const queryClient = useQueryClient();
 
