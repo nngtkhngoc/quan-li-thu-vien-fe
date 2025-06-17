@@ -4,12 +4,14 @@ interface Props {
   notifications: Notification[];
   handleToggleRead: (id: BigInteger, seen: boolean) => void;
   handleDelete: (id: BigInteger) => void;
+  isUpdating: boolean;
 }
 
 export default function NotificationList({
   notifications,
   handleToggleRead,
   handleDelete,
+  isUpdating,
 }: Props) {
   if (!notifications.length) {
     return (
@@ -54,7 +56,10 @@ export default function NotificationList({
                 title={
                   notification.seen ? "Đánh dấu chưa đọc" : "Đánh dấu đã đọc"
                 }
-                className="text-gray-400 hover:text-gray-600"
+                disabled={isUpdating}
+                className={`text-gray-400 hover:text-gray-600 cursor-pointer ${
+                  isUpdating ? "cursor-not-allowed opacity-50" : ""
+                }`}
               >
                 {notification.seen ? (
                   <EyeOff className="w-4 h-4" />
@@ -62,12 +67,13 @@ export default function NotificationList({
                   <Eye className="w-4 h-4" />
                 )}
               </button>
+
               <button
                 onClick={() => handleDelete(notification.id)}
                 title="Xoá thông báo"
                 className="text-red-400 hover:text-red-600"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-4 h-4 cursor-pointer" />
               </button>
             </div>
           </div>

@@ -15,7 +15,6 @@ export default function FilterBar({
 }: Props) {
   return (
     <div className="flex flex-wrap gap-4 items-center bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-      {/* Search input */}
       <input
         type="text"
         placeholder="🔍 Search message..."
@@ -24,7 +23,6 @@ export default function FilterBar({
         className="px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full md:w-1/2"
       />
 
-      {/* Read status filter */}
       <select
         value={filterRead}
         onChange={(e) => setFilterRead(e.target.value)}
