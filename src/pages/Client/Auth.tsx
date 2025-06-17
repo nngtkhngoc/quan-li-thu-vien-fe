@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, BookOpen, Mail, Lock } from "lucide-react";
-import { signIn, signUp } from "../../../api/user.api";
-import type { SignInData, CreateUserRequest } from "../../../types/User";
-
+import { signIn, signUp } from "../../api/user.api";
+import type { SignInData, CreateUserRequest } from "../../types/User";
+import { useUser } from "../../hooks/useUser";
 interface AuthFormData {
   name: string;
   email: string;
@@ -22,7 +22,7 @@ const Auth: React.FC = () => {
     password: "",
     confirmPassword: "",
   });
-
+  const { setUserChanged } = useUser();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -51,6 +51,7 @@ const Auth: React.FC = () => {
       console.error("Authentication error:", error);
       alert("Authentication failed. Please try again.");
     } finally {
+      setUserChanged(true);
       setLoading(false);
     }
   };

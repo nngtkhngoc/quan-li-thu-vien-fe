@@ -39,6 +39,10 @@ export const getUserById = async (id: number): Promise<UserResponse> => {
   return response.data.data;
 };
 
+export const getProfile = async (): Promise<UserResponse> => {
+  const response = await axiosClient.get("/auth/me");
+  return response.data.data;
+};
 // Update user
 export const updateUser = async (
   id: number,

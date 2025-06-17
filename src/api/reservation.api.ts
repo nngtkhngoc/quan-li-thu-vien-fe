@@ -19,6 +19,11 @@ export const getReservationById = async (
   return response.data.data;
 };
 
+export const getMyReservation = async (): Promise<ReservationResponse[]> => {
+  const response = await axiosClient.get(`/reservations/me`);
+  return response.data.data;
+};
+
 // Create new reservation
 export const createReservation = async (
   data: CreateReservationRequest
