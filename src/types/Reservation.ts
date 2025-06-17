@@ -3,27 +3,33 @@ export type CreateReservationRequest = {
   book_item_id: number;
 };
 
-export type ReservationResponse = {
-  reservation_id: number;
-  user: {
+export interface Book {
+  id: number;
+  title: string;
+  author: string;
+  description: string;
+  avg_rating: number;
+  image?: string;
+  catalog?: {
     id: number;
     name: string;
-    email: string;
   };
-  bookItem: {
+  bookItems?: {
     id: number;
-    book: {
-      id: number;
-      title: string;
-      author: string;
-      description: string;
-      avg_rating: number;
-    };
-  };
-  reservationDate: Date;
-  expiry_date: Date;
+  }[];
+}
+
+export interface BookItem {
+  id: number;
+  book: Book;
+}
+
+export interface ReservationResponse {
+  reservation_id: number;
+  bookItem: BookItem;
+  reservationDate: string;
   returned: boolean;
-};
+}
 
 export type UpdateReservationRequest = {
   returned: boolean;
