@@ -11,7 +11,7 @@ export default function Layout() {
       <div className="w-full min-h-screen bg-gray-50 px-10 py-10">
         <Outlet />
       </div>
-      <ToastContainer />
+      <ToastContainer theme="colored" />
     </div>
   );
 }

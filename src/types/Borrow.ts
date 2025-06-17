@@ -4,6 +4,7 @@ export type CreateBorrowedBookRequest = {
 };
 
 export type UpdateBorrowedBookRequest = {
+  return_date: string | null;
   status: string;
 };
 
@@ -13,5 +14,6 @@ export type BorrowBookResponse = {
   user: any;
   borrow_date: Date;
   return_date: Date;
+  due_date: Date;
   status: string;
 };

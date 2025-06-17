@@ -32,8 +32,13 @@ export const updateBorrowedBook = async (
   id: number,
   data: UpdateBorrowedBookRequest
 ): Promise<BorrowBookResponse> => {
+  if (data.status === "RETURNED") {
+    data.return_date = new Date(Date.now()).toISOString();
+  }
+  if (data.status === "BORROWED") {
+    data.return_date = null;
+  }
   const response = await axiosClient.put(`/borrowed-books/${id}`, data);
-  console.log("Thay đổi thành công");
   return response.data;
 };
 

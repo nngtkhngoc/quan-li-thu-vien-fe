@@ -11,6 +11,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { deleteBorrowedBook, updateBorrowedBook } from "../../api/borrow.api";
 import useBorrow from "../../hooks/useBorrow";
+import { toast } from "react-toastify";
 
 type ChangeStatus = {
   id: number;
@@ -47,6 +48,7 @@ export default function Borrows() {
     onSuccess() {
       invalidateQuery();
       setIsChangingStatus({} as unknown as ChangeStatus);
+      toast.success("Thay đổi thành công");
     },
   });
 
@@ -55,6 +57,7 @@ export default function Borrows() {
     onSuccess() {
       invalidateQuery();
       setIsDeleting(null);
+      toast.success("Xóa thành công");
     },
   });
 
@@ -224,9 +227,9 @@ export default function Borrows() {
                           borrow.status === "OVERDUE" ? "text-red-600" : ""
                         }
                       >
-                        Due: {new Date(borrow.return_date).toLocaleDateString()}
+                        Due: {new Date(borrow.due_date).toLocaleDateString()}
                       </div>
-                      {borrow.return_date && (
+                      {borrow.return_date && borrow.status === "RETURNED" && (
                         <div className="text-emerald-600">
                           Returned:{" "}
                           {new Date(borrow.return_date).toLocaleDateString()}
