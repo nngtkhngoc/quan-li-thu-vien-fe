@@ -1,5 +1,10 @@
 export type ROLE = "ADMIN" | "USER" | "LIBRARIAN";
 
+export type SignInData = {
+  email: string;
+  password_hash: string;
+};
+
 export type UserResponse = {
   id: number;
   name: string;
