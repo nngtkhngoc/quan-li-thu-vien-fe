@@ -1,26 +1,52 @@
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import {
-  ArrowLeft,
-  Star,
-  BookOpen,
-  Calendar,
-  User,
-  Heart,
-  Share2,
-  Clock,
-} from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { ArrowLeft, Star, BookOpen, Heart, Share2, Clock } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getBookById } from "../../api/book.api";
-import { getReviewByBookId, getReviewById } from "../../api/review.api";
-
+import { createReview, getReviewByBookId } from "../../api/review.api";
+import { useUser } from "../../hooks/useUser";
+import { toast } from "react-toastify";
+import { createBorrowedBook } from "../../api/borrow.api";
+import axios, { AxiosError } from "axios";
+import { addToWishlist, getWishlist } from "../../api/wishlist.api";
 const BookDetail = () => {
   const { id } = useParams<{ id: string }>();
-
   const [isReserving, setIsReserving] = useState(false);
   const [newReview, setNewReview] = useState({ rating: 5, comment: "" });
   const [showReviewForm, setShowReviewForm] = useState(false);
-
+  const user = useUser();
+  const queryClient = useQueryClient();
+  const getWishListQuery = useQuery({
+    queryKey: ["wishlist", user.userProfile?.id],
+    queryFn: async () => {
+      return await getWishlist(user.userProfile?.id || 0);
+    },
+    enabled: !!user.userProfile?.id,
+  });
+  const isLiked = getWishListQuery?.data?.find(
+    (item: any) => item?.book.id === parseInt(id || "0")
+  );
+  console.log("isLiked:", getWishListQuery.data);
+  const addToWishlistMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return await addToWishlist({
+        book_id: data.book_id,
+        user_id: data.user_id,
+      });
+    },
+    onSuccess: () => {
+      toast.success("Đã thêm vào danh sách yêu thích!");
+      queryClient.invalidateQueries({
+        queryKey: ["wishlist", user.userProfile?.id],
+      });
+    },
+    onError: (e: AxiosError) => {
+      console.error("Error adding to wishlist:", e);
+      toast.error(
+        "Thêm vào danh sách yêu thích thất bại. Vui lòng thử lại sau."
+      );
+    },
+  });
   const getBookByIdQuery = useQuery({
     queryKey: ["book", id],
     queryFn: async () => {
@@ -33,33 +59,102 @@ const BookDetail = () => {
       return await getReviewByBookId(id ? parseInt(id) : 0);
     },
   });
-  const isAuthenticated = true; // Replace with actual authentication check
+  const createBorrowMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return createBorrowedBook({
+        user_id: user.userProfile?.id || 0,
+        book_item_id: data.book_item_id,
+      });
+    },
+    onSuccess: () => {
+      toast.success("Đặt sách thành công!");
+      queryClient.invalidateQueries({
+        queryKey: ["book", id],
+      });
+    },
+    onError: () => {
+      toast.error("Đặt sách thất bại. Vui lòng thử lại sau.");
+    },
+  });
+  const createReviewMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return await createReview({
+        user_id: user.userProfile?.id || 0,
+        book_id: id ? parseInt(id) : 0,
+        rating: data.rating,
+        comment: data.comment,
+      });
+    },
+    onSuccess: () => {
+      toast.success("Đánh giá đã được gửi thành công!");
+      queryClient.invalidateQueries({
+        queryKey: ["review", id],
+      });
+    },
+    onError: (e) => {
+      console.error("Error creating review:", e);
+      if (axios.isAxiosError(e)) {
+        toast.error(
+          e.response?.data?.message ||
+            "Đánh giá thất bại. Vui lòng thử lại sau."
+        );
+      } else {
+        toast.error("Đánh giá thất bại. Vui lòng thử lại sau.");
+      }
+    },
+  });
+  const isAuthenticated = user.userProfile;
+
   if (getBookByIdQuery.isLoading || getReviewsQuery.isLoading) {
     return <div className="flex justify-center py-12">Loading</div>;
   }
-  console.log(getBookByIdQuery, "getBookItemByIdQuery");
   const book = getBookByIdQuery.data;
   const reviews = getReviewsQuery.data.data.items || [];
-  console.log(reviews, "reviews");
+
+  const availableCopies =
+    book?.bookItems.reduce((count: number, item: any) => {
+      return count + (item.status === "AVAILABLE" ? 1 : 0);
+    }, 0) || 0;
   const handleReserve = async () => {
     if (!isAuthenticated) return;
-
+    console.log("Reserving book:@");
+    if (availableCopies === 0) {
+      toast.error("Không còn bản sách nào có sẵn để đặt.");
+      return;
+    }
+    console.log(availableCopies);
     setIsReserving(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      await createBorrowMutation.mutateAsync({
+        book_item_id: book.bookItems.find(
+          (item: any) => item.status === "AVAILABLE"
+        ).id,
+        user_id: user.userProfile?.id || 0,
+      });
+    } catch (error) {
+      console.error("Error reserving book:", error);
+    }
     setIsReserving(false);
-    alert("Book reserved successfully!");
   };
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAuthenticated) return;
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    const rating = newReview.rating || 5;
+    const comment = formData.get("comment");
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    setShowReviewForm(false);
-    setNewReview({ rating: 5, comment: "" });
-    alert("Review submitted successfully!");
+    try {
+      await createReviewMutation.mutateAsync({
+        rating: rating,
+        comment: comment ? comment.toString() : "",
+        user_id: user.userProfile?.id || 0,
+        book_id: id ? parseInt(id) : 0,
+      });
+    } catch (error) {
+      console.log("Error creating review:", error);
+    }
+    (e.currentTarget as HTMLFormElement).reset();
   };
 
   if (getBookByIdQuery.isLoading) {
@@ -95,7 +190,7 @@ const BookDetail = () => {
         className="inline-flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
       >
         <ArrowLeft className="h-4 w-4 mr-2" />
-        Back to Catalogue
+        Trở về danh mục sách
       </Link>
 
       {/* Book Header */}
@@ -117,7 +212,7 @@ const BookDetail = () => {
                 {book.title}
               </h1>
               <p className="text-xl text-gray-600 dark:text-gray-400 mb-4">
-                by {book.author}
+                Bởi {book.author}
               </p>
 
               <div className="flex items-center space-x-6 mb-6">
@@ -145,22 +240,15 @@ const BookDetail = () => {
                 <div className="flex items-center text-gray-600 dark:text-gray-400">
                   <BookOpen className="h-5 w-5 mr-1" />
                   <span>
-                    {/* {book.availableCopies}/{book.totalCopies} available */}
+                    {availableCopies}/{book.bookItems?.length || 0} bản có sẵn
                   </span>
                 </div>
               </div>
 
               <div className="flex flex-wrap gap-4 mb-6">
                 <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-3 py-1 rounded-full text-sm font-medium">
-                  {book.category}
+                  {book.catalog?.name || "Không có danh mục"}
                 </span>
-                <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
-                  <Calendar className="h-4 w-4 mr-1" />
-                  Published {book.publishedYear}
-                </div>
-                <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
-                  {/* <span>ISBN: {book.isbn}</span> */}
-                </div>
               </div>
             </div>
 
@@ -170,24 +258,39 @@ const BookDetail = () => {
                 <>
                   <button
                     onClick={handleReserve}
-                    disabled={book.availableCopies === 0 || isReserving}
-                    className={`flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
-                      book.availableCopies > 0
+                    disabled={availableCopies === 0 || isReserving}
+                    className={`cursor-pointer flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
+                      availableCopies > 0
                         ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:shadow-lg transform hover:-translate-y-1"
                         : "bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
                     }`}
                   >
                     <Clock className="h-5 w-5 mr-2" />
                     {isReserving
-                      ? "Reserving..."
-                      : book.availableCopies > 0
-                      ? "Reserve Book"
-                      : "Unavailable"}
+                      ? "Đang đặt..."
+                      : availableCopies > 0
+                      ? "Đặt sách"
+                      : "Đã hết sách"}
                   </button>
 
-                  <button className="flex items-center px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                  <button
+                    className={`flex cursor-pointer items-center px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+                      isLiked ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                    onClick={async () => {
+                      if (!isAuthenticated) {
+                        toast.error("Bạn cần đăng nhập để thêm vào yêu thích.");
+                        return;
+                      }
+                      await addToWishlistMutation.mutateAsync({
+                        book_id: book.id,
+                        user_id: user.userProfile?.id || 0,
+                      });
+                    }}
+                    disabled={isLiked}
+                  >
                     <Heart className="h-5 w-5 mr-2" />
-                    Thêm vào yêu thích
+                    {isLiked ? "Đã thêm vào yêu thích" : "Thêm vào yêu thích"}
                   </button>
                 </>
               ) : (
@@ -224,14 +327,20 @@ const BookDetail = () => {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
             {/* Reviews ({bookReviews.length}) */}
           </h2>
-          {isAuthenticated && (
+          {
             <button
-              onClick={() => setShowReviewForm(!showReviewForm)}
+              onClick={() => {
+                if (!isAuthenticated) {
+                  toast.error("Bạn cần đăng nhập để viết đánh giá.");
+                  return;
+                }
+                setShowReviewForm(!showReviewForm);
+              }}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               Viết đánh giá
             </button>
-          )}
+          }
         </div>
 
         {/* Review Form */}
@@ -268,13 +377,10 @@ const BookDetail = () => {
 
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Your Review
+                Bình luận của bạn
               </label>
               <textarea
-                value={newReview.comment}
-                onChange={(e) =>
-                  setNewReview((prev) => ({ ...prev, comment: e.target.value }))
-                }
+                name="comment"
                 rows={4}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                 placeholder="Share your thoughts about this book..."
@@ -308,11 +414,11 @@ const BookDetail = () => {
               className="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-b-0"
             >
               <div className="flex items-start space-x-4">
-                {/* <img
-                  // src={review.user.}
-                  alt={review.u}
+                <img
+                  src={review.user?.image}
+                  alt={review.user?.name}
                   className="w-12 h-12 rounded-full object-cover"
-                /> */}
+                />
                 {/* <h2 className="">{review.user.name}</h2> */}
                 <div className="flex-1">
                   <div className="flex items-center space-x-2 mb-2">
@@ -332,7 +438,7 @@ const BookDetail = () => {
                       ))}
                     </div>
                     <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {new Date(review.date).toLocaleDateString()}
+                      {new Date(review.createdAt).toLocaleDateString()}
                     </span>
                   </div>
                   <p className="text-gray-600 dark:text-gray-300 mb-3">
