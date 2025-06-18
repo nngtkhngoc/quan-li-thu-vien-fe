@@ -18,7 +18,7 @@ const Header: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const queryClient = useQueryClient();
 
-  const unreadNotifications = mockNotifications.filter((n) => !n.isRead).length;
+  const unreadNotifications = mockNotifications.filter(n => !n.isRead).length;
 
   const signOutMutation = useMutation({
     mutationFn: signOut,
@@ -46,7 +46,7 @@ const Header: React.FC = () => {
 
   const navigationItems = [
     { path: "/", label: "Trang chủ" },
-    { path: "/catalogue", label: "Sách" },
+    { path: "/books", label: "Sách" },
   ];
 
   return (
@@ -65,7 +65,7 @@ const Header: React.FC = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            {navigationItems.map((item) => (
+            {navigationItems.map(item => (
               <Link
                 key={item.path}
                 to={item.path}
@@ -91,7 +91,7 @@ const Header: React.FC = () => {
                 type="text"
                 placeholder="Search books, authors..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={e => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
@@ -215,7 +215,7 @@ const Header: React.FC = () => {
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-gray-200 dark:border-gray-700 py-4">
             <div className="space-y-2">
-              {navigationItems.map((item) => (
+              {navigationItems.map(item => (
                 <Link
                   key={item.path}
                   to={item.path}
@@ -238,7 +238,7 @@ const Header: React.FC = () => {
                     type="text"
                     placeholder="Search books, authors..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={e => setSearchQuery(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
