@@ -15,7 +15,7 @@ const Reservations: React.FC = () => {
     queryFn: getMyReservation,
   });
 
-  const { userProfile } = useUser();
+  const { userProfile, setUserChanged } = useUser();
 
   const queryClient = useQueryClient();
   const invalidateQuery = () =>
@@ -37,6 +37,7 @@ const Reservations: React.FC = () => {
     mutationFn: deleteReservation,
     onSuccess() {
       invalidateQuery();
+      setUserChanged(true);
       toast.success("Xóa đặt trước thành công");
       setIsDeleting(null);
     },
@@ -114,12 +115,12 @@ const Reservations: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gray-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-white dark:bg-gray-900">
         <div className="space-y-6">
           {/* Header Skeleton */}
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-700 rounded-lg w-1/3 mb-2"></div>
-            <div className="h-4 bg-gray-700 rounded-lg w-1/2"></div>
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded-lg w-1/3 mb-2"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded-lg w-1/2"></div>
           </div>
 
           {/* Stats Cards Skeleton */}
@@ -127,15 +128,15 @@ const Reservations: React.FC = () => {
             {Array.from({ length: 2 }).map((_, i) => (
               <div
                 key={i}
-                className="bg-gray-800 rounded-xl p-6 border border-gray-700"
+                className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm"
               >
                 <div className="flex items-center">
-                  <div className="p-2 bg-gray-700 rounded-lg">
+                  <div className="p-2 bg-gray-200 dark:bg-gray-700 rounded-lg">
                     <div className="h-6 w-6"></div>
                   </div>
                   <div className="ml-4">
-                    <div className="h-4 bg-gray-700 rounded w-20 mb-2"></div>
-                    <div className="h-8 bg-gray-700 rounded w-12"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 mb-2"></div>
+                    <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-12"></div>
                   </div>
                 </div>
               </div>
@@ -143,12 +144,12 @@ const Reservations: React.FC = () => {
           </div>
 
           {/* Filter Tabs Skeleton */}
-          <div className="bg-gray-800 rounded-xl p-1">
+          <div className="bg-gray-100 dark:bg-gray-800 rounded-xl p-1 shadow-sm">
             <div className="flex space-x-1">
               {Array.from({ length: 3 }).map((_, i) => (
                 <div
                   key={i}
-                  className="flex-1 h-10 bg-gray-700 rounded-lg animate-pulse"
+                  className="flex-1 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"
                 ></div>
               ))}
             </div>
@@ -159,26 +160,26 @@ const Reservations: React.FC = () => {
             {Array.from({ length: 3 }).map((_, i) => (
               <div
                 key={i}
-                className="bg-gray-800 rounded-xl p-6 border border-gray-700"
+                className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm"
               >
                 <div className="flex flex-col lg:flex-row gap-6">
                   {/* Book Cover Skeleton */}
                   <div className="flex-shrink-0">
-                    <div className="w-24 h-32 bg-gray-700 rounded-lg animate-pulse"></div>
+                    <div className="w-24 h-32 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
                   </div>
 
                   {/* Content Skeleton */}
                   <div className="flex-1 space-y-4">
                     <div>
-                      <div className="h-6 bg-gray-700 rounded-lg w-3/4 mb-2"></div>
-                      <div className="h-4 bg-gray-700 rounded-lg w-1/2"></div>
+                      <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-lg w-3/4 mb-2"></div>
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded-lg w-1/2"></div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                       {Array.from({ length: 4 }).map((_, j) => (
                         <div key={j}>
-                          <div className="h-4 bg-gray-700 rounded-lg w-20 mb-2"></div>
-                          <div className="h-5 bg-gray-700 rounded-lg w-24"></div>
+                          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded-lg w-20 mb-2"></div>
+                          <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded-lg w-24"></div>
                         </div>
                       ))}
                     </div>
@@ -186,8 +187,8 @@ const Reservations: React.FC = () => {
 
                   {/* Status and Actions Skeleton */}
                   <div className="flex flex-col items-end space-y-3">
-                    <div className="h-8 bg-gray-700 rounded-full w-24"></div>
-                    <div className="h-10 bg-gray-700 rounded-lg w-28"></div>
+                    <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded-full w-24"></div>
+                    <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-lg w-28"></div>
                   </div>
                 </div>
               </div>
@@ -199,7 +200,7 @@ const Reservations: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gray-900">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-white dark:bg-gray-900">
       <div className="space-y-6">
         {/* Header */}
         <div>
@@ -213,7 +214,7 @@ const Reservations: React.FC = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center">
               <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
                 <Clock className="h-6 w-6 text-amber-600 dark:text-amber-400" />
@@ -228,7 +229,7 @@ const Reservations: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center">
               <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
                 <CheckCircle className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
@@ -246,7 +247,7 @@ const Reservations: React.FC = () => {
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex space-x-1 bg-gray-100 dark:bg-gray-800 rounded-xl p-1">
+        <div className="flex space-x-1 bg-gray-100 dark:bg-gray-800 rounded-xl p-1 shadow-sm">
           {[
             { key: "all", label: "Tất cả" },
             { key: "pending", label: "Đang chờ" },
@@ -258,7 +259,7 @@ const Reservations: React.FC = () => {
               className={`flex-1 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
                 filter === key
                   ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
-                  : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                  : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700/50"
               }`}
             >
               {label}
@@ -367,7 +368,7 @@ const Reservations: React.FC = () => {
                               id: reservation.reservation_id,
                             })
                           }
-                          className="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors w-33"
+                          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors w-33 disabled:opacity-50 disabled:cursor-not-allowed"
                           disabled={isBorrowingBook}
                         >
                           {isBorrowingBook ? "Đang mượn..." : "Mượn ngay"}
@@ -377,7 +378,7 @@ const Reservations: React.FC = () => {
                           onClick={() =>
                             setIsDeleting(reservation.reservation_id)
                           }
-                          className="px-4 py-2 mt-10 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors w-30"
+                          className="px-4 py-2 mt-10 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors w-30 disabled:opacity-50 disabled:cursor-not-allowed"
                           disabled={isDeletingReservation}
                         >
                           {isDeletingReservation ? "Đang hủy..." : "Hủy"}
@@ -389,7 +390,7 @@ const Reservations: React.FC = () => {
               </div>
             ))
           ) : (
-            <div className="text-center py-12">
+            <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
               <Calendar className="h-16 w-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                 Không tìm thấy đặt trước
