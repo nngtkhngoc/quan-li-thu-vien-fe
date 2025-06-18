@@ -102,7 +102,15 @@ const Auth: React.FC = () => {
     } catch (error: unknown) {
       console.error("Authentication error:", error);
       if (axios.isAxiosError(error) && error.response?.data?.message) {
-        toast.error(error.response.data.message);
+        const errorMessage = error.response.data.message;
+        if (errorMessage.toLowerCase().includes("email already ")) {
+          setErrors((prev) => ({
+            ...prev,
+            email: "Email đã được sử dụng",
+          }));
+        } else {
+          toast.error(errorMessage);
+        }
       } else {
         toast.error("Đăng nhập thất bại. Vui lòng thử lại.");
       }
