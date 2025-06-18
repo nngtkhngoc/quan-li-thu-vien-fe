@@ -26,3 +26,8 @@ export const getDashboard = async () => {
   const response = await axiosClient.get(`/books/dashboard`);
   return response.data;
 };
+
+export const getSimilarBooks = async (formData: FormData) => {
+  const response = await axiosClientFormData.post(`/books/similar`, formData);
+  return response.data;
+};
