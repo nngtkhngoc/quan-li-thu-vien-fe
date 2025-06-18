@@ -166,6 +166,14 @@ const Header: React.FC = () => {
                       >
                         Sách đang đặt trước
                       </Link>
+                      {userProfile.role === "ADMIN" && (
+                        <Link
+                          to="/admin"
+                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                          Quản trị viên
+                        </Link>
+                      )}
                       <hr className="my-1 border-gray-200 dark:border-gray-700" />
                       <button
                         onClick={() => signOutMutation.mutate()}
