@@ -19,12 +19,10 @@ import {
   TrendingUp,
   Calendar,
   Star,
-  Trophy,
 } from "lucide-react";
 
 import useBorrow from "../../../hooks/useBorrow";
 import useDashboard from "../../../hooks/useDashboard";
-import { dashboardStats } from "../../../data/mockData";
 import { useQuery } from "@tanstack/react-query";
 import { getAllUsers } from "../../../api/user.api";
 
@@ -69,7 +67,6 @@ const StatCard = ({
 );
 
 export default function Dashboard() {
-  const { borrows } = useBorrow();
   const { dashboard } = useDashboard();
   const { data: users } = useQuery({
     queryFn: getAllUsers,

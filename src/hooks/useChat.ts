@@ -1,6 +1,8 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef } from "react";
 import SockJS from "sockjs-client";
 import { CompatClient, Stomp } from "@stomp/stompjs";
+import { useQueryClient } from "@tanstack/react-query";
+import type { MessageResponse } from "../api/message.api";
 
 export interface ChatMessage {
   id?: number;
@@ -9,33 +11,37 @@ export interface ChatMessage {
   timestamp: string;
 }
 
-export function useChat(username: string, endMessageEl: any) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+export function useChat(username: string) {
   const client = useRef<CompatClient | null>(null);
+  const queryClient = useQueryClient();
 
-  // Kết nối socket
+  // Kết nối socket - chỉ phụ thuộc vào username
   useEffect(() => {
+    if (!username) return;
+
     const socket = new SockJS("http://localhost:5002/ws-chat");
     const stompClient = Stomp.over(socket);
     client.current = stompClient;
 
     stompClient.connect({}, () => {
       stompClient.subscribe("/topic/public", msg => {
-        const received: ChatMessage = JSON.parse(msg.body);
-        setMessages(prev => [...prev, received]);
-        endMessageEl?.scrollIntoView({ behavior: "smooth" });
-      });
+        const received: MessageResponse = JSON.parse(msg.body);
 
-      // Load tin nhắn cũ từ REST API
-      fetch("http://localhost:5002/api/chat/messages")
-        .then(res => res.json())
-        .then((data: ChatMessage[]) => setMessages(data));
+        // Update React Query cache with new message
+        queryClient.setQueryData<MessageResponse[]>(["messages"], oldData => {
+          if (!oldData) return [received];
+          // Check if message already exists to avoid duplicates
+          const exists = oldData.some(message => message.id === received.id);
+          if (exists) return oldData;
+          return [...oldData, received];
+        });
+      });
     });
 
     return () => {
       stompClient.disconnect();
     };
-  }, []);
+  }, [username, queryClient]);
 
   // Gửi tin nhắn
   const sendMessage = (content: string) => {
@@ -48,5 +54,5 @@ export function useChat(username: string, endMessageEl: any) {
     }
   };
 
-  return { messages, sendMessage };
+  return { sendMessage };
 }

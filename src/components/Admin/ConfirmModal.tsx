@@ -11,8 +11,8 @@ export function ConfirmModal({
 }) {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl max-w-md w-full">
-        <div className="p-6 border-b border-gray-200">
+      <div className="dark:bg-gray-800 rounded-xl max-w-md w-full">
+        <div className="p-6 border-b ">
           {children}
           <div className="flex justify-end space-x-3 pt-4">
             <button
