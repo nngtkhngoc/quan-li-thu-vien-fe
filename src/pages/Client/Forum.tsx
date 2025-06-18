@@ -14,7 +14,7 @@ import {
   MoreVertical,
 } from "lucide-react";
 import { useUser } from "../../hooks/useUser";
-import { ConfirmModal } from "../../components/Admin/ConfirmModal";
+import ConfirmModal from "../../components/Client/ClientDeleteModal";
 
 export default function Forum() {
   const { userProfile } = useUser();
@@ -29,6 +29,7 @@ export default function Forum() {
     updateMessage,
     deleteMessage,
     isUpdatingMessage,
+    isDeletingMessage,
     updatingMessageId,
     deletingMessageId,
   } = useMessage();
@@ -104,9 +105,13 @@ export default function Forum() {
 
   const confirmDeleteMessage = () => {
     if (deleteConfirmModal.messageId) {
-      deleteMessage(deleteConfirmModal.messageId);
+      deleteMessage(deleteConfirmModal.messageId, {
+        onSuccess() {
+          console.log("Tat modal");
+          setDeleteConfirmModal({ show: false, messageId: null });
+        },
+      });
     }
-    setDeleteConfirmModal({ show: false, messageId: null });
   };
 
   const cancelDeleteMessage = () => {
@@ -129,20 +134,6 @@ export default function Forum() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [displayedMessages.length]);
-
-  // // Close dropdown when clicking outside
-  // useEffect(() => {
-  //   const handleClickOutside = () => {
-  //     setShowMenuForMessage(null);
-  //   };
-
-  //   if (showMenuForMessage !== null) {
-  //     document.addEventListener("click", handleClickOutside);
-  //     return () => {
-  //       document.removeEventListener("click", handleClickOutside);
-  //     };
-  //   }
-  // }, [showMenuForMessage]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gray-900">
@@ -465,27 +456,14 @@ export default function Forum() {
         </div>
       </div>
 
-      {/* Confirm Delete Modal */}
-      {deleteConfirmModal.show && (
+      {
         <ConfirmModal
-          onSave={confirmDeleteMessage}
-          onCancel={cancelDeleteMessage}
-          isPending={deletingMessageId === deleteConfirmModal.messageId}
-        >
-          <div className="text-center">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30 mb-4">
-              <Trash2 className="h-6 w-6 text-red-600 dark:text-red-400" />
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              Xóa tin nhắn
-            </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Bạn có chắc chắn muốn xóa tin nhắn này? Hành động này không thể
-              hoàn tác.
-            </p>
-          </div>
-        </ConfirmModal>
-      )}
+          onConfirm={confirmDeleteMessage}
+          onClose={cancelDeleteMessage}
+          isPending={isDeletingMessage}
+          isOpen={deleteConfirmModal.show}
+        ></ConfirmModal>
+      }
     </div>
   );
 }
