@@ -13,6 +13,11 @@ export const getBookItems = async ({
   );
   return response.data.data;
 };
+export const getBookItemById = async (id: Number) => {
+  const response = await axiosClient.get(`/book-items/${id}`);
+  return response.data;
+};
+
 export const getBookItemByBookId = async (id: Number) => {
   const response = await axiosClient.get(`/book-items/book/${id}`);
   return response.data;

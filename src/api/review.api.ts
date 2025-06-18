@@ -31,3 +31,7 @@ export const deleteReviews = async (
   const res = await axiosClient.delete(`/reviews`, { data });
   return res?.data;
 };
+export const getReviewByBookId = async (book_id: number) => {
+  const res = await axiosClient.get(`/reviews/book/${book_id}`);
+  return res?.data;
+};
