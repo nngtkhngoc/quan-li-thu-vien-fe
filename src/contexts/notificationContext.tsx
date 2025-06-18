@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import type { Notification } from "../types/Notification";
 import { useQuery } from "@tanstack/react-query";
 import { getNotificationsByUserId } from "../api/notification.api";
+import { useUser } from "../hooks/useUser";
 
 type NotificationContextType = {
   newNotifications: Notification[];
@@ -21,11 +22,14 @@ export const NotificationProvider = ({
   children: React.ReactNode;
 }) => {
   const [changedNotifications, setChangedNotifications] = useState(false);
-  const userId = "1";
+  const { userProfile } = useUser();
 
   const { data, isLoading } = useQuery({
     queryKey: ["getUnreadNotifications", changedNotifications],
-    queryFn: () => getNotificationsByUserId(userId, { seen: false }),
+    queryFn: () =>
+      getNotificationsByUserId(userProfile?.id ? String(userProfile.id) : "", {
+        seen: false,
+      }),
   });
 
   const [newNotifications, setNewNotifications] = useState<Notification[]>([]);

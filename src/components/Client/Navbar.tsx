@@ -1,18 +1,38 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Search, Bell, User, Moon, Sun, Menu, X, BookOpen } from "lucide-react";
+import { Search, Bell, User, Moon, Menu, X, BookOpen } from "lucide-react";
 import { mockNotifications } from "../../data/mockData";
-import { useNotification } from "../../contexts/notificationContext";
+import { useUser } from "../../hooks/useUser";
+import { signOut } from "../../api/user.api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 
 const Header: React.FC = () => {
-  // const { user, isAuthenticated, logout } = useAuth();
+  const { userProfile } = useUser();
+  const { setUserChanged } = useUser();
+
   // const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const queryClient = useQueryClient();
 
-  const unreadNotifications = mockNotifications.filter((n) => !n.isRead).length;
+  const unreadNotifications = mockNotifications.filter(n => !n.isRead).length;
+
+  const signOutMutation = useMutation({
+    mutationFn: signOut,
+    onSuccess: () => {
+      setUserChanged(true);
+      queryClient.clear();
+      navigate("/");
+      toast.success("Đăng xuất thành công");
+      setUserChanged(true);
+    },
+    onError: () => {
+      toast.error("Đăng xuất thất bại");
+    },
+  });
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,16 +45,13 @@ const Header: React.FC = () => {
   const isActivePage = (path: string) => location.pathname === path;
 
   const navigationItems = [
-    { path: "/", label: "Home" },
-    { path: "/catalogue", label: "Books" },
-    { path: "/challenges", label: "Challenges" },
+    { path: "/", label: "Trang chủ" },
+    { path: "/books", label: "Sách" },
   ];
 
-  const { newNotifications } = useNotification();
-
   return (
-    <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700 flex flex-row justify-between items-between">
-      <div className="flex flex-row justify-between items-between">
+    <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 group">
@@ -48,7 +65,7 @@ const Header: React.FC = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            {navigationItems.map((item) => (
+            {navigationItems.map(item => (
               <Link
                 key={item.path}
                 to={item.path}
@@ -63,6 +80,23 @@ const Header: React.FC = () => {
             ))}
           </nav>
 
+          {/* Search Bar */}
+          <form
+            onSubmit={handleSearch}
+            className="hidden sm:block flex-1 max-w-md mx-8"
+          >
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <input
+                type="text"
+                placeholder="Search books, authors..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </form>
+
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
             {/* Theme Toggle */}
@@ -70,81 +104,98 @@ const Header: React.FC = () => {
               // onClick={toggleTheme}
               className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
-              {/* {isDark ? (
-                <Sun className="h-5 w-5" />
-              ) : ( */}
+              {/* {isDark ? ( */}
+              {/* <Sun className="h-5 w-5" /> */}
+              {/* ) : ( */}
               <Moon className="h-5 w-5" />
               {/* )} */}
             </button>
 
-            {/* {isAuthenticated ? (
+            {userProfile ? (
               <>
                 {/* Notifications */}
-            <Link
-              to="/notifications"
-              className="relative p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            >
-              <Bell className="h-5 w-5" />
-              {newNotifications.length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {newNotifications.length}
-                </span>
-              )}
-            </Link>
+                <Link
+                  to="/notifications"
+                  className="relative p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                >
+                  <Bell className="h-5 w-5" />
+                  {unreadNotifications > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {unreadNotifications}
+                    </span>
+                  )}
+                </Link>
 
-            {/* User Menu */}
-            <div className="relative group">
-              <button className="flex items-center space-x-3 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                <User className="h-8 w-8 rounded-full object-cover" />
-                <div className="hidden lg:block text-left">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {/* {user?.name} */}
-                    abc
-                  </p>
-                </div>
-              </button>
-
-              {/* Dropdown Menu */}
-              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                <div className="py-1">
-                  <Link
-                    to="/profile"
-                    className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    My Profile
-                  </Link>
-                  <Link
-                    to="/borrowed-books"
-                    className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    My Books
-                  </Link>
-                  <Link
-                    to="/reservations"
-                    className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    Reservations
-                  </Link>
-                  <hr className="my-1 border-gray-200 dark:border-gray-700" />
-                  <button
-                    // onClick={logout}
-                    className="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    Sign Out
+                {/* User Menu */}
+                <div className="relative group">
+                  <button className="flex items-center space-x-3 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="0.75"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      className="lucide lucide-circle-user-icon lucide-circle-user"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <circle cx="12" cy="10" r="3" />
+                      <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662" />
+                    </svg>
+                    <div className="hidden lg:block text-left">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {userProfile?.name}
+                      </p>
+                    </div>
                   </button>
+
+                  {/* Dropdown Menu */}
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                    <div className="py-1">
+                      <Link
+                        to="/profile"
+                        className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      >
+                        My Profile
+                      </Link>
+                      <Link
+                        to="/borrowed-books"
+                        className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      >
+                        My Books
+                      </Link>
+                      <Link
+                        to="/reservations"
+                        className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      >
+                        Reservations
+                      </Link>
+                      <hr className="my-1 border-gray-200 dark:border-gray-700" />
+                      <button
+                        onClick={() => signOutMutation.mutate()}
+                        disabled={signOutMutation.isPending}
+                        className="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {signOutMutation.isPending
+                          ? "Đang đăng xuất..."
+                          : "Sign Out"}
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            {/* </> */}
-            {/* ) : (  */}
-            <Link
-              to="/login"
-              className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-300"
-            >
-              <User className="h-4 w-4" />
-              <span>Sign In</span>
-            </Link>
-            {/* )} */}
+              </>
+            ) : (
+              <Link
+                to="/auth"
+                className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-300"
+              >
+                <User className="h-4 w-4" />
+                <span>Sign In</span>
+              </Link>
+            )}
 
             {/* Mobile Menu Button */}
             <button
@@ -164,7 +215,7 @@ const Header: React.FC = () => {
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-gray-200 dark:border-gray-700 py-4">
             <div className="space-y-2">
-              {navigationItems.map((item) => (
+              {navigationItems.map(item => (
                 <Link
                   key={item.path}
                   to={item.path}
@@ -187,7 +238,7 @@ const Header: React.FC = () => {
                     type="text"
                     placeholder="Search books, authors..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={e => setSearchQuery(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
