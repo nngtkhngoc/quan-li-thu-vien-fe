@@ -1,17 +1,20 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Eye, EyeOff, Trash2, Bell } from "lucide-react";
 import type { Notification } from "../../../../types/Notification";
 interface Props {
   notifications: Notification[];
   handleToggleRead: (id: BigInteger, seen: boolean) => void;
-  handleDelete: (id: BigInteger) => void;
+  setShowDeleteModal: any;
   isUpdating: boolean;
+  setSelectedIdToDelete: any;
 }
 
 export default function NotificationList({
   notifications,
   handleToggleRead,
-  handleDelete,
+  setShowDeleteModal,
   isUpdating,
+  setSelectedIdToDelete,
 }: Props) {
   if (!notifications.length) {
     return (
@@ -69,7 +72,10 @@ export default function NotificationList({
               </button>
 
               <button
-                onClick={() => handleDelete(notification.id)}
+                onClick={() => {
+                  setShowDeleteModal(true);
+                  setSelectedIdToDelete(notification.id);
+                }}
                 title="Xoá thông báo"
                 className="text-red-400 hover:text-red-600"
               >

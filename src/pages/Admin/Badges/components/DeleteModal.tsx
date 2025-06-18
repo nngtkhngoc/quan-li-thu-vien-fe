@@ -20,10 +20,10 @@ export default function DeleteConfirmModal({
       <div className="bg-white rounded-xl shadow-lg p-6 w-[90%] max-w-md space-y-4">
         <div className="flex items-center gap-2 text-red-600">
           <Trash2 className="w-6 h-6" />
-          <h3 className="text-lg font-bold">Xác nhận xoá thông báo</h3>
+          <h3 className="text-lg font-bold">Xác nhận xoá huy hiệu</h3>
         </div>
         <p className="text-gray-700">
-          Bạn có chắc chắn muốn xoá thông báo này? Hành động này không thể hoàn
+          Bạn có chắc chắn muốn xoá huy hiệu này? Hành động này không thể hoàn
           tác.
         </p>
         <div className="flex justify-end gap-2">
