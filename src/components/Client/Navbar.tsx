@@ -18,7 +18,7 @@ const Header: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const queryClient = useQueryClient();
 
-  const unreadNotifications = mockNotifications.filter(n => !n.isRead).length;
+  const unreadNotifications = mockNotifications.filter((n) => !n.isRead).length;
 
   const signOutMutation = useMutation({
     mutationFn: signOut,
@@ -65,7 +65,7 @@ const Header: React.FC = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            {navigationItems.map(item => (
+            {navigationItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
@@ -91,7 +91,7 @@ const Header: React.FC = () => {
                 type="text"
                 placeholder="Search books, authors..."
                 value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
@@ -129,22 +129,30 @@ const Header: React.FC = () => {
                 {/* User Menu */}
                 <div className="relative group">
                   <button className="flex items-center space-x-3 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="0.75"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      className="lucide lucide-circle-user-icon lucide-circle-user"
-                    >
-                      <circle cx="12" cy="12" r="10" />
-                      <circle cx="12" cy="10" r="3" />
-                      <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662" />
-                    </svg>
+                    {userProfile?.image ? (
+                      <img
+                        src={userProfile.image}
+                        alt={userProfile.name}
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="0.75"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        className="lucide lucide-circle-user-icon lucide-circle-user"
+                      >
+                        <circle cx="12" cy="12" r="10" />
+                        <circle cx="12" cy="10" r="3" />
+                        <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662" />
+                      </svg>
+                    )}
                     <div className="hidden lg:block text-left">
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
                         {userProfile?.name}
@@ -215,7 +223,7 @@ const Header: React.FC = () => {
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-gray-200 dark:border-gray-700 py-4">
             <div className="space-y-2">
-              {navigationItems.map(item => (
+              {navigationItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
@@ -238,7 +246,7 @@ const Header: React.FC = () => {
                     type="text"
                     placeholder="Search books, authors..."
                     value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
