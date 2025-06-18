@@ -10,8 +10,6 @@ import {
   Trash2,
 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ConfirmModal } from "../../components/Admin/ConfirmModal";
-import DeleteConfirmModal from "../../pages/Admin/Notifications/components/DeleteModal";
 
 import {
   getAllReservations,
@@ -27,6 +25,8 @@ import { getAllUsers } from "../../api/user.api";
 import { getBooks } from "../../api/book.api";
 import { toast } from "react-toastify";
 import type { BookResponse } from "../../types/Book";
+import { AdminConfirmModal } from "../../components/Admin/AdminConfirmModal";
+import AdminDeleteModal from "../../components/Admin/AdminDeleteModal";
 
 export default function Reservations() {
   const { data: reservations, isLoading } = useQuery({
@@ -55,6 +55,10 @@ export default function Reservations() {
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
   const [isCreating, setIsCreating] = useState(false);
   const [isDeleting, setIsDeleting] = useState<number | null>(null);
+  const [isConfirmingStatus, setIsConfirmingStatus] = useState<{
+    id: number;
+    returned: boolean;
+  } | null>(null);
 
   const {
     mutate: updateReservationMutation,
@@ -70,6 +74,7 @@ export default function Reservations() {
     onSuccess() {
       invalidateQuery();
       toast.success("Cập nhật đặt trước thành công");
+      setIsConfirmingStatus(null);
     },
     onError() {
       toast.error("Cập nhật đặt trước thất bại");
@@ -145,7 +150,22 @@ export default function Reservations() {
     });
 
   const handleStatusChange = (id: number, returned: boolean) => {
-    updateReservationMutation({ id, data: { returned } });
+    setIsConfirmingStatus({ id, returned });
+  };
+
+  const confirmStatusChange = () => {
+    if (isConfirmingStatus) {
+      updateReservationMutation({
+        id: isConfirmingStatus.id,
+        data: { returned: isConfirmingStatus.returned },
+      });
+    }
+  };
+
+  const handleDelete = () => {
+    if (isDeleting) {
+      deleteReservationMutation(isDeleting);
+    }
   };
 
   return (
@@ -354,7 +374,7 @@ export default function Reservations() {
                                   true
                                 )
                               }
-                              className="text-blue-600 hover:text-blue-900 p-1 rounded-full hover:bg-blue-100 transition-colors"
+                              className="text-blue-600 hover:text-blue-900 p-1 rounded-full hover:bg-blue-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                               title="Hoàn thành"
                               disabled={isUpdatingReservation}
                             >
@@ -368,7 +388,7 @@ export default function Reservations() {
                                   false
                                 )
                               }
-                              className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-100 transition-colors"
+                              className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                               title="Chuyển đang chờ"
                               disabled={isUpdatingReservation}
                             >
@@ -379,11 +399,9 @@ export default function Reservations() {
                             onClick={() =>
                               setIsDeleting(reservation.reservation_id)
                             }
-                            className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-100 transition-colors"
+                            className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             title="Xóa"
-                            disabled={
-                              isUpdatingReservation || isDeletingReservation
-                            }
+                            disabled={isDeletingReservation}
                           >
                             <Trash2 className="h-5 w-5" />
                           </button>
@@ -410,7 +428,7 @@ export default function Reservations() {
 
       {/* Add Create Modal */}
       {isCreating && (
-        <ConfirmModal
+        <AdminConfirmModal
           isOpen={isCreating}
           onCancel={() => setIsCreating(false)}
           onSave={() => {
@@ -473,15 +491,38 @@ export default function Reservations() {
               </div>
             </form>
           </div>
-        </ConfirmModal>
+        </AdminConfirmModal>
       )}
 
-      {/* Add Delete Confirmation Modal */}
+      {/* Status Change Confirmation Modal */}
+      {isConfirmingStatus && (
+        <AdminConfirmModal
+          isOpen={!!isConfirmingStatus}
+          onCancel={() => setIsConfirmingStatus(null)}
+          onSave={confirmStatusChange}
+          isPending={isUpdatingReservation}
+        >
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold text-gray-900">
+              {isConfirmingStatus.returned
+                ? "Xác nhận hoàn thành"
+                : "Xác nhận chuyển đang chờ"}
+            </h2>
+            <p className="text-gray-600">
+              {isConfirmingStatus.returned
+                ? "Bạn có chắc chắn muốn đánh dấu đặt trước này là đã hoàn thành?"
+                : "Bạn có chắc chắn muốn chuyển đặt trước này về trạng thái đang chờ?"}
+            </p>
+          </div>
+        </AdminConfirmModal>
+      )}
+
+      {/* Delete Confirmation Modal */}
       {isDeleting && (
-        <DeleteConfirmModal
+        <AdminDeleteModal
           isOpen={!!isDeleting}
           onClose={() => setIsDeleting(null)}
-          onConfirm={() => deleteReservationMutation(isDeleting)}
+          onConfirm={handleDelete}
           isPending={isDeletingReservation}
         />
       )}

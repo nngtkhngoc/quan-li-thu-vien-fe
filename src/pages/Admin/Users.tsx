@@ -3,10 +3,11 @@ import { Search, Edit, Trash2, Eye, Users as UsersIcon } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pagination } from "antd";
 import { deleteUser, getAllUsers, updateUser } from "../../api/user.api";
-import type { UserResponse, UpdateUserRequest } from "../../types/User";
+import type { UserResponse } from "../../types/User";
 import { toast } from "react-toastify";
-import { ConfirmModal } from "../../components/Admin/ConfirmModal";
-import DeleteConfirmModal from "../../pages/Admin/Notifications/components/DeleteModal";
+import { AdminConfirmModal } from "../../components/Admin/AdminConfirmModal";
+import AdminDeleteModal from "../../components/Admin/AdminDeleteModal";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Users() {
   const queryClient = useQueryClient();
@@ -30,14 +31,13 @@ export default function Users() {
 
   const { mutate: updateUserMutation, isPending: isPendingUpdate } =
     useMutation({
-      mutationFn: ({ id, data }: { id: number; data: UpdateUserRequest }) =>
-        updateUser(id, data),
+      mutationFn: ({ id, formData }: { id: number; formData: FormData }) =>
+        updateUser(id, formData),
       onSuccess() {
         invalidateQuery();
         toast.success("Cập nhật người dùng thành công");
         setIsEditing(null);
       },
-
       onError() {
         toast.error("Cập nhật người dùng thất bại");
       },
@@ -72,13 +72,23 @@ export default function Users() {
 
   const handleUpdate = (data: UpdateUserRequest) => {
     if (!isEditing) return;
-    updateUserMutation({ id: isEditing.id, data });
+    const formData = new FormData();
+    if (data.name) formData.append("name", data.name);
+    if (data.email) formData.append("email", data.email);
+    if (data.role) formData.append("role", data.role);
+    updateUserMutation({ id: isEditing.id, formData });
   };
 
   const handleDelete = () => {
     if (!isDeleting) return;
     deleteUserMutation(isDeleting);
   };
+
+  const [formData, setFormData] = useState<UpdateUserRequest>({
+    name: "",
+    email: "",
+    role: "USER",
+  });
 
   if (isLoading) {
     return (
@@ -308,15 +318,51 @@ export default function Users() {
       )}
       {/* Modals */}
       {isEditing && (
-        <UserFormModal
-          user={isEditing}
-          onSave={handleUpdate}
+        <AdminConfirmModal
+          isOpen={!!isEditing}
           onCancel={() => setIsEditing(null)}
+          onSave={() => handleUpdate(formData)}
           isPending={isPendingUpdate}
-        />
+        >
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold text-gray-900">
+              Chỉnh sửa người dùng
+            </h2>
+            <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Họ và tên *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email *
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+            </form>
+          </div>
+        </AdminConfirmModal>
       )}
       {isDeleting && (
-        <DeleteConfirmModal
+        <AdminDeleteModal
           isOpen={!!isDeleting}
           onClose={() => setIsDeleting(null)}
           onConfirm={handleDelete}
@@ -333,89 +379,6 @@ export default function Users() {
   );
 }
 
-function UserFormModal({
-  user,
-  onSave,
-  onCancel,
-  isPending,
-}: {
-  user: UserResponse;
-  onSave: (data: UpdateUserRequest) => void;
-  onCancel: () => void;
-  isPending: boolean;
-}) {
-  const [formData, setFormData] = useState<UpdateUserRequest>({
-    name: user.name || "",
-    email: user.email || "",
-    role: user.role || "USER",
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSave(formData);
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl max-w-md w-full">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">
-            {user.id ? "Chỉnh sửa người dùng" : "Thêm người dùng mới"}
-          </h2>
-        </div>
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Họ và tên *
-            </label>
-            <input
-              type="text"
-              required
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email *
-            </label>
-            <input
-              type="email"
-              required
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            />
-          </div>
-          <div></div>
-
-          <div className="flex justify-end space-x-3 pt-4">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-            >
-              Hủy
-            </button>
-            <button
-              type="submit"
-              disabled={isPending}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:bg-gray-700"
-            >
-              {isPending ? "Đang lưu..." : user.id ? "Cập nhật" : "Thêm mới"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
-
 function UserDetailsModal({
   user,
   onClose,
@@ -424,94 +387,284 @@ function UserDetailsModal({
   onClose: () => void;
 }) {
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">
-            Chi tiết người dùng
-          </h2>
-        </div>
-        <div className="p-6 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-500">
-                Họ và tên
-              </label>
-              <p className="text-lg font-semibold text-gray-900">{user.name}</p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-500">
-                Email
-              </label>
-              <p className="text-gray-900">{user.email}</p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-500">
-                Vai trò
-              </label>
-              <span
-                className={`inline-flex text-sm font-semibold rounded-full`}
-              >
-                {user.role === "ADMIN"
-                  ? "Quản trị viên"
-                  : user.role === "LIBRARIAN"
-                  ? "Thủ thư"
-                  : "Người dùng"}
-              </span>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-500">
-                Ngày tham gia
-              </label>
-              <p className="text-gray-900">
-                {new Date(user.created_at).toLocaleDateString()}
-              </p>
-            </div>
-          </div>
-
-          <div className="border-t pt-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Hoạt động
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-indigo-50 rounded-lg p-4">
-                <div className="flex items-center">
-                  <UsersIcon className="h-8 w-8 text-indigo-600 mr-3" />
-                  <div>
-                    <p className="text-sm font-medium text-indigo-600">
-                      Tổng số lần mượn
-                    </p>
-                    <p className="text-2xl font-bold text-indigo-700">
-                      {user.lendings.length}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-emerald-50 rounded-lg p-4">
-                <div className="flex items-center">
-                  <UsersIcon className="h-8 w-8 text-emerald-600 mr-3" />
-                  <div>
-                    <p className="text-sm font-medium text-emerald-600">
-                      Tổng số lần đặt trước
-                    </p>
-                    <p className="text-2xl font-bold text-emerald-700">
-                      {user.reservations.length}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="px-6 py-4 border-t border-gray-200">
-          <button
-            onClick={onClose}
-            className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+      >
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          transition={{ type: "spring", duration: 0.5 }}
+          className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        >
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="p-6 border-b border-gray-200"
           >
-            Đóng
-          </button>
-        </div>
-      </div>
-    </div>
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-gray-900">
+                Chi tiết người dùng
+              </h2>
+              <motion.button
+                whileHover={{ scale: 1.1, rotate: 90 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={onClose}
+                className="text-gray-400 hover:text-gray-500 transition-colors"
+              >
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </motion.button>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="p-6 space-y-6"
+          >
+            {/* User Info */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                className="bg-gray-50 rounded-lg p-4"
+              >
+                <div className="flex items-center space-x-4">
+                  <motion.div
+                    whileHover={{ rotate: 360 }}
+                    transition={{ duration: 0.5 }}
+                    className="h-16 w-16 bg-indigo-100 rounded-full flex items-center justify-center"
+                  >
+                    <UsersIcon className="h-8 w-8 text-indigo-600" />
+                  </motion.div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {user.name}
+                    </h3>
+                    <p className="text-sm text-gray-500">{user.email}</p>
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                className="bg-gray-50 rounded-lg p-4"
+              >
+                <div className="space-y-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">
+                      Vai trò
+                    </label>
+                    <motion.span
+                      whileHover={{ scale: 1.05 }}
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        user.role === "ADMIN"
+                          ? "bg-purple-100 text-purple-800"
+                          : user.role === "LIBRARIAN"
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-green-100 text-green-800"
+                      }`}
+                    >
+                      {user.role === "ADMIN" ? "Quản trị viên" : "Người dùng"}
+                    </motion.span>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">
+                      Ngày tham gia
+                    </label>
+                    <p className="text-sm text-gray-900">
+                      {new Date(user.created_at).toLocaleDateString("vi-VN", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Activity Stats */}
+            <div className="border-t pt-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Hoạt động
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg p-4"
+                >
+                  <div className="flex items-center">
+                    <motion.div
+                      whileHover={{ rotate: 360 }}
+                      transition={{ duration: 0.5 }}
+                      className="p-2 bg-indigo-200 rounded-lg"
+                    >
+                      <svg
+                        className="h-6 w-6 text-indigo-600"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                        />
+                      </svg>
+                    </motion.div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-indigo-600">
+                        Tổng số lần mượn
+                      </p>
+                      <motion.p
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", delay: 0.5 }}
+                        className="text-2xl font-bold text-indigo-700"
+                      >
+                        {user.lendings.length}
+                      </motion.p>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-lg p-4"
+                >
+                  <div className="flex items-center">
+                    <motion.div
+                      whileHover={{ rotate: 360 }}
+                      transition={{ duration: 0.5 }}
+                      className="p-2 bg-emerald-200 rounded-lg"
+                    >
+                      <svg
+                        className="h-6 w-6 text-emerald-600"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                    </motion.div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-emerald-600">
+                        Tổng số lần đặt trước
+                      </p>
+                      <motion.p
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", delay: 0.6 }}
+                        className="text-2xl font-bold text-emerald-700"
+                      >
+                        {user.reservations.length}
+                      </motion.p>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </div>
+
+            {/* Recent Activity */}
+            <div className="border-t pt-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Hoạt động gần đây
+              </h3>
+              <div className="space-y-4">
+                {user.lendings.slice(0, 3).map((lending, index) => (
+                  <motion.div
+                    key={lending.id}
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.1 * index }}
+                    whileHover={{ x: 5 }}
+                    className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg"
+                  >
+                    <motion.div
+                      whileHover={{ rotate: 360 }}
+                      transition={{ duration: 0.5 }}
+                      className="p-2 bg-indigo-100 rounded-lg"
+                    >
+                      <svg
+                        className="h-5 w-5 text-indigo-600"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                        />
+                      </svg>
+                    </motion.div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">
+                        Mượn sách: {lending.book_item.book?.title}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {new Date(lending.created_at).toLocaleDateString(
+                          "vi-VN"
+                        )}
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
+                {user.lendings.length === 0 && (
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-sm text-gray-500 text-center py-4"
+                  >
+                    Chưa có hoạt động mượn sách
+                  </motion.p>
+                )}
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="px-6 py-4 border-t border-gray-200"
+          >
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={onClose}
+              className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+            >
+              Đóng
+            </motion.button>
+          </motion.div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   );
 }

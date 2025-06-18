@@ -4,6 +4,9 @@ import { Eye, EyeOff, BookOpen, Mail, Lock } from "lucide-react";
 import { signIn, signUp } from "../../api/user.api";
 import type { SignInData, CreateUserRequest } from "../../types/User";
 import { useUser } from "../../hooks/useUser";
+import { toast } from "react-toastify";
+import axios from "axios";
+
 interface AuthFormData {
   name: string;
   email: string;
@@ -36,7 +39,7 @@ const Auth: React.FC = () => {
         await signIn(signInData);
       } else {
         if (formData.password !== formData.confirmPassword) {
-          alert("Passwords do not match");
+          toast.error("Mật khẩu không khớp");
           return;
         }
         const signUpData: CreateUserRequest = {
@@ -49,7 +52,11 @@ const Auth: React.FC = () => {
       navigate("/");
     } catch (error: unknown) {
       console.error("Authentication error:", error);
-      alert("Authentication failed. Please try again.");
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Đăng nhập thất bại. Vui lòng thử lại.");
+      }
     } finally {
       setUserChanged(true);
       setLoading(false);

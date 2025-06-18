@@ -6,8 +6,8 @@ import { toast } from "react-toastify";
 import type { ReservationResponse } from "../../types/Reservation";
 import { createBorrowedBook } from "../../api/borrow.api";
 import { useUser } from "../../hooks/useUser";
-import { ConfirmModal } from "../../components/Admin/ConfirmModal";
-import DeleteConfirmModal from "../../pages/Admin/Notifications/components/DeleteModal";
+import { ClientConfirmModal } from "../../components/Client/ClientConfirmModal";
+import ClientDeleteModal from "../../components/Client/ClientDeleteModal";
 
 const Reservations: React.FC = () => {
   const { data: reservations, isLoading } = useQuery<ReservationResponse[]>({
@@ -279,7 +279,7 @@ const Reservations: React.FC = () => {
                   <div className="flex-shrink-0">
                     <img
                       src={
-                        reservation.bookItem.book.image || "/placeholder.png"
+                        reservation.bookItem.book?.image || "/placeholder.png"
                       }
                       alt={reservation.bookItem.book.title}
                       className="w-24 h-32 object-cover rounded-lg shadow-md"
@@ -407,7 +407,7 @@ const Reservations: React.FC = () => {
       </div>
 
       {/* Delete Confirmation Modal */}
-      <DeleteConfirmModal
+      <ClientDeleteModal
         isOpen={!!isDeleting}
         onClose={() => setIsDeleting(null)}
         onConfirm={() => isDeleting && deleteReservationMutation(isDeleting)}
@@ -415,7 +415,7 @@ const Reservations: React.FC = () => {
       />
 
       {/* Borrow Confirmation Modal */}
-      <ConfirmModal
+      <ClientConfirmModal
         isOpen={!!isBorrowing}
         onCancel={() => setIsBorrowing(null)}
         onSave={() =>
@@ -433,7 +433,7 @@ const Reservations: React.FC = () => {
             được chuyển vào danh sách sách đang mượn của bạn.
           </p>
         </div>
-      </ConfirmModal>
+      </ClientConfirmModal>
     </div>
   );
 };
