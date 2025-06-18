@@ -45,10 +45,6 @@ const BorrowedBooks = () => {
     return days;
   };
 
-  const totalFines = borrows
-    ?.filter(() => 0)
-    .reduce((total: number) => total + 0, 0);
-
   const statusCounts = {
     borrowed: borrows?.filter(
       (b: BorrowBookResponse) => b.status === "BORROWED"
@@ -61,7 +57,7 @@ const BorrowedBooks = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gray-900">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 dark:bg-gray-900">
       <div className="space-y-6 ">
         {/* Header */}
         <div>
@@ -181,7 +177,7 @@ const BorrowedBooks = () => {
                           {borrowedBook.book_item.book.title}
                         </h3>
                         <p className="text-gray-600 dark:text-gray-400">
-                          tác giả {borrowedBook.book_item.book.author}
+                          Tác giả {borrowedBook.book_item.book.author}
                         </p>
                       </div>
 

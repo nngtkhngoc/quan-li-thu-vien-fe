@@ -21,7 +21,6 @@ import {
   Star,
 } from "lucide-react";
 
-import useBorrow from "../../../hooks/useBorrow";
 import useDashboard from "../../../hooks/useDashboard";
 import { useQuery } from "@tanstack/react-query";
 import { getAllUsers } from "../../../api/user.api";
