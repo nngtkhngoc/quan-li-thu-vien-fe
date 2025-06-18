@@ -126,12 +126,11 @@ export default function Forum() {
     return senderName === username;
   };
 
-  // Lấy tin nhắn theo limit, từ tin nhắn mới nhất
   const displayedMessages = messages?.slice(-messagesLimit) || [];
   const hasMoreMessages = messages && messages.length > messagesLimit;
 
-  // Auto scroll to bottom when new message arrives
   useEffect(() => {
+    if (displayedMessages.length > 10) return;
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [displayedMessages.length]);
 
@@ -290,133 +289,186 @@ export default function Forum() {
                 </p>
               </div>
             ) : (
-              displayedMessages?.map((msg, i) => (
-                <div key={i} className="flex space-x-3 group">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                      {msg.senderName?.charAt(0).toUpperCase() || "X"}
-                    </div>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">
-                          {msg.senderName}
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {new Date(msg.timestamp).toLocaleTimeString("vi-VN", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            second: "2-digit",
-                          })}
-                        </p>
-                        {editingMessageId === msg.id && (
-                          <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-                            (Đang chỉnh sửa)
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Message Actions - Only show for own messages */}
-                      {isOwnMessage(msg.senderName) && msg.id && (
-                        <div className="relative">
-                          <button
-                            onClick={() => toggleMessageMenu(msg.id!)}
-                            className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-all duration-200"
-                          >
-                            <MoreVertical className="h-4 w-4" />
-                          </button>
-
-                          {/* Dropdown Menu */}
-                          {showMenuForMessage === msg.id && (
-                            <div
-                              onClick={e => e.stopPropagation()}
-                              className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 z-10 min-w-[120px]"
-                            >
-                              <button
-                                onClick={() =>
-                                  handleEditMessage(msg.id!, msg.content)
-                                }
-                                className="flex items-center w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                              >
-                                <Edit2 className="h-3 w-3 mr-2" />
-                                Chỉnh sửa
-                              </button>
-                              <button
-                                onClick={() => handleDeleteMessage(msg.id!)}
-                                disabled={deletingMessageId === msg.id}
-                                className="flex items-center w-full px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
-                              >
-                                {deletingMessageId === msg.id ? (
-                                  <>
-                                    <div className="animate-spin h-3 w-3 mr-2 border border-red-600 border-t-transparent rounded-full"></div>
-                                    Đang xóa...
-                                  </>
-                                ) : (
-                                  <>
-                                    <Trash2 className="h-3 w-3 mr-2" />
-                                    Xóa
-                                  </>
-                                )}
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Message Content */}
-                    <div className="mt-1 p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-                      {editingMessageId === msg.id ? (
-                        <div className="space-y-2">
-                          <textarea
-                            value={editingContent}
-                            onChange={e => setEditingContent(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm resize-none"
-                            rows={2}
-                            placeholder="Chỉnh sửa tin nhắn..."
-                          />
-                          <div className="flex items-center space-x-2">
-                            <button
-                              onClick={handleSaveEdit}
-                              disabled={
-                                !editingContent.trim() ||
-                                (isUpdatingMessage &&
-                                  updatingMessageId === msg.id)
-                              }
-                              className="inline-flex items-center px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
-                            >
-                              {isUpdatingMessage &&
-                              updatingMessageId === msg.id ? (
-                                <>
-                                  <div className="animate-spin h-3 w-3 mr-1 border border-white border-t-transparent rounded-full"></div>
-                                  Đang lưu...
-                                </>
-                              ) : (
-                                <>
-                                  <Check className="h-3 w-3 mr-1" />
-                                  Lưu
-                                </>
-                              )}
-                            </button>
-                            <button
-                              onClick={handleCancelEdit}
-                              className="inline-flex items-center px-3 py-1 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500 text-sm font-medium"
-                            >
-                              <X className="h-3 w-3 mr-1" />
-                              Hủy
-                            </button>
+              displayedMessages?.map((msg, i) => {
+                const isOwn = isOwnMessage(msg.senderName);
+                return (
+                  <div
+                    key={i}
+                    className={`flex group ${
+                      isOwn ? "justify-end" : "justify-start"
+                    }`}
+                  >
+                    {/* Avatar and content for others' messages (left side) */}
+                    {!isOwn && (
+                      <div className="flex space-x-3 max-w-[80%]">
+                        <div className="flex-shrink-0">
+                          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                            {msg.senderName?.charAt(0).toUpperCase() || "X"}
                           </div>
                         </div>
-                      ) : (
-                        <p className="text-sm text-gray-900 dark:text-white">
-                          {msg.content}
-                        </p>
-                      )}
-                    </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center space-x-2 mb-1">
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">
+                              {msg.senderName}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {new Date(msg.timestamp).toLocaleTimeString(
+                                "vi-VN",
+                                {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  second: "2-digit",
+                                }
+                              )}
+                            </p>
+                          </div>
+
+                          {/* Message Content for others */}
+                          <div className="p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+                            <p className="text-sm text-gray-900 dark:text-white">
+                              {msg.content}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Content and avatar for own messages (right side) */}
+                    {isOwn && (
+                      <div className="flex space-x-3 max-w-[80%]">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-end space-x-2 mb-1">
+                            {editingMessageId === msg.id && (
+                              <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                                (Đang chỉnh sửa)
+                              </span>
+                            )}
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {new Date(msg.timestamp).toLocaleTimeString(
+                                "vi-VN",
+                                {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  second: "2-digit",
+                                }
+                              )}
+                            </p>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">
+                              Bạn
+                            </p>
+
+                            {/* Message Actions - Only show for own messages */}
+                            {msg.id && (
+                              <div className="relative">
+                                <button
+                                  onClick={() => toggleMessageMenu(msg.id!)}
+                                  className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-all duration-200"
+                                >
+                                  <MoreVertical className="h-4 w-4" />
+                                </button>
+
+                                {/* Dropdown Menu */}
+                                {showMenuForMessage === msg.id && (
+                                  <div
+                                    onClick={e => e.stopPropagation()}
+                                    className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 z-10 min-w-[120px]"
+                                  >
+                                    <button
+                                      onClick={() =>
+                                        handleEditMessage(msg.id!, msg.content)
+                                      }
+                                      className="flex items-center w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    >
+                                      <Edit2 className="h-3 w-3 mr-2" />
+                                      Chỉnh sửa
+                                    </button>
+                                    <button
+                                      onClick={() =>
+                                        handleDeleteMessage(msg.id!)
+                                      }
+                                      disabled={deletingMessageId === msg.id}
+                                      className="flex items-center w-full px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+                                    >
+                                      {deletingMessageId === msg.id ? (
+                                        <>
+                                          <div className="animate-spin h-3 w-3 mr-2 border border-red-600 border-t-transparent rounded-full"></div>
+                                          Đang xóa...
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Trash2 className="h-3 w-3 mr-2" />
+                                          Xóa
+                                        </>
+                                      )}
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Message Content for own messages */}
+                          <div className="p-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow-sm">
+                            {editingMessageId === msg.id ? (
+                              <div className="space-y-2">
+                                <textarea
+                                  value={editingContent}
+                                  onChange={e =>
+                                    setEditingContent(e.target.value)
+                                  }
+                                  className="w-full px-3 py-2 border border-blue-300 rounded-md focus:ring-2 focus:ring-blue-200 focus:border-transparent bg-white text-gray-900 text-sm resize-none"
+                                  rows={2}
+                                  placeholder="Chỉnh sửa tin nhắn..."
+                                />
+                                <div className="flex items-center space-x-2">
+                                  <button
+                                    onClick={handleSaveEdit}
+                                    disabled={
+                                      !editingContent.trim() ||
+                                      (isUpdatingMessage &&
+                                        updatingMessageId === msg.id)
+                                    }
+                                    className="inline-flex items-center px-3 py-1 bg-white text-blue-600 rounded-md hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                                  >
+                                    {isUpdatingMessage &&
+                                    updatingMessageId === msg.id ? (
+                                      <>
+                                        <div className="animate-spin h-3 w-3 mr-1 border border-blue-600 border-t-transparent rounded-full"></div>
+                                        Đang lưu...
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Check className="h-3 w-3 mr-1" />
+                                        Lưu
+                                      </>
+                                    )}
+                                  </button>
+                                  <button
+                                    onClick={handleCancelEdit}
+                                    className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 text-sm font-medium"
+                                  >
+                                    <X className="h-3 w-3 mr-1" />
+                                    Hủy
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <p className="text-sm text-white">
+                                {msg.content}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex-shrink-0">
+                          <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                            {msg.senderName?.charAt(0).toUpperCase() || "X"}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
 
             {/* Scroll anchor for auto-scroll to bottom */}
