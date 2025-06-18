@@ -18,7 +18,7 @@ const Header: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const queryClient = useQueryClient();
 
-  const unreadNotifications = mockNotifications.filter((n) => !n.isRead).length;
+  const unreadNotifications = mockNotifications.filter(n => !n.isRead).length;
 
   const signOutMutation = useMutation({
     mutationFn: signOut,
@@ -47,6 +47,8 @@ const Header: React.FC = () => {
   const navigationItems = [
     { path: "/", label: "Trang chủ" },
     { path: "/books", label: "Sách" },
+    { path: "/forum", label: "Diễn đàn" },
+    { path: "/search", label: "Tìm kiếm" },
   ];
 
   return (
@@ -65,7 +67,7 @@ const Header: React.FC = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            {navigationItems.map((item) => (
+            {navigationItems.map(item => (
               <Link
                 key={item.path}
                 to={item.path}
@@ -79,23 +81,6 @@ const Header: React.FC = () => {
               </Link>
             ))}
           </nav>
-
-          {/* Search Bar */}
-          <form
-            onSubmit={handleSearch}
-            className="hidden sm:block flex-1 max-w-md mx-8"
-          >
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-              <input
-                type="text"
-                placeholder="Tìm sách hoặc tác giả..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-          </form>
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
@@ -223,7 +208,7 @@ const Header: React.FC = () => {
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-gray-200 dark:border-gray-700 py-4">
             <div className="space-y-2">
-              {navigationItems.map((item) => (
+              {navigationItems.map(item => (
                 <Link
                   key={item.path}
                   to={item.path}
@@ -246,7 +231,7 @@ const Header: React.FC = () => {
                     type="text"
                     placeholder="Tìm sách hoặc tác giả."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={e => setSearchQuery(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
