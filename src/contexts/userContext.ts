@@ -6,6 +6,7 @@ export interface UserContextType {
   setUserProfile: React.Dispatch<React.SetStateAction<UserResponse | null>>;
   userChanged: boolean;
   setUserChanged: React.Dispatch<React.SetStateAction<boolean>>;
+  isLoading: boolean;
 }
 
 export const UserContext = createContext<UserContextType | null>(null);

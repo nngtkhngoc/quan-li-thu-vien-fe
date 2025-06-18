@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useUser } from "../../hooks/useUser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateUser } from "../../api/user.api";
+import ProfileSkeleton from "../../components/Client/ProfileSkeleton";
 
 import { toast } from "react-toastify";
 import {
@@ -25,15 +26,15 @@ interface Lending {
   book_item: {
     book: {
       title: string;
-      cover_image?: string;
+      image?: string;
     };
   };
-  borrowed_at: Date;
+  borrow_date: Date;
   status: "BORROWED" | "RETURNED" | "OVERDUE";
 }
 
 export default function Profile() {
-  const { userProfile: user, setUserChanged } = useUser();
+  const { userProfile: user, setUserChanged, isLoading } = useUser();
   const queryClient = useQueryClient();
 
   const [showImageModal, setShowImageModal] = useState(false);
@@ -97,6 +98,10 @@ export default function Profile() {
       toast.error("Cập nhật ảnh thất bại");
     }
   };
+
+  if (isLoading) {
+    return <ProfileSkeleton />;
+  }
 
   if (!user) {
     return (
@@ -462,9 +467,9 @@ export default function Profile() {
                     className="flex items-center gap-6 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700/30 dark:to-gray-600/30 rounded-xl transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
                   >
                     <div className="flex-shrink-0 w-20 h-28 bg-gray-100 dark:bg-gray-600 rounded-lg overflow-hidden shadow-lg">
-                      {lending.book_item.book.cover_image ? (
+                      {lending.book_item.book.image ? (
                         <img
-                          src={lending.book_item.book.cover_image}
+                          src={lending.book_item.book.image}
                           alt={lending.book_item.book.title}
                           className="w-full h-full object-cover transform transition-transform duration-300 hover:scale-110"
                         />

@@ -89,7 +89,7 @@ const Header: React.FC = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
                 type="text"
-                placeholder="Search books, authors..."
+                placeholder="Tìm sách hoặc tác giả..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -167,19 +167,19 @@ const Header: React.FC = () => {
                         to="/profile"
                         className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
-                        My Profile
+                        Hồ sơ của tôi
                       </Link>
                       <Link
                         to="/borrowed-books"
                         className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
-                        My Books
+                        Sách đang mượn
                       </Link>
                       <Link
                         to="/reservations"
                         className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
-                        Reservations
+                        Sách đang đặt trước
                       </Link>
                       <hr className="my-1 border-gray-200 dark:border-gray-700" />
                       <button
@@ -189,7 +189,7 @@ const Header: React.FC = () => {
                       >
                         {signOutMutation.isPending
                           ? "Đang đăng xuất..."
-                          : "Sign Out"}
+                          : "Đăng xuất"}
                       </button>
                     </div>
                   </div>
@@ -201,7 +201,7 @@ const Header: React.FC = () => {
                 className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-300"
               >
                 <User className="h-4 w-4" />
-                <span>Sign In</span>
+                <span>Đăng nhập</span>
               </Link>
             )}
 
@@ -244,7 +244,7 @@ const Header: React.FC = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                   <input
                     type="text"
-                    placeholder="Search books, authors..."
+                    placeholder="Tìm sách hoặc tác giả."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
