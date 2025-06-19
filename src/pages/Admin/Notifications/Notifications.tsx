@@ -14,8 +14,8 @@ import NotificationList from "./components/NotificationList";
 import type { Notification } from "../../../types/Notification";
 import DeleteConfirmModal from "./components/DeleteModal";
 import CreateNotificationModal from "./components/CreateModal";
-import LoadingSpinner from "../../../components/ui/LoadingSpinner";
 import { toast } from "react-toastify";
+import NotificationsSkeleton from "./components/NotificationSkeleton";
 
 export default function Notifications() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -109,7 +109,7 @@ export default function Notifications() {
   };
 
   const isLoading = isReadLoading || isTotalLoading || isUnreadLoading;
-  if (isLoading) return <LoadingSpinner size="lg" />;
+  if (isLoading) return <NotificationsSkeleton />;
 
   return (
     <div className="space-y-6">

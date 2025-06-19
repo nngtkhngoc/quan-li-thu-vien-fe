@@ -1,8 +1,8 @@
 import { getBooks } from "../../../api/book.api";
 import { getAllReviews } from "../../../api/review.api";
-import LoadingSpinner from "../../../components/ui/LoadingSpinner";
 import FeaturedBooks from "./components/FeaturedBooks";
 import HeroSection from "./components/HeroSection";
+import HomepageSkeleton from "./components/HomepageSkeleton";
 import RecentReviews from "./components/RecentReviews";
 import StatsSection from "./components/StatsSection";
 
@@ -21,7 +21,7 @@ export default function Homepage() {
 
   const isLoading = isBookLoading || isReviewLoading;
 
-  if (isLoading) return <LoadingSpinner size="lg" />;
+  if (isLoading) return <HomepageSkeleton />;
   return (
     <div>
       <HeroSection />

@@ -4,9 +4,9 @@ import { deleteReviews, getAllReviews } from "../../../api/review.api";
 import { useState } from "react";
 import FilterBar from "./components/FilterBar";
 import ReviewList from "./components/ReviewLists";
-import LoadingSpinner from "../../../components/ui/LoadingSpinner";
 import DeleteConfirmModal from "./components/DeleteModal";
 import { toast } from "react-toastify";
+import ReviewSkeleton from "./components/ReviewSkeleton";
 
 export default function Reviews() {
   const { data: totalReviews, isLoading: isTotalLoading } = useQuery({
@@ -48,7 +48,7 @@ export default function Reviews() {
     },
   });
 
-  if (isTotalLoading) return <LoadingSpinner size="lg" />;
+  if (isTotalLoading) return <ReviewSkeleton />;
 
   return (
     <div className="space-y-6">

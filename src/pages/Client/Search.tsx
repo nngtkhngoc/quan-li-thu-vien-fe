@@ -3,6 +3,7 @@ import React from "react";
 import { useState, useRef } from "react";
 import { Upload, X, Star, Eye, Heart } from "lucide-react";
 import { getSimilarBooks } from "../../api/book.api";
+import { Link } from "react-router-dom";
 
 export default function SearchPage() {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -39,6 +40,7 @@ export default function SearchPage() {
 
   const handleFiles = (files: FileList) => {
     const file = files[0];
+    console.log("Selected file:", file);
     if (file) {
       const Url = URL.createObjectURL(file);
       setUploadedImage(Url);
@@ -69,6 +71,7 @@ export default function SearchPage() {
     }
   };
   const clearImage = () => {
+    console.log("Clearing image");
     setUploadedImage(null);
     setShowResults(false);
     setIsLoading(false);
@@ -168,54 +171,56 @@ export default function SearchPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {books.map((book) => (
-                <div
-                  key={book.id}
-                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group"
-                >
-                  <div className="relative">
-                    <img
-                      src={book.image}
-                      alt={book.title}
-                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute top-4 right-4 bg-green-500 text-white px-2 py-1 rounded-full text-sm font-medium">
-                      {/* {book.similarity}% match */}
-                    </div>
-                    <div className="absolute bottom-4 left-4 right-4 bg-black/50 backdrop-blur-sm rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="text-white text-sm">
-                        <div className="flex items-center space-x-2">
-                          <Eye className="w-4 h-4" />
-                          <span>Đọc ngay</span>
+                <Link to={`/books/${book.id}`} key={book.id}>
+                  <div
+                    key={book.id}
+                    className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group"
+                  >
+                    <div className="relative">
+                      <img
+                        src={book.image}
+                        alt={book.title}
+                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute top-4 right-4 bg-green-500 text-white px-2 py-1 rounded-full text-sm font-medium">
+                        {/* {book.similarity}% match */}
+                      </div>
+                      <div className="absolute bottom-4 left-4 right-4 bg-black/50 backdrop-blur-sm rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="text-white text-sm">
+                          <div className="flex items-center space-x-2">
+                            <Eye className="w-4 h-4" />
+                            <span>Đọc ngay</span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                      {book.title}
-                    </h3>
-                    <p className="text-gray-600 mb-3">by {book.author}</p>
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center space-x-1">
-                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                        <span className="text-sm text-gray-600">
-                          {book.rating}
+                    <div className="p-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+                        {book.title}
+                      </h3>
+                      <p className="text-gray-600 mb-3">by {book.author}</p>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-1">
+                          <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                          <span className="text-sm text-gray-600">
+                            {book.rating}
+                          </span>
+                        </div>
+                        <span className="text-sm text-purple-600 bg-purple-100 px-2 py-1 rounded-full">
+                          {book.genre}
                         </span>
                       </div>
-                      <span className="text-sm text-purple-600 bg-purple-100 px-2 py-1 rounded-full">
-                        {book.genre}
-                      </span>
-                    </div>
-                    <div className="flex space-x-2">
-                      <button className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 text-white py-2 px-4 rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-200 text-sm">
-                        Xem chi tiết
-                      </button>
-                      <button className="p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                        <Heart className="w-4 h-4 text-gray-600" />
-                      </button>
+                      <div className="flex space-x-2">
+                        <button className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 text-white py-2 px-4 rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-200 text-sm">
+                          Xem chi tiết
+                        </button>
+                        <button className="p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                          <Heart className="w-4 h-4 text-gray-600" />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

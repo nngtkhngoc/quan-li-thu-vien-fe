@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { deleteBadge, getBadges } from "../../../api/badge.api";
 import StatsCard from "./components/StatsCard";
-import LoadingSpinner from "../../../components/ui/LoadingSpinner";
 import SearchBar from "./components/SearchBar";
 import { useState } from "react";
 import BadgeGrid from "./components/BadgeGrid";
@@ -10,6 +9,7 @@ import { toast } from "react-toastify";
 
 import DeleteConfirmModal from "./components/DeleteModal";
 import CreateModal from "./components/CreateModal";
+import BadgeSkeleton from "./components/BadgeSkeleton";
 
 export type Category = {
   name: string;
@@ -60,7 +60,7 @@ export default function Badges() {
     },
   });
 
-  if (isLoading) return <LoadingSpinner size="lg" />;
+  if (isLoading) return <BadgeSkeleton />;
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">

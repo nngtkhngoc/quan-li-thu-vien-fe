@@ -1,4 +1,4 @@
-import { axiosClient, axiosClientFormData } from "../lib/axios";
+import { axiosClient } from "../lib/axios";
 import type { BadgeResponse, CreateOrUpdateBadgeRequest } from "../types/Badge";
 
 export const createBadge = async (data: CreateOrUpdateBadgeRequest) => {
@@ -11,8 +11,9 @@ export const getBadges = async (): Promise<BadgeResponse> => {
   return response.data;
 };
 
-export const getUserBadges = async (userId: number) => {
+export const getUserBadges = async (userId: number): Promise<BadgeResponse> => {
   const response = await axiosClient.get(`/badges/user/${userId}`);
+  console.log(response.data.data);
   return response.data;
 };
 
@@ -20,7 +21,7 @@ export const updateBadge = async (
   id: number,
   data: CreateOrUpdateBadgeRequest
 ) => {
-  const response = await axiosClientFormData.put(`/badges/${id}`, data);
+  const response = await axiosClient.put(`/badges/${id}`, data);
   return response.data;
 };
 
