@@ -29,6 +29,23 @@ const ProfileSkeleton = () => {
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column Skeleton */}
           <div className="lg:col-span-1 space-y-8">
+            <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-6 border border-gray-200/50 dark:border-gray-700/50 transform transition-all duration-300 hover:shadow-xl">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6"></h2>
+              <div className="grid grid-cols-2 gap-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="bg-gray-100 animate-pulse rounded-full shadow-sm border border-gray-200 p-4"
+                  >
+                    <div className="text-center mb-4 h-[100px] flex flex-col justify-center items-center">
+                      <div className="bg-gray-300 h-10 w-10 rounded-full mb-2"></div>
+                      <div className="h-4 bg-gray-300 rounded w-24 mb-1"></div>
+                      <div className="h-3 bg-gray-300 rounded w-16"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
             <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-6 border border-gray-200/50 dark:border-gray-700/50">
               <div className="h-6 w-48 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse mb-6" />
               <div className="grid grid-cols-2 gap-4">

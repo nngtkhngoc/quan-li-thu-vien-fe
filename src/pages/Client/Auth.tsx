@@ -6,7 +6,6 @@ import type { SignInData, CreateUserRequest } from "../../types/User";
 import { useUser } from "../../hooks/useUser";
 import { toast } from "react-toastify";
 import axios from "axios";
-
 interface AuthFormData {
   name: string;
   email: string;

@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { useUser } from "../../hooks/useUser";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { updateUser } from "../../api/user.api";
 import ProfileSkeleton from "../../components/Client/ProfileSkeleton";
 
@@ -20,6 +21,7 @@ import {
   Upload,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { getUserBadges } from "../../api/badge.api";
 
 interface Lending {
   id: number;
@@ -40,6 +42,19 @@ export default function Profile() {
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  type BadgeResponse = Awaited<ReturnType<typeof getUserBadges>>;
+
+  const { data: totalBadges, isLoading: isBadgesLoading } =
+    useQuery<BadgeResponse>({
+      queryKey: ["getAllBadges", user?.id],
+      queryFn: async () => {
+        if (!user) {
+          return { success: false, message: "No user", data: [] };
+        }
+        return await getUserBadges(user.id);
+      },
+      enabled: !!user,
+    });
 
   const { mutate: updateUserMutation, isPending } = useMutation({
     mutationFn: ({ id, formData }: { id: number; formData: FormData }) =>
@@ -99,7 +114,7 @@ export default function Profile() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || isBadgesLoading) {
     return <ProfileSkeleton />;
   }
 
@@ -133,7 +148,11 @@ export default function Profile() {
   const overdueBorrows = user.lendings.filter(
     (l) => l.status === "OVERDUE"
   ).length;
-
+  const categoryColors = {
+    BOOK: "bg-blue-100 text-blue-800",
+    COMMUNITY: "bg-emerald-100 text-emerald-800",
+    ACHIEVEMENT: "bg-purple-100 text-purple-800",
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50 to-gray-50 dark:from-gray-900 dark:via-purple-900 dark:to-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -340,7 +359,42 @@ export default function Profile() {
         {/* Profile Content */}
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Edit Form or Stats */}
+
           <div className="lg:col-span-1 space-y-8">
+            <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-6 border border-gray-200/50 dark:border-gray-700/50 transform transition-all duration-300 hover:shadow-xl">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+                Huy hiệu đạt được
+              </h2>
+              <div className="grid grid-cols-2 gap-4">
+                {totalBadges?.data.map((badge: any) => (
+                  <div
+                    key={badge.badgeId}
+                    className="bg-white rounded-full shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow"
+                    title={badge.description}
+                  >
+                    <div className="">
+                      <div className="text-center mb-4 h-[100px]">
+                        <div className="text-4xl mb-2">{badge.iconUrl}</div>
+                        <h3 className="font-semibold text-gray-900 mb-1">
+                          {badge.badgeName}
+                        </h3>
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                            categoryColors[
+                              badge.category as keyof typeof categoryColors
+                            ]
+                          }`}
+                        >
+                          {badge.category === "BOOK" && "Đọc sách"}
+                          {badge.category === "COMMUNITY" && "Cộng đồng"}
+                          {badge.category === "ACHIEVEMENT" && "Thành tựu"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
             <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-6 border border-gray-200/50 dark:border-gray-700/50 transform transition-all duration-300 hover:shadow-xl">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
                 Thống kê đọc sách
