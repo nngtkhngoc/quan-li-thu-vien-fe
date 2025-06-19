@@ -6,18 +6,22 @@ import type { MessageResponse } from "../api/message.api";
 
 export interface ChatMessage {
   id?: number;
-  senderName: string;
+  sender: {
+    id: number;
+    name: string;
+    image: string;
+  };
   content: string;
   timestamp: string;
 }
 
-export function useChat(username: string) {
+export function useChat(userId: number) {
   const client = useRef<CompatClient | null>(null);
   const queryClient = useQueryClient();
 
-  // Kết nối socket - chỉ phụ thuộc vào username
+  // Kết nối socket - chỉ phụ thuộc vào userId
   useEffect(() => {
-    if (!username) return;
+    if (!userId) return;
 
     const socket = new SockJS("http://localhost:5002/ws-chat");
     const stompClient = Stomp.over(socket);
@@ -26,7 +30,6 @@ export function useChat(username: string) {
     stompClient.connect({}, () => {
       stompClient.subscribe("/topic/public", msg => {
         const received: MessageResponse = JSON.parse(msg.body);
-
         // Update React Query cache with new message
         queryClient.setQueryData<MessageResponse[]>(["messages"], oldData => {
           if (!oldData) return [received];
@@ -41,7 +44,7 @@ export function useChat(username: string) {
     return () => {
       stompClient.disconnect();
     };
-  }, [username, queryClient]);
+  }, [userId, queryClient]);
 
   // Gửi tin nhắn
   const sendMessage = (content: string) => {
@@ -49,7 +52,7 @@ export function useChat(username: string) {
       client.current.send(
         "/app/chat.sendMessage",
         {},
-        JSON.stringify({ senderName: username, content })
+        JSON.stringify({ sender_id: userId, content })
       );
     }
   };
