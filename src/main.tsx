@@ -26,6 +26,7 @@ import Profile from "./pages/Client/Profile.tsx";
 import Catalogs from "./pages/Admin/Catalogs.tsx";
 import { NotificationProvider } from "./contexts/notificationContext.tsx";
 import { UserProvider } from "./contexts/userContext.tsx";
+import Badges from "./pages/Admin/Badges/Badges.tsx";
 import Forum from "./pages/Client/Forum.tsx";
 
 const queryClient = new QueryClient();
@@ -66,6 +67,7 @@ createRoot(document.getElementById("root")!).render(
                 <Route path="/admin/reviews" element={<Reviews />} />
                 <Route path="/admin/reservations" element={<Reservations />} />
                 <Route path="/admin/catalogs" element={<Catalogs />} />
+                <Route path="/admin/badges" element={<Badges />} />
               </Route>
 
               <Route path="/admin/login">
