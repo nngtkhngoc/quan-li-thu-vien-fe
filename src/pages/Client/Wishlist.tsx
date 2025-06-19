@@ -126,7 +126,7 @@ const Wishlist: React.FC = () => {
                   }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <BookCard book={item.book} />
+                  <BookCard key={item.book.id} book={item.book} />
                 </motion.div>
               ))}
             </AnimatePresence>

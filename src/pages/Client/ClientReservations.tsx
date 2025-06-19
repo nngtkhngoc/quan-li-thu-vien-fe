@@ -287,16 +287,6 @@ const Reservations: React.FC = () => {
                             "Chưa phân loại"}
                         </span>
                       </div>
-
-                      <div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          Số lượng
-                        </p>
-                        <p className="font-medium text-gray-900 dark:text-white">
-                          {reservation.bookItem.book.bookItems?.length || 0}{" "}
-                          cuốn
-                        </p>
-                      </div>
                     </div>
                   </div>
 

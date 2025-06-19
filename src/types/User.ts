@@ -1,16 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export type ROLE = "ADMIN" | "USER" | "LIBRARIAN";
+export type ROLE = "ADMIN" | "USER";
 
 export type SignInData = {
   email: string;
   password_hash: string;
 };
 
+export type updateUserRequest = {
+  name?: string;
+  email?: string;
+};
+
 export type UserResponse = {
   id: number;
   name: string;
   email: string;
-  password_hash: string;
   created_at: Date;
   role: ROLE;
   lendings: any[];

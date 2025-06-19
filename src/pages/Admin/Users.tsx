@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, Edit, Trash2, Eye, Users as UsersIcon } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pagination } from "antd";
 import { deleteUser, getAllUsers, updateUser } from "../../api/user.api";
-import type { UserResponse } from "../../types/User";
+import type { UserResponse, updateUserRequest } from "../../types/User";
 import { toast } from "react-toastify";
 import { AdminConfirmModal } from "../../components/Admin/AdminConfirmModal";
 import AdminDeleteModal from "../../components/Admin/AdminDeleteModal";
@@ -70,12 +70,12 @@ export default function Users() {
     currentPage * pageSize
   );
 
-  const handleUpdate = (data: UpdateUserRequest) => {
+  const handleUpdate = (data: updateUserRequest) => {
     if (!isEditing) return;
     const formData = new FormData();
     if (data.name) formData.append("name", data.name);
     if (data.email) formData.append("email", data.email);
-    if (data.role) formData.append("role", data.role);
+
     updateUserMutation({ id: isEditing.id, formData });
   };
 
@@ -84,11 +84,19 @@ export default function Users() {
     deleteUserMutation(isDeleting);
   };
 
-  const [formData, setFormData] = useState<UpdateUserRequest>({
+  const [formData, setFormData] = useState<updateUserRequest>({
     name: "",
     email: "",
-    role: "USER",
   });
+
+  useEffect(() => {
+    if (isEditing) {
+      setFormData({
+        name: isEditing.name || "",
+        email: isEditing.email || "",
+      });
+    }
+  }, [isEditing]);
 
   if (isLoading) {
     return (
@@ -248,11 +256,7 @@ export default function Users() {
                       className={`inline-flex  text-sm font-semibold rounded-full 
                     }`}
                     >
-                      {user.role === "ADMIN"
-                        ? "Quản trị viên"
-                        : user.role === "LIBRARIAN"
-                        ? "Thủ thư"
-                        : "Người dùng"}
+                      {user.role === "ADMIN" ? "Quản trị viên" : "Người dùng"}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -320,7 +324,10 @@ export default function Users() {
       {isEditing && (
         <AdminConfirmModal
           isOpen={!!isEditing}
-          onCancel={() => setIsEditing(null)}
+          onCancel={() => {
+            setIsEditing(null);
+            setFormData({ name: "", email: "" });
+          }}
           onSave={() => handleUpdate(formData)}
           isPending={isPendingUpdate}
         >
@@ -477,8 +484,6 @@ function UserDetailsModal({
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         user.role === "ADMIN"
                           ? "bg-purple-100 text-purple-800"
-                          : user.role === "LIBRARIAN"
-                          ? "bg-blue-100 text-blue-800"
                           : "bg-green-100 text-green-800"
                       }`}
                     >

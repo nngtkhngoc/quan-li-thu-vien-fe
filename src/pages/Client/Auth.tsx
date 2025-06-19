@@ -322,17 +322,6 @@ const Auth: React.FC = () => {
               </div>
             )}
 
-            {isLogin && (
-              <div className="flex items-center justify-end">
-                <button
-                  type="button"
-                  className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
-                >
-                  Quên mật khẩu?
-                </button>
-              </div>
-            )}
-
             <button
               type="submit"
               disabled={loading}

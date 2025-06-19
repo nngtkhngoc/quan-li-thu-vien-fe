@@ -314,7 +314,7 @@ const BookDetail = () => {
                 </>
               ) : (
                 <Link
-                  to="/login"
+                  to="/auth"
                   className="flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition-all duration-300"
                 >
                   Đăng nhập để mượn sách
