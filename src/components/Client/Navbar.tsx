@@ -18,7 +18,7 @@ const Header: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const queryClient = useQueryClient();
 
-  const unreadNotifications = mockNotifications.filter(n => !n.isRead).length;
+  const unreadNotifications = mockNotifications.filter((n) => !n.isRead).length;
 
   const signOutMutation = useMutation({
     mutationFn: signOut,
@@ -67,7 +67,7 @@ const Header: React.FC = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            {navigationItems.map(item => (
+            {navigationItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
@@ -109,6 +109,28 @@ const Header: React.FC = () => {
                       {unreadNotifications}
                     </span>
                   )}
+                </Link>
+
+                {/* Wishlist */}
+                <Link
+                  to="/wishlist"
+                  className="p-2 text-gray-500 hover:text-pink-600 dark:text-gray-400 dark:hover:text-pink-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  title="Yêu thích"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M21.435 6.304a5.373 5.373 0 0 0-7.6 0l-.835.834-.835-.834a5.373 5.373 0 0 0-7.6 7.6l.834.835 7.601 7.6 7.601-7.6.834-.835a5.373 5.373 0 0 0 0-7.6z"
+                    />
+                  </svg>
                 </Link>
 
                 {/* User Menu */}
@@ -216,7 +238,7 @@ const Header: React.FC = () => {
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-gray-200 dark:border-gray-700 py-4">
             <div className="space-y-2">
-              {navigationItems.map(item => (
+              {navigationItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
@@ -239,7 +261,7 @@ const Header: React.FC = () => {
                     type="text"
                     placeholder="Tìm sách hoặc tác giả."
                     value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
