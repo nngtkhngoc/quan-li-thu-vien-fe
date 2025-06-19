@@ -154,7 +154,11 @@ const BookDetail = () => {
     } catch (error) {
       console.log("Error creating review:", error);
     }
-    (e.currentTarget as HTMLFormElement).reset();
+
+    const form = document.querySelector("#review-form") as HTMLFormElement;
+    form?.reset();
+    setShowReviewForm(false);
+    setNewReview({ rating: 5, comment: "" });
   };
 
   if (getBookByIdQuery.isLoading) {
@@ -346,6 +350,7 @@ const BookDetail = () => {
         {/* Review Form */}
         {showReviewForm && (
           <form
+            id="review-form"
             onSubmit={handleReviewSubmit}
             className="mb-8 p-6 bg-gray-50 dark:bg-gray-700 rounded-xl"
           >
@@ -383,7 +388,7 @@ const BookDetail = () => {
                 name="comment"
                 rows={4}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                placeholder="Share your thoughts about this book..."
+                placeholder="Chia sẻ cảm nhận của bạn về quyển sách này..."
                 required
               />
             </div>

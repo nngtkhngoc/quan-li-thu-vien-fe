@@ -30,6 +30,8 @@ export default function BookItems({ setModal, bookItems, query }: any) {
     <div className="bg-gray-500/50 fixed w-[100vw] h-[100vh] top-0 left-0 z-50">
       {modalDelete && (
         <ConfirmModal
+          isOpen={!!modalDelete}
+          // setIsOpen={setModalDelete}
           isPending={false}
           onSave={handleDelete}
           onCancel={() => {
