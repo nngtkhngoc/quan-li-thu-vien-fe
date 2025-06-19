@@ -71,6 +71,7 @@ export default function Reviews() {
         filteredReviews={filteredReviews}
         handleDelete={(id: BigInteger) => setIdToDelete(id)}
         isPending={deleteMutation.isPending}
+        setShowDeleteModal={setShowDeleteModal}
       />
 
       <DeleteConfirmModal

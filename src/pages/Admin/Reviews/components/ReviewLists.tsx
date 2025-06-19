@@ -9,10 +9,12 @@ export default function ReviewList({
   filteredReviews,
   handleDelete,
   isPending,
+  setShowDeleteModal,
 }: {
   filteredReviews: any;
   handleDelete: any;
   isPending: boolean;
+  setShowDeleteModal: any;
 }) {
   const [viewingReview, setViewingReview] = useState<Review | null>(null);
 
@@ -39,17 +41,20 @@ export default function ReviewList({
             <div className="flex space-x-2">
               <button
                 onClick={() => setViewingReview(review)}
-                className="text-gray-400 hover:text-gray-600"
-                title="View Details"
+                className="text-gray-400 hover:text-gray-600 cursor-pointer"
+                title="Xem chi tiết"
               >
-                <Eye className="h-4 w-4" />
+                <Eye className="h-5 w-5" />
               </button>
               <button
-                onClick={() => handleDelete(review.review_id)}
-                className="text-red-400 hover:text-red-600"
-                title="Delete Review"
+                onClick={() => {
+                  handleDelete(review.review_id);
+                  setShowDeleteModal(true);
+                }}
+                className="text-red-400 hover:text-red-600 cursor-pointer"
+                title="Xóa đánh giá"
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className="h-5 w-5" />
               </button>
             </div>
           </div>

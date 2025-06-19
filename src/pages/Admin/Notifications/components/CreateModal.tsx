@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { getAllUsers } from "../../../../api/user.api";
 
 interface Props {
   isOpen: boolean;
@@ -7,34 +9,24 @@ interface Props {
   isCreating: boolean;
 }
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-}
-
 export default function CreateNotificationModal({
   isOpen,
   onClose,
   onCreate,
   isCreating,
 }: Props) {
-  const [users, setUsers] = useState<User[]>([]);
   const [selectedEmail, setSelectedEmail] = useState("");
   const [message, setMessage] = useState("");
 
-  // Fetch all users on open
-  useEffect(() => {
-    if (isOpen) {
-      fetch("http://localhost:5002/api/users")
-        .then((res) => res.json())
-        .then((data) => setUsers(data))
-        .catch((err) => console.error("Failed to fetch users:", err));
-    }
-  }, [isOpen]);
+  const { data: users } = useQuery({
+    queryKey: ["getUsers"],
+    queryFn: () => getAllUsers(),
+  });
 
   const handleSubmit = () => {
-    const selectedUser = users.find((user) => user.email === selectedEmail);
+    const selectedUser = (users ?? []).find(
+      (user) => user.email === selectedEmail
+    );
     if (!selectedUser || !message.trim()) return;
     onCreate({ userId: selectedUser.id, message });
     setSelectedEmail("");
@@ -58,7 +50,7 @@ export default function CreateNotificationModal({
             className="w-full px-3 py-2 border rounded-md mt-1"
           >
             <option value="">-- Chọn người nhận --</option>
-            {users.map((user) => (
+            {(users ?? []).map((user) => (
               <option key={user.id} value={user.email}>
                 {user.email}
               </option>
