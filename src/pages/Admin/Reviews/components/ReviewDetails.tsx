@@ -5,13 +5,9 @@ import { StarRating } from "./StarRating";
 export default function ReviewDetailsModal({
   review,
   onClose,
-  handleDelete,
-  isPending,
 }: {
   review: Review;
   onClose: () => void;
-  handleDelete: any;
-  isPending: boolean;
 }) {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
@@ -74,14 +70,7 @@ export default function ReviewDetailsModal({
             </div>
           </div>
         </div>
-        <div className="px-6 py-4 border-t border-gray-200 flex justify-between">
-          <button
-            onClick={() => handleDelete(review.review_id)}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors cursor-pointer disabled:cursor-not-allowed disabled:bg-red-300"
-            disabled={isPending}
-          >
-            Xóa đánh giá
-          </button>
+        <div className="px-6 py-4 border-t border-gray-200 flex justify-end">
           <button
             onClick={onClose}
             className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors cursor-pointer"

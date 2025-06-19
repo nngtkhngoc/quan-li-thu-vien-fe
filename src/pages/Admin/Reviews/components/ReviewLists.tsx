@@ -69,11 +69,6 @@ export default function ReviewList({
         <ReviewDetailsModal
           review={viewingReview}
           onClose={() => setViewingReview(null)}
-          handleDelete={() => {
-            handleDelete(viewingReview.review_id);
-            setViewingReview(null);
-          }}
-          isPending={isPending}
         />
       )}
     </div>
