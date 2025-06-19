@@ -7,6 +7,7 @@ import {
   Star,
   Bell,
   Library,
+  Award,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
@@ -19,6 +20,7 @@ const navigation = [
   { name: "Đặt trước", href: "/admin/reservations", icon: Calendar },
   { name: "Đánh giá", href: "/admin/reviews", icon: Star },
   { name: "Thông báo", href: "/admin/notifications", icon: Bell },
+  { name: "Huy hiệu", href: "/admin/badges", icon: Award },
 ];
 
 export default function Sidebar() {
