@@ -1,17 +1,14 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import StatsCard from "./components/StatsCard";
 import { deleteReviews, getAllReviews } from "../../../api/review.api";
 import { useState } from "react";
 import FilterBar from "./components/FilterBar";
 import ReviewList from "./components/ReviewLists";
 import LoadingSpinner from "../../../components/ui/LoadingSpinner";
+import DeleteConfirmModal from "./components/DeleteModal";
 
 export default function Reviews() {
-  const {
-    data: totalReviews,
-    isLoading: isTotalLoading,
-    refetch,
-  } = useQuery({
+  const { data: totalReviews, isLoading: isTotalLoading } = useQuery({
     queryKey: ["getAllReviews"],
     queryFn: () => getAllReviews(),
   });
@@ -33,10 +30,14 @@ export default function Reviews() {
       return matchesSearch && matchesRating;
     }) || [];
 
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [idToDelete, setIdToDelete] = useState<BigInteger | null>(null);
+
+  const queryClient = useQueryClient();
   const deleteMutation = useMutation({
     mutationFn: deleteReviews,
     onSuccess: () => {
-      refetch();
+      queryClient.invalidateQueries({ queryKey: ["getAllReviews"] });
     },
     onError: (err) => {
       console.error("Delete error", err);
@@ -68,11 +69,18 @@ export default function Reviews() {
 
       <ReviewList
         filteredReviews={filteredReviews}
-        handleDelete={(id: BigInteger) =>
-          deleteMutation.mutate({
-            ids: [id],
-          })
-        }
+        handleDelete={(id: BigInteger) => setIdToDelete(id)}
+        isPending={deleteMutation.isPending}
+      />
+
+      <DeleteConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={() => {
+          if (idToDelete !== null) {
+            deleteMutation.mutate({ ids: [idToDelete] });
+          }
+        }}
         isPending={deleteMutation.isPending}
       />
     </div>
