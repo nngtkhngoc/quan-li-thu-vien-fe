@@ -51,12 +51,16 @@ const BorrowedBooks = () => {
 
   const statusCounts = {
     borrowed: borrows?.filter(
-      (b: BorrowBookResponse) => b.status === "BORROWED"
+      (b: BorrowBookResponse) =>
+        b.status === "BORROWED" && b.user.id === userProfile?.id
     ).length,
-    overdue: borrows?.filter((b: BorrowBookResponse) => b.status === "OVERDUE")
-      .length,
+    overdue: borrows?.filter(
+      (b: BorrowBookResponse) =>
+        b.status === "OVERDUE" && b.user.id === userProfile?.id
+    ).length,
     returned: borrows?.filter(
-      (b: BorrowBookResponse) => b.status === "RETURNED"
+      (b: BorrowBookResponse) =>
+        b.status === "RETURNED" && b.user.id === userProfile?.id
     ).length,
   };
 
@@ -204,13 +208,13 @@ const BorrowedBooks = () => {
                           </p>
                           <p
                             className={`font-medium ${
-                              borrowedBook.status === "overdue"
+                              borrowedBook.status === "BORROWED"
                                 ? "text-red-600 dark:text-red-400"
                                 : "text-gray-900 dark:text-white"
                             }`}
                           >
                             {format(
-                              new Date(borrowedBook.return_date),
+                              new Date(borrowedBook.due_date),
                               "dd/MM/yyyy"
                             )}
                           </p>
@@ -231,7 +235,7 @@ const BorrowedBooks = () => {
                             </div>
                           )}
 
-                        {borrowedBook.status === "borrowed" &&
+                        {borrowedBook.status === "BORROWED" &&
                           daysRemaining !== null && (
                             <div>
                               <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -274,11 +278,11 @@ const BorrowedBooks = () => {
                         </span>
                       </div>
 
-                      {borrowedBook.status === "borrowed" && (
+                      {/* {borrowedBook.status === "BORROWED" && (
                         <button className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
                           Gia Hạn
                         </button>
-                      )}
+                      )} */}
                     </div>
                   </div>
                 </div>

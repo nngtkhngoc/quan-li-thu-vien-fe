@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Link } from "react-router-dom";
 import { Star, BookOpen, Clock } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function BookCard({ book, showActions = true }: any) {
   const avaibility =
@@ -66,12 +67,22 @@ export default function BookCard({ book, showActions = true }: any) {
 
         {showActions && (
           <div className="flex space-x-2">
-            <Link
-              to={`/books/${book.id}`}
-              className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-medium py-2 px-4 rounded-lg hover:shadow-lg transition-all duration-300 text-center"
+            <motion.div
+              whileHover={{
+                scale: 1.06,
+                y: -3,
+                boxShadow: "0 4px 16px 0 rgba(80, 63, 205, 0.10)",
+              }}
+              whileTap={{ scale: 0.97 }}
+              className="flex-1"
             >
-              Xem chi tiết
-            </Link>
+              <Link
+                to={`/books/${book.id}`}
+                className="block bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-medium py-2 px-4 rounded-lg hover:shadow-lg transition-all duration-300 text-center"
+              >
+                Xem chi tiết
+              </Link>
+            </motion.div>
             {book.availableCopies > 0 && (
               <button className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium py-2 px-4 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                 <Clock className="h-4 w-4" />

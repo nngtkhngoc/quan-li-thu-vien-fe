@@ -93,7 +93,7 @@ const BookDetail = () => {
         queryKey: ["review", id],
       });
     },
-    onError: (e) => {
+    onError: e => {
       console.error("Error creating review:", e);
       if (axios.isAxiosError(e)) {
         toast.error(
@@ -175,7 +175,7 @@ const BookDetail = () => {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
           Không tìm thấy sách
         </h2>
-        <Link to="/catalogue" className="text-blue-600 hover:text-blue-700">
+        <Link to="/books" className="text-blue-600 hover:text-blue-700">
           ← Trở về danh mục sách
         </Link>
       </div>
@@ -188,7 +188,7 @@ const BookDetail = () => {
     <div className="space-y-8 max-w-screen-xl">
       {/* Back Navigation */}
       <Link
-        to="/catalogue"
+        to="/books"
         className="inline-flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
       >
         <ArrowLeft className="h-4 w-4 mr-2" />
@@ -373,12 +373,12 @@ const BookDetail = () => {
                 Đánh giá
               </label>
               <div className="flex items-center space-x-1">
-                {[1, 2, 3, 4, 5].map((star) => (
+                {[1, 2, 3, 4, 5].map(star => (
                   <button
                     key={star}
                     type="button"
                     onClick={() =>
-                      setNewReview((prev) => ({ ...prev, rating: star }))
+                      setNewReview(prev => ({ ...prev, rating: star }))
                     }
                     className="p-1"
                   >
