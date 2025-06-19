@@ -26,6 +26,8 @@ import Profile from "./pages/Client/Profile.tsx";
 import Catalogs from "./pages/Admin/Catalogs.tsx";
 import { NotificationProvider } from "./contexts/notificationContext.tsx";
 import { UserProvider } from "./contexts/userContext.tsx";
+import Badges from "./pages/Admin/Badges/Badges.tsx";
+import Forum from "./pages/Client/Forum.tsx";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +40,7 @@ createRoot(document.getElementById("root")!).render(
             <Routes>
               <Route path="/" element={<App />}>
                 <Route index element={<Homepage />} />
+                <Route path="/forum" element={<Forum />} />
                 <Route path="/books" element={<BookCatalogue />} />
                 <Route path="/books/:id" element={<BookDetailed />} />
                 <Route path="/borrowed-books" element={<BorrowedBooks />} />
@@ -64,6 +67,7 @@ createRoot(document.getElementById("root")!).render(
                 <Route path="/admin/reviews" element={<Reviews />} />
                 <Route path="/admin/reservations" element={<Reservations />} />
                 <Route path="/admin/catalogs" element={<Catalogs />} />
+                <Route path="/admin/badges" element={<Badges />} />
               </Route>
 
               <Route path="/admin/login">

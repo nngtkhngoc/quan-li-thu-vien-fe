@@ -1,5 +1,5 @@
 import { Bot, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useUser } from "../../hooks/useUser";
 import { toast } from "react-toastify";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -35,7 +35,7 @@ export default function Chatbot() {
         user_id: userId,
       });
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["chatbotMessages", userId],
       });

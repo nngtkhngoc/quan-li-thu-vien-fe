@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Search, Bell, User, Moon, Menu, X, BookOpen } from "lucide-react";
-import { mockNotifications } from "../../data/mockData";
 import { useUser } from "../../hooks/useUser";
 import { signOut } from "../../api/user.api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import { useNotification } from "../../contexts/notificationContext";
 
 const Header: React.FC = () => {
   const { userProfile } = useUser();
@@ -18,7 +18,7 @@ const Header: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const queryClient = useQueryClient();
 
-  const unreadNotifications = mockNotifications.filter(n => !n.isRead).length;
+  const { newNotifications } = useNotification();
 
   const signOutMutation = useMutation({
     mutationFn: signOut,
@@ -47,6 +47,8 @@ const Header: React.FC = () => {
   const navigationItems = [
     { path: "/", label: "Trang chủ" },
     { path: "/books", label: "Sách" },
+    { path: "/forum", label: "Diễn đàn" },
+    { path: "/search", label: "Tìm kiếm" },
   ];
 
   return (
@@ -65,7 +67,7 @@ const Header: React.FC = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            {navigationItems.map(item => (
+            {navigationItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
@@ -79,23 +81,6 @@ const Header: React.FC = () => {
               </Link>
             ))}
           </nav>
-
-          {/* Search Bar */}
-          <form
-            onSubmit={handleSearch}
-            className="hidden sm:block flex-1 max-w-md mx-8"
-          >
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-              <input
-                type="text"
-                placeholder="Search books, authors..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-          </form>
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
@@ -119,9 +104,9 @@ const Header: React.FC = () => {
                   className="relative p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 >
                   <Bell className="h-5 w-5" />
-                  {unreadNotifications > 0 && (
+                  {newNotifications && newNotifications.length > 0 && (
                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                      {unreadNotifications}
+                      {newNotifications.length}
                     </span>
                   )}
                 </Link>
@@ -129,22 +114,30 @@ const Header: React.FC = () => {
                 {/* User Menu */}
                 <div className="relative group">
                   <button className="flex items-center space-x-3 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="0.75"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      className="lucide lucide-circle-user-icon lucide-circle-user"
-                    >
-                      <circle cx="12" cy="12" r="10" />
-                      <circle cx="12" cy="10" r="3" />
-                      <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662" />
-                    </svg>
+                    {userProfile?.image ? (
+                      <img
+                        src={userProfile.image}
+                        alt={userProfile.name}
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="0.75"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        className="lucide lucide-circle-user-icon lucide-circle-user"
+                      >
+                        <circle cx="12" cy="12" r="10" />
+                        <circle cx="12" cy="10" r="3" />
+                        <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662" />
+                      </svg>
+                    )}
                     <div className="hidden lg:block text-left">
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
                         {userProfile?.name}
@@ -159,20 +152,28 @@ const Header: React.FC = () => {
                         to="/profile"
                         className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
-                        My Profile
+                        Hồ sơ của tôi
                       </Link>
                       <Link
                         to="/borrowed-books"
                         className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
-                        My Books
+                        Sách đang mượn
                       </Link>
                       <Link
                         to="/reservations"
                         className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
-                        Reservations
+                        Sách đang đặt trước
                       </Link>
+                      {userProfile.role === "ADMIN" && (
+                        <Link
+                          to="/admin"
+                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                          Quản trị viên
+                        </Link>
+                      )}
                       <hr className="my-1 border-gray-200 dark:border-gray-700" />
                       <button
                         onClick={() => signOutMutation.mutate()}
@@ -181,7 +182,7 @@ const Header: React.FC = () => {
                       >
                         {signOutMutation.isPending
                           ? "Đang đăng xuất..."
-                          : "Sign Out"}
+                          : "Đăng xuất"}
                       </button>
                     </div>
                   </div>
@@ -193,7 +194,7 @@ const Header: React.FC = () => {
                 className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-300"
               >
                 <User className="h-4 w-4" />
-                <span>Sign In</span>
+                <span>Đăng nhập</span>
               </Link>
             )}
 
@@ -215,7 +216,7 @@ const Header: React.FC = () => {
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-gray-200 dark:border-gray-700 py-4">
             <div className="space-y-2">
-              {navigationItems.map(item => (
+              {navigationItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
@@ -236,9 +237,9 @@ const Header: React.FC = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                   <input
                     type="text"
-                    placeholder="Search books, authors..."
+                    placeholder="Tìm sách hoặc tác giả."
                     value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>

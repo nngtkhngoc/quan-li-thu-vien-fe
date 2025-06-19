@@ -4,17 +4,21 @@ import { format, differenceInDays } from "date-fns";
 // import { borrows? } from "../data/mockData";
 import type { BorrowBookResponse } from "../../types/Borrow";
 import useBorrow from "../../hooks/useBorrow";
+import { useUser } from "../../hooks/useUser";
 
 type FilterType = "ALL" | "BORROWED" | "RETURNED" | "OVERDUE";
 
 const BorrowedBooks = () => {
   const [filter, setFilter] = useState<FilterType>("ALL");
+  const { userProfile } = useUser();
 
   const { borrows, isLoadingBorrows } = useBorrow();
 
   if (isLoadingBorrows) return <p>Đang tải...</p>;
 
   const filteredBooks = borrows?.filter(book => {
+    if (!userProfile) return false;
+    if (book.user.id !== userProfile?.id) return false;
     if (filter === "ALL") return true;
     return book.status === filter;
   });
@@ -45,10 +49,6 @@ const BorrowedBooks = () => {
     return days;
   };
 
-  const totalFines = borrows
-    ?.filter(() => 0)
-    .reduce((total: number) => total + 0, 0);
-
   const statusCounts = {
     borrowed: borrows?.filter(
       (b: BorrowBookResponse) => b.status === "BORROWED"
@@ -61,7 +61,7 @@ const BorrowedBooks = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gray-900">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 dark:bg-gray-900">
       <div className="space-y-6 ">
         {/* Header */}
         <div>
@@ -164,7 +164,7 @@ const BorrowedBooks = () => {
                       : "border-gray-200 dark:border-gray-700 hover:shadow-lg"
                   }`}
                 >
-                  <div className="flex flex-col lg:flex-row gap-6">
+                  <div className="flex  lg:flex-row gap-6">
                     {/* Book Cover */}
                     <div className="flex-shrink-0">
                       <img
@@ -181,7 +181,7 @@ const BorrowedBooks = () => {
                           {borrowedBook.book_item.book.title}
                         </h3>
                         <p className="text-gray-600 dark:text-gray-400">
-                          tác giả {borrowedBook.book_item.book.author}
+                          Tác giả {borrowedBook.book_item.book.author}
                         </p>
                       </div>
 

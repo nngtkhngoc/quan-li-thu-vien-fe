@@ -19,12 +19,11 @@ import {
   TrendingUp,
   Calendar,
   Star,
-  Trophy,
 } from "lucide-react";
 
-import useBorrow from "../../../hooks/useBorrow";
 import useDashboard from "../../../hooks/useDashboard";
-import { dashboardStats } from "../../../data/mockData";
+import { useQuery } from "@tanstack/react-query";
+import { getAllUsers } from "../../../api/user.api";
 
 const StatCard = ({
   title,
@@ -67,10 +66,31 @@ const StatCard = ({
 );
 
 export default function Dashboard() {
-  const { borrows } = useBorrow();
   const { dashboard } = useDashboard();
-  console.log(dashboard);
-  const overdueBooks = borrows?.filter(borrow => borrow.status === "OVERDUE");
+  const { data: users } = useQuery({
+    queryFn: getAllUsers,
+    queryKey: ["users"],
+  });
+  // const overdueBooks = borrows?.filter(borrow => borrow.status === "OVERDUE");
+
+  // Array of colors for pie chart cells
+  const pieColors = [
+    "#8884d8",
+    "#82ca9d",
+    "#ffc658",
+    "#ff7c7c",
+    "#8dd1e1",
+    "#d084d0",
+    "#ffb347",
+    "#87ceeb",
+    "#dda0dd",
+    "#98fb98",
+    "#f0e68c",
+    "#ff6347",
+    "#40e0d0",
+    "#ee82ee",
+    "#90ee90",
+  ];
 
   return (
     <div className="p-6 space-y-6">
@@ -98,7 +118,7 @@ export default function Dashboard() {
         />
         <StatCard
           title="Active Users"
-          value={dashboardStats.totalUsers.toLocaleString()}
+          value={users?.length || 0}
           icon={Users}
           change="+5.2% from last month"
           changeType="positive"
@@ -107,8 +127,8 @@ export default function Dashboard() {
           title="Active Borrows"
           value={dashboard?.activeBorrows}
           icon={ArrowRightLeft}
-          change="-3 from yesterday"
-          changeType="negative"
+          change="+5 from yesterday"
+          changeType="positive"
         />
         <StatCard
           title="Overdue Books"
@@ -174,12 +194,15 @@ export default function Dashboard() {
                   `${name} ${(percent * 100).toFixed(0)}%`
                 }
               >
-                {dashboard?.categoryDistribution.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    // fill={entry.color}
-                  />
-                ))}
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                {dashboard?.categoryDistribution.map(
+                  (_entry: any, index: number) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={pieColors[index % pieColors.length]}
+                    />
+                  )
+                )}
               </Pie>
               <Tooltip />
             </PieChart>

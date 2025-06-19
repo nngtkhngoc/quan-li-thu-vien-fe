@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createNotification,
-  deleteNotifications,
+  deleteNotification,
   getAllNotifications,
   updateNotification,
 } from "../../../api/notification.api";
@@ -15,17 +15,15 @@ import type { Notification } from "../../../types/Notification";
 import DeleteConfirmModal from "./components/DeleteModal";
 import CreateNotificationModal from "./components/CreateModal";
 import LoadingSpinner from "../../../components/ui/LoadingSpinner";
+import { toast } from "react-toastify";
+
 export default function Notifications() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRead, setFilterRead] = useState("All");
 
   const readStatuses = ["All", "Read", "Unread"];
 
-  const {
-    data: totalNotifications,
-    isLoading: isTotalLoading,
-    refetch,
-  } = useQuery({
+  const { data: totalNotifications, isLoading: isTotalLoading } = useQuery({
     queryKey: ["getAllNotifications"],
     queryFn: () => getAllNotifications(),
   });
@@ -56,12 +54,17 @@ export default function Notifications() {
   );
 
   const deleteMutation = useMutation({
-    mutationFn: deleteNotifications,
+    mutationFn: deleteNotification,
     onSuccess: () => {
-      refetch();
+      queryClient.invalidateQueries({ queryKey: ["getAllNotifications"] });
+      queryClient.invalidateQueries({ queryKey: ["getReadNotifications"] });
+      queryClient.invalidateQueries({ queryKey: ["getUnreadNotifications"] });
+      toast.success("Xóa thông báo thành công!");
+      setShowDeleteModal(false);
     },
     onError: (err) => {
       console.error("Delete error", err);
+      toast.error("Xóa thông báo thất bại!");
     },
   });
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -70,6 +73,7 @@ export default function Notifications() {
     mutationFn: ({ userId, message }: { userId: number; message: string }) =>
       createNotification({ user_id: userId, message }),
     onSuccess: () => {
+      toast.success("Tạo thông báo thành công!");
       queryClient.invalidateQueries({ queryKey: ["getAllNotifications"] });
       setShowCreateModal(false);
       queryClient.invalidateQueries({ queryKey: ["getAllNotifications"] });
@@ -77,6 +81,7 @@ export default function Notifications() {
       queryClient.invalidateQueries({ queryKey: ["getUnreadNotifications"] });
     },
     onError: (err) => {
+      toast.error("Tạo thông báo thất bại!");
       console.error("Create notification error", err);
     },
   });
@@ -101,11 +106,6 @@ export default function Notifications() {
       id,
       seen,
     });
-  };
-
-  const handleDelete = (id: BigInteger) => {
-    setSelectedIdToDelete(id.toString);
-    setShowDeleteModal(true); // show modal
   };
 
   const isLoading = isReadLoading || isTotalLoading || isUnreadLoading;
@@ -133,8 +133,9 @@ export default function Notifications() {
       <NotificationList
         notifications={filteredNotifications}
         handleToggleRead={(id, seen) => handleToggleRead(id, seen)}
-        handleDelete={handleDelete}
         isUpdating={updateMutation.isPending}
+        setSelectedIdToDelete={setSelectedIdToDelete}
+        setShowDeleteModal={setShowDeleteModal}
       />
 
       <DeleteConfirmModal
@@ -142,7 +143,7 @@ export default function Notifications() {
         onClose={() => setShowDeleteModal(false)}
         onConfirm={() => {
           if (selectedIdToDelete !== null) {
-            deleteMutation.mutate({ ids: [selectedIdToDelete] });
+            deleteMutation.mutate(selectedIdToDelete);
           }
         }}
         isPending={deleteMutation.isPending}

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export type ROLE = "ADMIN" | "USER" | "LIBRARIAN";
 
 export type SignInData = {
@@ -14,12 +15,7 @@ export type UserResponse = {
   role: ROLE;
   lendings: any[];
   reservations: any[];
-};
-
-export type UpdateUserRequest = {
-  name?: string;
-  email?: string;
-  role?: ROLE;
+  image: string;
 };
 
 export type CreateUserRequest = {

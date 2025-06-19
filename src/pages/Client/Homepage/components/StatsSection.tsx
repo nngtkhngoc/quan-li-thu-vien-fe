@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Users, BookOpen, Star } from "lucide-react";
+import { BookOpen, Star } from "lucide-react";
 
 export default function StatsSection({
   totalBooks,
@@ -7,7 +7,7 @@ export default function StatsSection({
   totalReviews,
 }: {
   totalBooks: number;
-  totalUsers: number;
+  //totalUsers: number;
   totalReviews: number;
 }) {
   const stats = [

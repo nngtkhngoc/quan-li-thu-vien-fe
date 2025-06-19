@@ -4,11 +4,21 @@ import { Eye, EyeOff, BookOpen, Mail, Lock } from "lucide-react";
 import { signIn, signUp } from "../../api/user.api";
 import type { SignInData, CreateUserRequest } from "../../types/User";
 import { useUser } from "../../hooks/useUser";
+import { toast } from "react-toastify";
+import axios from "axios";
+
 interface AuthFormData {
   name: string;
   email: string;
   password: string;
   confirmPassword: string;
+}
+
+interface FormErrors {
+  name?: string;
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
 }
 
 const Auth: React.FC = () => {
@@ -22,34 +32,80 @@ const Auth: React.FC = () => {
     password: "",
     confirmPassword: "",
   });
+  const [errors, setErrors] = useState<FormErrors>({});
   const { setUserChanged } = useUser();
+
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    if (!isLogin && !formData.name.trim()) {
+      newErrors.name = "Vui lòng nhập họ và tên";
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Vui lòng nhập email";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Email không hợp lệ";
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Vui lòng nhập mật khẩu";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Mật khẩu phải có ít nhất 6 ký tự";
+    }
+
+    if (!isLogin) {
+      if (!formData.confirmPassword) {
+        newErrors.confirmPassword = "Vui lòng xác nhận mật khẩu";
+      } else if (formData.password !== formData.confirmPassword) {
+        newErrors.confirmPassword = "Mật khẩu không khớp";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleLogin = async () => {
+    const signInData: SignInData = {
+      email: formData.email,
+      password_hash: formData.password,
+    };
+    await signIn(signInData);
+    toast.success("Đăng nhập thành công!");
+    navigate("/");
+  };
+
+  const handleRegister = async () => {
+    const signUpData: CreateUserRequest = {
+      name: formData.name,
+      email: formData.email,
+      password_hash: formData.password,
+    };
+    await signUp(signUpData);
+    toast.success("Đăng ký thành công! Vui lòng đăng nhập.");
+    setIsLogin(true);
+    setFormData((prev) => ({ ...prev, password: "", confirmPassword: "" }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    if (!validateForm()) return;
 
+    setLoading(true);
     try {
       if (isLogin) {
-        const signInData: SignInData = {
-          email: formData.email,
-          password_hash: formData.password,
-        };
-        await signIn(signInData);
+        await handleLogin();
       } else {
-        if (formData.password !== formData.confirmPassword) {
-          alert("Passwords do not match");
-          return;
-        }
-        const signUpData: CreateUserRequest = {
-          name: formData.name,
-          email: formData.email,
-          password_hash: formData.password,
-        };
-        await signUp(signUpData);
+        await handleRegister();
       }
-      navigate("/");
     } catch (error: unknown) {
       console.error("Authentication error:", error);
-      alert("Authentication failed. Please try again.");
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Đăng nhập thất bại. Vui lòng thử lại.");
+      }
     } finally {
       setUserChanged(true);
       setLoading(false);
@@ -57,10 +113,29 @@ const Auth: React.FC = () => {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: value,
     }));
+    // Clear error when user starts typing
+    if (errors[name as keyof FormErrors]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: undefined,
+      }));
+    }
+  };
+
+  const toggleAuthMode = () => {
+    setIsLogin(!isLogin);
+    setErrors({});
+    setFormData({
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    });
   };
 
   return (
@@ -109,9 +184,16 @@ const Auth: React.FC = () => {
                   value={formData.name}
                   onChange={handleInputChange}
                   autoComplete="name"
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className={`w-full px-4 py-3 border ${
+                    errors.name
+                      ? "border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
+                  } rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
                   placeholder="Nhập họ và tên của bạn"
                 />
+                {errors.name && (
+                  <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+                )}
               </div>
             )}
 
@@ -132,10 +214,17 @@ const Auth: React.FC = () => {
                   value={formData.email}
                   onChange={handleInputChange}
                   autoComplete="email"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className={`w-full pl-10 pr-4 py-3 border ${
+                    errors.email
+                      ? "border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
+                  } rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
                   placeholder="Nhập email của bạn"
                 />
               </div>
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-500">{errors.email}</p>
+              )}
             </div>
 
             <div>
@@ -155,7 +244,11 @@ const Auth: React.FC = () => {
                   value={formData.password}
                   onChange={handleInputChange}
                   autoComplete="password"
-                  className="w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className={`w-full pl-10 pr-12 py-3 border ${
+                    errors.password
+                      ? "border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
+                  } rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
                   placeholder="Nhập mật khẩu của bạn"
                 />
                 <button
@@ -170,6 +263,9 @@ const Auth: React.FC = () => {
                   )}
                 </button>
               </div>
+              {errors.password && (
+                <p className="mt-1 text-sm text-red-500">{errors.password}</p>
+              )}
             </div>
 
             {!isLogin && (
@@ -189,10 +285,30 @@ const Auth: React.FC = () => {
                     required={!isLogin}
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className={`w-full pl-10 pr-12 py-3 border ${
+                      errors.confirmPassword
+                        ? "border-red-500"
+                        : "border-gray-300 dark:border-gray-600"
+                    } rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
                     placeholder="Nhập lại mật khẩu của bạn"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
                 </div>
+                {errors.confirmPassword && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.confirmPassword}
+                  </p>
+                )}
               </div>
             )}
 
@@ -212,11 +328,35 @@ const Auth: React.FC = () => {
               disabled={loading}
               className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-lg"
             >
-              {loading
-                ? "Vui lòng đợi..."
-                : isLogin
-                ? "Đăng nhập"
-                : "Tạo tài khoản"}
+              {loading ? (
+                <div className="flex items-center">
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Vui lòng đợi...
+                </div>
+              ) : isLogin ? (
+                "Đăng nhập"
+              ) : (
+                "Tạo tài khoản"
+              )}
             </button>
           </form>
 
@@ -235,7 +375,7 @@ const Auth: React.FC = () => {
             <div className="mt-6">
               <button
                 type="button"
-                onClick={() => setIsLogin(!isLogin)}
+                onClick={toggleAuthMode}
                 className="w-full text-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
               >
                 {isLogin ? "Tạo tài khoản mới" : "Đăng nhập"}

@@ -80,7 +80,7 @@ export default function DeleteConfirmModal({
               disabled={isPending}
               className={`px-4 py-2 rounded-md text-white transition-colors ${
                 isPending
-                  ? "bg-red-300 cursor-not-allowed"
+                  ? "bg-gray-500 cursor-not-allowed"
                   : "bg-red-500 hover:bg-red-600 cursor-pointer"
               }`}
             >
