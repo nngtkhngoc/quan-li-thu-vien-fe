@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, Edit, Trash2, Eye, Users as UsersIcon } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pagination } from "antd";
@@ -89,6 +89,16 @@ export default function Users() {
     email: "",
     role: "USER",
   });
+
+  useEffect(() => {
+    if (isEditing) {
+      setFormData({
+        name: isEditing.name || "",
+        email: isEditing.email || "",
+        role: isEditing.role || "USER",
+      });
+    }
+  }, [isEditing]);
 
   if (isLoading) {
     return (
@@ -320,7 +330,10 @@ export default function Users() {
       {isEditing && (
         <AdminConfirmModal
           isOpen={!!isEditing}
-          onCancel={() => setIsEditing(null)}
+          onCancel={() => {
+            setIsEditing(null);
+            setFormData({ name: "", email: "", role: "USER" });
+          }}
           onSave={() => handleUpdate(formData)}
           isPending={isPendingUpdate}
         >
