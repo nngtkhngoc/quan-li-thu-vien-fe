@@ -2,7 +2,7 @@ import { axiosClient, axiosClientFormData } from "../lib/axios";
 import type { BadgeResponse, CreateOrUpdateBadgeRequest } from "../types/Badge";
 
 export const createBadge = async (data: CreateOrUpdateBadgeRequest) => {
-  const response = await axiosClientFormData.post("/badges", data);
+  const response = await axiosClient.post("/badges", data);
   return response.data;
 };
 
