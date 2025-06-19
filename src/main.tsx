@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
+import Search from "./pages/Client/Search.tsx";
 import "./index.css";
 import App from "./App.tsx";
 import Homepage from "./pages/Client/Homepage/Homepage.tsx";
@@ -27,6 +27,7 @@ import Catalogs from "./pages/Admin/Catalogs.tsx";
 import { NotificationProvider } from "./contexts/notificationContext.tsx";
 import { UserProvider } from "./contexts/userContext.tsx";
 import Badges from "./pages/Admin/Badges/Badges.tsx";
+import Forum from "./pages/Client/Forum.tsx";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ createRoot(document.getElementById("root")!).render(
             <Routes>
               <Route path="/" element={<App />}>
                 <Route index element={<Homepage />} />
+                <Route path="/forum" element={<Forum />} />
                 <Route path="/books" element={<BookCatalogue />} />
                 <Route path="/books/:id" element={<BookDetailed />} />
                 <Route path="/borrowed-books" element={<BorrowedBooks />} />
@@ -46,6 +48,7 @@ createRoot(document.getElementById("root")!).render(
                   path="/notifications"
                   element={<ClientNotifications />}
                 />
+                <Route path="search" element={<Search />} />
                 <Route path="/reservations" element={<ClientReservations />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/auth" element={<Auth />} />

@@ -25,6 +25,8 @@ import { getAllUsers } from "../../api/user.api";
 import { getBooks } from "../../api/book.api";
 import { toast } from "react-toastify";
 import type { BookResponse } from "../../types/Book";
+import { AdminConfirmModal } from "../../components/Admin/AdminConfirmModal";
+import AdminDeleteModal from "../../components/Admin/AdminDeleteModal";
 
 export default function Reservations() {
   const { data: reservations, isLoading } = useQuery({
@@ -53,6 +55,10 @@ export default function Reservations() {
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
   const [isCreating, setIsCreating] = useState(false);
   const [isDeleting, setIsDeleting] = useState<number | null>(null);
+  const [isConfirmingStatus, setIsConfirmingStatus] = useState<{
+    id: number;
+    returned: boolean;
+  } | null>(null);
 
   const {
     mutate: updateReservationMutation,
@@ -68,6 +74,7 @@ export default function Reservations() {
     onSuccess() {
       invalidateQuery();
       toast.success("Cập nhật đặt trước thành công");
+      setIsConfirmingStatus(null);
     },
     onError() {
       toast.error("Cập nhật đặt trước thất bại");
@@ -143,7 +150,22 @@ export default function Reservations() {
     });
 
   const handleStatusChange = (id: number, returned: boolean) => {
-    updateReservationMutation({ id, data: { returned } });
+    setIsConfirmingStatus({ id, returned });
+  };
+
+  const confirmStatusChange = () => {
+    if (isConfirmingStatus) {
+      updateReservationMutation({
+        id: isConfirmingStatus.id,
+        data: { returned: isConfirmingStatus.returned },
+      });
+    }
+  };
+
+  const handleDelete = () => {
+    if (isDeleting) {
+      deleteReservationMutation(isDeleting);
+    }
   };
 
   return (
@@ -352,7 +374,7 @@ export default function Reservations() {
                                   true
                                 )
                               }
-                              className="text-blue-600 hover:text-blue-900 p-1 rounded-full hover:bg-blue-100 transition-colors"
+                              className="text-blue-600 hover:text-blue-900 p-1 rounded-full hover:bg-blue-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                               title="Hoàn thành"
                               disabled={isUpdatingReservation}
                             >
@@ -366,7 +388,7 @@ export default function Reservations() {
                                   false
                                 )
                               }
-                              className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-100 transition-colors"
+                              className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                               title="Chuyển đang chờ"
                               disabled={isUpdatingReservation}
                             >
@@ -377,11 +399,9 @@ export default function Reservations() {
                             onClick={() =>
                               setIsDeleting(reservation.reservation_id)
                             }
-                            className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-100 transition-colors"
+                            className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             title="Xóa"
-                            disabled={
-                              isUpdatingReservation || isDeletingReservation
-                            }
+                            disabled={isDeletingReservation}
                           >
                             <Trash2 className="h-5 w-5" />
                           </button>
@@ -408,24 +428,26 @@ export default function Reservations() {
 
       {/* Add Create Modal */}
       {isCreating && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl max-w-md w-full">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">
-                Tạo đặt trước mới
-              </h2>
-            </div>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const formData = new FormData(e.currentTarget);
-                createReservationMutation({
-                  user_id: Number(formData.get("userId")),
-                  book_item_id: Number(formData.get("bookItemId")),
-                });
-              }}
-              className="p-6 space-y-4"
-            >
+        <AdminConfirmModal
+          isOpen={isCreating}
+          onCancel={() => setIsCreating(false)}
+          onSave={() => {
+            const form = document.querySelector("form") as HTMLFormElement;
+            if (form) {
+              const formData = new FormData(form);
+              createReservationMutation({
+                user_id: Number(formData.get("userId")),
+                book_item_id: Number(formData.get("bookItemId")),
+              });
+            }
+          }}
+          isPending={isCreatingReservation}
+        >
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold text-gray-900">
+              Tạo đặt trước mới
+            </h2>
+            <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Người dùng *
@@ -467,53 +489,42 @@ export default function Reservations() {
                   )}
                 </select>
               </div>
-              <div className="flex justify-end space-x-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setIsCreating(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-                >
-                  Hủy
-                </button>
-                <button
-                  type="submit"
-                  disabled={isCreatingReservation}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:bg-gray-700"
-                >
-                  {isCreatingReservation ? "Đang tạo..." : "Tạo mới"}
-                </button>
-              </div>
             </form>
           </div>
-        </div>
+        </AdminConfirmModal>
       )}
 
-      {/* Add Delete Confirmation Modal */}
-      {isDeleting && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl max-w-md w-full">
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-800">
-                Bạn chắc chắn muốn xóa đặt trước này?
-              </h3>
-              <div className="flex justify-end space-x-3 pt-4">
-                <button
-                  onClick={() => setIsDeleting(null)}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-                >
-                  Hủy
-                </button>
-                <button
-                  onClick={() => deleteReservationMutation(isDeleting)}
-                  disabled={isDeletingReservation}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:bg-gray-700"
-                >
-                  {isDeletingReservation ? "Đang xóa..." : "Xác nhận"}
-                </button>
-              </div>
-            </div>
+      {/* Status Change Confirmation Modal */}
+      {isConfirmingStatus && (
+        <AdminConfirmModal
+          isOpen={!!isConfirmingStatus}
+          onCancel={() => setIsConfirmingStatus(null)}
+          onSave={confirmStatusChange}
+          isPending={isUpdatingReservation}
+        >
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold text-gray-900">
+              {isConfirmingStatus.returned
+                ? "Xác nhận hoàn thành"
+                : "Xác nhận chuyển đang chờ"}
+            </h2>
+            <p className="text-gray-600">
+              {isConfirmingStatus.returned
+                ? "Bạn có chắc chắn muốn đánh dấu đặt trước này là đã hoàn thành?"
+                : "Bạn có chắc chắn muốn chuyển đặt trước này về trạng thái đang chờ?"}
+            </p>
           </div>
-        </div>
+        </AdminConfirmModal>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {isDeleting && (
+        <AdminDeleteModal
+          isOpen={!!isDeleting}
+          onClose={() => setIsDeleting(null)}
+          onConfirm={handleDelete}
+          isPending={isDeletingReservation}
+        />
       )}
     </div>
   );

@@ -15,12 +15,7 @@ export type UserResponse = {
   role: ROLE;
   lendings: any[];
   reservations: any[];
-};
-
-export type UpdateUserRequest = {
-  name?: string;
-  email?: string;
-  role?: ROLE;
+  image: string;
 };
 
 export type CreateUserRequest = {

@@ -1,7 +1,6 @@
-import { axiosClient } from "../lib/axios";
+import { axiosClient, axiosClientFormData } from "../lib/axios";
 import type {
   UserResponse,
-  UpdateUserRequest,
   SignInData,
   CreateUserRequest,
 } from "../types/User";
@@ -44,16 +43,13 @@ export const getProfile = async (): Promise<UserResponse> => {
   return response.data.data;
 };
 // Update user
-export const updateUser = async (
-  id: number,
-  data: UpdateUserRequest
-): Promise<UserResponse> => {
-  const response = await axiosClient.put(`/users/${id}`, data);
+export const updateUser = async (id: number, formData: FormData) => {
+  const response = await axiosClientFormData.put(`/users/${id}`, formData);
   return response.data.data;
 };
 
 // Delete user
 export const deleteUser = async (id: number): Promise<{ message: string }> => {
   const response = await axiosClient.delete(`/users/${id}`);
-  return response.data.data;
+  return response.data.message;
 };

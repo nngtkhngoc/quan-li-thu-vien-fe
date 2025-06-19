@@ -7,10 +7,12 @@ import { UserContext } from "./userContext";
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [userProfile, setUserProfile] = useState<UserResponse | null>(null);
   const [userChanged, setUserChanged] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
+        setIsLoading(true);
         const response = await getProfile();
         console.log("user", response);
         if (response) {
@@ -23,6 +25,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         setUserProfile(null);
       } finally {
         setUserChanged(false);
+        setIsLoading(false);
       }
     };
 
@@ -36,6 +39,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         setUserProfile,
         userChanged,
         setUserChanged,
+        isLoading,
       }}
     >
       {children}

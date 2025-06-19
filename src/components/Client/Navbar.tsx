@@ -47,6 +47,8 @@ const Header: React.FC = () => {
   const navigationItems = [
     { path: "/", label: "Trang chủ" },
     { path: "/books", label: "Sách" },
+    { path: "/forum", label: "Diễn đàn" },
+    { path: "/search", label: "Tìm kiếm" },
   ];
 
   return (
@@ -80,23 +82,6 @@ const Header: React.FC = () => {
             ))}
           </nav>
 
-          {/* Search Bar */}
-          <form
-            onSubmit={handleSearch}
-            className="hidden sm:block flex-1 max-w-md mx-8"
-          >
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-              <input
-                type="text"
-                placeholder="Search books, authors..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-          </form>
-
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
             {/* Theme Toggle */}
@@ -129,22 +114,30 @@ const Header: React.FC = () => {
                 {/* User Menu */}
                 <div className="relative group">
                   <button className="flex items-center space-x-3 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="0.75"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      className="lucide lucide-circle-user-icon lucide-circle-user"
-                    >
-                      <circle cx="12" cy="12" r="10" />
-                      <circle cx="12" cy="10" r="3" />
-                      <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662" />
-                    </svg>
+                    {userProfile?.image ? (
+                      <img
+                        src={userProfile.image}
+                        alt={userProfile.name}
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="0.75"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        className="lucide lucide-circle-user-icon lucide-circle-user"
+                      >
+                        <circle cx="12" cy="12" r="10" />
+                        <circle cx="12" cy="10" r="3" />
+                        <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662" />
+                      </svg>
+                    )}
                     <div className="hidden lg:block text-left">
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
                         {userProfile?.name}
@@ -159,20 +152,28 @@ const Header: React.FC = () => {
                         to="/profile"
                         className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
-                        My Profile
+                        Hồ sơ của tôi
                       </Link>
                       <Link
                         to="/borrowed-books"
                         className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
-                        My Books
+                        Sách đang mượn
                       </Link>
                       <Link
                         to="/reservations"
                         className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
-                        Reservations
+                        Sách đang đặt trước
                       </Link>
+                      {userProfile.role === "ADMIN" && (
+                        <Link
+                          to="/admin"
+                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                          Quản trị viên
+                        </Link>
+                      )}
                       <hr className="my-1 border-gray-200 dark:border-gray-700" />
                       <button
                         onClick={() => signOutMutation.mutate()}
@@ -181,7 +182,7 @@ const Header: React.FC = () => {
                       >
                         {signOutMutation.isPending
                           ? "Đang đăng xuất..."
-                          : "Sign Out"}
+                          : "Đăng xuất"}
                       </button>
                     </div>
                   </div>
@@ -193,7 +194,7 @@ const Header: React.FC = () => {
                 className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-300"
               >
                 <User className="h-4 w-4" />
-                <span>Sign In</span>
+                <span>Đăng nhập</span>
               </Link>
             )}
 
@@ -236,7 +237,7 @@ const Header: React.FC = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                   <input
                     type="text"
-                    placeholder="Search books, authors..."
+                    placeholder="Tìm sách hoặc tác giả."
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"

@@ -23,11 +23,7 @@ export default function Notifications() {
 
   const readStatuses = ["All", "Read", "Unread"];
 
-  const {
-    data: totalNotifications,
-    isLoading: isTotalLoading,
-    refetch,
-  } = useQuery({
+  const { data: totalNotifications, isLoading: isTotalLoading } = useQuery({
     queryKey: ["getAllNotifications"],
     queryFn: () => getAllNotifications(),
   });
@@ -60,7 +56,9 @@ export default function Notifications() {
   const deleteMutation = useMutation({
     mutationFn: deleteNotification,
     onSuccess: () => {
-      refetch();
+      queryClient.invalidateQueries({ queryKey: ["getAllNotifications"] });
+      queryClient.invalidateQueries({ queryKey: ["getReadNotifications"] });
+      queryClient.invalidateQueries({ queryKey: ["getUnreadNotifications"] });
       toast.success("Xóa thông báo thành công!");
       setShowDeleteModal(false);
     },
