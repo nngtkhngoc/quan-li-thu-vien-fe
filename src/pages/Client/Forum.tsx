@@ -15,10 +15,12 @@ import {
 } from "lucide-react";
 import { useUser } from "../../hooks/useUser";
 import ConfirmModal from "../../components/Client/ClientDeleteModal";
+import { useMutation } from "@tanstack/react-query";
+import { createNotification } from "../../api/notification.api";
 
 export default function Forum() {
   const { userProfile } = useUser();
-  const username = userProfile?.name;
+  const { id, name: username } = userProfile ?? { id: 0, username: "" };
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Use React Query for message management
@@ -34,8 +36,12 @@ export default function Forum() {
     deletingMessageId,
   } = useMessage();
 
+  const { mutate: sendNotification } = useMutation({
+    mutationFn: createNotification,
+  });
+
   // Use WebSocket for real-time messaging
-  const { sendMessage } = useChat(username || "");
+  const { sendMessage } = useChat(id || 0);
 
   const [input, setInput] = useState("");
   const [messagesLimit, setMessagesLimit] = useState(10);
@@ -103,6 +109,8 @@ export default function Forum() {
     setShowMenuForMessage(null);
   };
 
+  const handleAdminDelete = () => {};
+
   const confirmDeleteMessage = () => {
     if (deleteConfirmModal.messageId) {
       deleteMessage(deleteConfirmModal.messageId, {
@@ -122,9 +130,11 @@ export default function Forum() {
     setShowMenuForMessage(showMenuForMessage === messageId ? null : messageId);
   };
 
-  const isOwnMessage = (senderName: string) => {
-    return senderName === username;
+  const isOwnMessage = (senderId: number) => {
+    return senderId === id;
   };
+
+  const isAdmin = userProfile?.role === "ADMIN";
 
   const displayedMessages = messages?.slice(-messagesLimit) || [];
   const hasMoreMessages = messages && messages.length > messagesLimit;
@@ -289,11 +299,11 @@ export default function Forum() {
                 </p>
               </div>
             ) : (
-              displayedMessages?.map((msg, i) => {
-                const isOwn = isOwnMessage(msg.senderName);
+              displayedMessages?.map(msg => {
+                const isOwn = isOwnMessage(msg.senderId);
                 return (
                   <div
-                    key={i}
+                    key={msg.id}
                     className={`flex group ${
                       isOwn ? "justify-end" : "justify-start"
                     }`}
@@ -303,24 +313,70 @@ export default function Forum() {
                       <div className="flex space-x-3 max-w-[80%]">
                         <div className="flex-shrink-0">
                           <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                            {msg.senderName?.charAt(0).toUpperCase() || "X"}
+                            <img src={msg.image} alt="" />
                           </div>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center space-x-2 mb-1">
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">
-                              {msg.senderName}
-                            </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              {new Date(msg.timestamp).toLocaleTimeString(
-                                "vi-VN",
-                                {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                  second: "2-digit",
-                                }
-                              )}
-                            </p>
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="flex items-center space-x-2">
+                              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                {msg.senderName}
+                              </p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                {new Date(msg.timestamp).toLocaleTimeString(
+                                  "vi-VN",
+                                  {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    second: "2-digit",
+                                  }
+                                )}
+                              </p>
+                            </div>
+
+                            {/* Admin Actions - Only show for admin on others' messages */}
+                            {isAdmin && msg.id && (
+                              <div className="relative">
+                                <button
+                                  onClick={() => toggleMessageMenu(msg.id!)}
+                                  className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-all duration-200"
+                                >
+                                  <MoreVertical className="h-4 w-4" />
+                                </button>
+
+                                {/* Admin Dropdown Menu */}
+                                {showMenuForMessage === msg.id && (
+                                  <div
+                                    onClick={e => e.stopPropagation()}
+                                    className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 z-10 min-w-[140px]"
+                                  >
+                                    <button
+                                      onClick={() => {
+                                        handleDeleteMessage(msg.id!);
+                                        sendNotification({
+                                          user_id: msg.senderId,
+                                          message: `Tin nhắn "${msg.content}" của bạn đã bị xóa bởi Admin`,
+                                        });
+                                      }}
+                                      disabled={deletingMessageId === msg.id}
+                                      className="flex items-center w-full px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+                                    >
+                                      {deletingMessageId === msg.id ? (
+                                        <>
+                                          <div className="animate-spin h-3 w-3 mr-2 border border-red-600 border-t-transparent rounded-full"></div>
+                                          Đang xóa...
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Trash2 className="h-3 w-3 mr-2" />
+                                          Xóa tin nhắn với quyền Admin
+                                        </>
+                                      )}
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            )}
                           </div>
 
                           {/* Message Content for others */}
@@ -461,7 +517,7 @@ export default function Forum() {
                         </div>
                         <div className="flex-shrink-0">
                           <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                            {msg.senderName?.charAt(0).toUpperCase() || "X"}
+                            <img src={msg.image} alt="" />
                           </div>
                         </div>
                       </div>

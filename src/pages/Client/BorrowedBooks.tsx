@@ -4,17 +4,21 @@ import { format, differenceInDays } from "date-fns";
 // import { borrows? } from "../data/mockData";
 import type { BorrowBookResponse } from "../../types/Borrow";
 import useBorrow from "../../hooks/useBorrow";
+import { useUser } from "../../hooks/useUser";
 
 type FilterType = "ALL" | "BORROWED" | "RETURNED" | "OVERDUE";
 
 const BorrowedBooks = () => {
   const [filter, setFilter] = useState<FilterType>("ALL");
+  const { userProfile } = useUser();
 
   const { borrows, isLoadingBorrows } = useBorrow();
 
   if (isLoadingBorrows) return <p>Đang tải...</p>;
 
   const filteredBooks = borrows?.filter(book => {
+    if (!userProfile) return false;
+    if (book.user.id !== userProfile?.id) return false;
     if (filter === "ALL") return true;
     return book.status === filter;
   });
@@ -160,7 +164,7 @@ const BorrowedBooks = () => {
                       : "border-gray-200 dark:border-gray-700 hover:shadow-lg"
                   }`}
                 >
-                  <div className="flex flex-col lg:flex-row gap-6">
+                  <div className="flex  lg:flex-row gap-6">
                     {/* Book Cover */}
                     <div className="flex-shrink-0">
                       <img
