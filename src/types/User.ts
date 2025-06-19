@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export type ROLE = "ADMIN" | "USER"";
+export type ROLE = "ADMIN" | "USER";
 
 export type SignInData = {
   email: string;
@@ -7,9 +7,9 @@ export type SignInData = {
 };
 
 export type updateUserRequest = {
-  name?: string; 
+  name?: string;
   email?: string;
-}
+};
 
 export type UserResponse = {
   id: number;
