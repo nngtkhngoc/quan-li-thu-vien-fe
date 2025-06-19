@@ -12,8 +12,12 @@ import FilterTabs from "./components/FilterTabs";
 import NotificationsList from "./components/NotificationsList";
 import type { Notification } from "../../../types/Notification";
 import { useNotification } from "../../../contexts/notificationContext";
-import LoadingSpinner from "../../../components/ui/LoadingSpinner";
 import { useUser } from "../../../hooks/useUser";
+import {
+  FilterTabsSkeleton,
+  NotificationSkeleton,
+  StatsCardSkeleton,
+} from "./components/ClientNotificationSkeleton";
 
 export default function ClientNotifications() {
   const { userProfile } = useUser();
@@ -110,7 +114,24 @@ export default function ClientNotifications() {
 
   const isLoading = isReadLoading || isTotalLoading || isUnreadLoading;
 
-  if (isLoading) return <LoadingSpinner size="lg" />;
+  if (isLoading)
+    return (
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          Thông báo
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400 my-4">
+          Cập nhật những thông báo mới nhất của bạn
+        </p>
+        <StatsCardSkeleton />
+        <FilterTabsSkeleton />
+        <div className="space-y-3 py-5">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <NotificationSkeleton key={i} />
+          ))}
+        </div>
+      </div>
+    );
 
   return (
     <div>

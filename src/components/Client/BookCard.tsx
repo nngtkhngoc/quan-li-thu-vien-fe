@@ -1,11 +1,7 @@
-import React from "react";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Link } from "react-router-dom";
 import { Star, BookOpen, Clock } from "lucide-react";
-
-interface BookCardProps {
-  book: any;
-  showActions?: boolean;
-}
 
 export default function BookCard({ book, showActions = true }: any) {
   const avaibility =
@@ -20,11 +16,13 @@ export default function BookCard({ book, showActions = true }: any) {
   return (
     <div className="group bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 dark:border-gray-700">
       <div className="relative">
-        <img
-          src={book.image}
-          alt={book.title}
-          className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-        />
+        <div className="h-64 overflow-hidden">
+          <img
+            src={book.image}
+            alt={book.title}
+            className="w-full h-64 object-cover group-hover:scale-130 transition-transform duration-2000"
+          />
+        </div>
         <div className="absolute top-3 right-3">
           <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs font-medium">
             {avaibility > 0 ? (

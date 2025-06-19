@@ -1,8 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { Search, Filter, Grid, List } from "lucide-react";
 import BookCard from "../../components/Client/BookCard";
 import { useBook } from "../../hooks/useBook";
 import { Pagination } from "antd";
+import BookCardSkeleton from "../../components/Client/BookCardSkeleton";
+import SearchFilterSkeleton from "../../components/Client/SearchFilterSkeleton";
 
 export default function BookCatalogue() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -25,7 +28,16 @@ export default function BookCatalogue() {
   );
 
   if (getBookQuery.isLoading || getCatalogsQuery.isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="space-y-6 max-w-screen-xl mx-auto p-6">
+        <SearchFilterSkeleton />
+        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <BookCardSkeleton key={index} />
+          ))}
+        </div>
+      </div>
+    );
   }
 
   const books = getBookQuery.data?.content || [];

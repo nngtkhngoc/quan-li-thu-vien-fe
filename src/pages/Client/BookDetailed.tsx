@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Star, BookOpen, Heart, Share2, Clock } from "lucide-react";
@@ -9,6 +10,7 @@ import { toast } from "react-toastify";
 import { createBorrowedBook } from "../../api/borrow.api";
 import axios, { AxiosError } from "axios";
 import { addToWishlist, getWishlist } from "../../api/wishlist.api";
+import BookDetailSkeleton from "../../components/Client/BookDetailedSkeleton";
 const BookDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [isReserving, setIsReserving] = useState(false);
@@ -106,7 +108,7 @@ const BookDetail = () => {
   const isAuthenticated = user.userProfile;
 
   if (getBookByIdQuery.isLoading || getReviewsQuery.isLoading) {
-    return <div className="flex justify-center py-12">Loading</div>;
+    return <BookDetailSkeleton />;
   }
   const book = getBookByIdQuery.data;
   const reviews = getReviewsQuery.data.data.items || [];
@@ -201,7 +203,7 @@ const BookDetail = () => {
             <img
               src={book.image || ""}
               alt={book.title}
-              className="w-full max-w-sm mx-auto rounded-2xl shadow-2xl"
+              className="w-full max-w-sm mx-auto rounded-2xl shadow-md"
             />
           </div>
 
@@ -274,9 +276,6 @@ const BookDetail = () => {
                   </button>
 
                   <button
-                    className={`flex cursor-pointer items-center px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
-                      isLiked ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
                     onClick={async () => {
                       if (!isAuthenticated) {
                         toast.error("Bạn cần đăng nhập để thêm vào yêu thích.");
@@ -288,8 +287,28 @@ const BookDetail = () => {
                       });
                     }}
                     disabled={isLiked}
+                    className={`
+    group flex items-center justify-center gap-2
+    px-6 py-3 rounded-xl transition-all duration-300 ease-in-out
+    text-sm font-semibold tracking-wide
+    ${
+      isLiked
+        ? "bg-gradient-to-r from-gray-400 to-gray-500 text-white opacity-60 cursor-not-allowed"
+        : "bg-gradient-to-r from-pink-400 via-red-400 to-orange-400 text-white shadow-lg hover:brightness-110 hover:scale-105"
+    }
+    disabled:cursor-not-allowed
+  `}
                   >
-                    <Heart className="h-5 w-5 mr-2" />
+                    <Heart
+                      className={`
+      h-5 w-5 transition-transform duration-300
+      ${
+        isLiked
+          ? "text-white"
+          : "group-hover:scale-125 group-hover:text-yellow-200"
+      }
+    `}
+                    />
                     {isLiked ? "Đã thêm vào yêu thích" : "Thêm vào yêu thích"}
                   </button>
                 </>
@@ -336,7 +355,7 @@ const BookDetail = () => {
                 }
                 setShowReviewForm(!showReviewForm);
               }}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
             >
               Viết đánh giá
             </button>
@@ -350,8 +369,8 @@ const BookDetail = () => {
             className="mb-8 p-6 bg-gray-50 dark:bg-gray-700 rounded-xl"
           >
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Rating
+              <label className="block text-md font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Đánh giá
               </label>
               <div className="flex items-center space-x-1">
                 {[1, 2, 3, 4, 5].map((star) => (
@@ -376,29 +395,29 @@ const BookDetail = () => {
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-md font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Bình luận của bạn
               </label>
               <textarea
                 name="comment"
                 rows={4}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                placeholder="Share your thoughts about this book..."
+                placeholder="Chia sẻ cảm nghĩ của bạn về cuốn sách này..."
                 required
               />
             </div>
 
-            <div className="flex space-x-3">
+            <div className="flex space-x-3 ">
               <button
                 type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="px-4 py-2 cursor-pointer bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg hover:bg-gradient-to-bl transition-colors"
               >
                 Đánh giá
               </button>
               <button
                 type="button"
                 onClick={() => setShowReviewForm(false)}
-                className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
+                className="px-4 py-2 cursor-pointer bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-400/60  dark:hover:bg-gray-500 transition-colors duration-500"
               >
                 Hủy bỏ
               </button>
@@ -414,12 +433,21 @@ const BookDetail = () => {
               className="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-b-0"
             >
               <div className="flex items-start space-x-4">
-                <img
-                  src={review.user?.image}
-                  alt={review.user?.name}
-                  className="w-12 h-12 rounded-full object-cover"
-                />
-                {/* <h2 className="">{review.user.name}</h2> */}
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 p-1 animate-gradient-x">
+                  <div className=" w-full h-full rounded-full bg-white dark:bg-gray-900 flex items-center justify-center overflow-hidden">
+                    {review.user.image ? (
+                      <img
+                        src={review.user.image}
+                        alt={review.user.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-4xl font-bold text-gray-900 dark:text-white">
+                        {review.user.name.charAt(0).toUpperCase()}
+                      </span>
+                    )}
+                  </div>
+                </div>
                 <div className="flex-1">
                   <div className="flex items-center space-x-2 mb-2">
                     <h4 className="font-semibold text-gray-900 dark:text-white">
