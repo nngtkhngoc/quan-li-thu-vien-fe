@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Eye, EyeOff, BookOpen, Mail, Lock } from "lucide-react";
 import { signIn, signUp } from "../../api/user.api";
 import type { SignInData, CreateUserRequest } from "../../types/User";
@@ -34,6 +34,9 @@ const Auth: React.FC = () => {
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const { setUserChanged } = useUser();
+  const [seachParams] = useSearchParams();
+
+  const redirect = seachParams.get("redirect");
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -73,7 +76,7 @@ const Auth: React.FC = () => {
     };
     await signIn(signInData);
     toast.success("Đăng nhập thành công!");
-    navigate("/");
+    navigate(redirect || "/");
   };
 
   const handleRegister = async () => {
@@ -85,7 +88,7 @@ const Auth: React.FC = () => {
     await signUp(signUpData);
     toast.success("Đăng ký thành công! Vui lòng đăng nhập.");
     setIsLogin(true);
-    setFormData((prev) => ({ ...prev, password: "", confirmPassword: "" }));
+    setFormData(prev => ({ ...prev, password: "", confirmPassword: "" }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -104,7 +107,7 @@ const Auth: React.FC = () => {
       if (axios.isAxiosError(error) && error.response?.data?.message) {
         const errorMessage = error.response.data.message;
         if (errorMessage.toLowerCase().includes("email already ")) {
-          setErrors((prev) => ({
+          setErrors(prev => ({
             ...prev,
             email: "Email đã được sử dụng",
           }));
@@ -122,13 +125,13 @@ const Auth: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value,
     }));
     // Clear error when user starts typing
     if (errors[name as keyof FormErrors]) {
-      setErrors((prev) => ({
+      setErrors(prev => ({
         ...prev,
         [name]: undefined,
       }));

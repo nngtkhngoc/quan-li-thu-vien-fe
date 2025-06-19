@@ -12,6 +12,8 @@ import {
   Check,
   X,
   MoreVertical,
+  Search,
+  XCircle,
 } from "lucide-react";
 import { useUser } from "../../hooks/useUser";
 import ConfirmModal from "../../components/Client/ClientDeleteModal";
@@ -44,6 +46,7 @@ export default function Forum() {
   const { sendMessage } = useChat(id || 0);
 
   const [input, setInput] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [messagesLimit, setMessagesLimit] = useState(10);
   const [editingMessageId, setEditingMessageId] = useState<number | null>(null);
   const [editingContent, setEditingContent] = useState("");
@@ -54,6 +57,8 @@ export default function Forum() {
     show: boolean;
     messageId: number | null;
   }>({ show: false, messageId: null });
+
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const handleSend = (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -109,13 +114,10 @@ export default function Forum() {
     setShowMenuForMessage(null);
   };
 
-  const handleAdminDelete = () => {};
-
   const confirmDeleteMessage = () => {
     if (deleteConfirmModal.messageId) {
       deleteMessage(deleteConfirmModal.messageId, {
         onSuccess() {
-          console.log("Tat modal");
           setDeleteConfirmModal({ show: false, messageId: null });
         },
       });
@@ -136,13 +138,63 @@ export default function Forum() {
 
   const isAdmin = userProfile?.role === "ADMIN";
 
-  const displayedMessages = messages?.slice(-messagesLimit) || [];
-  const hasMoreMessages = messages && messages.length > messagesLimit;
+  // Function to highlight search terms in text
+  const highlightSearchTerm = (text: string, searchTerm: string) => {
+    if (!searchTerm.trim()) return text;
+
+    const regex = new RegExp(
+      `(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
+      "gi"
+    );
+    const parts = text.split(regex);
+
+    return parts.map((part, index) =>
+      regex.test(part) ? (
+        <mark
+          key={index}
+          className="bg-yellow-200 dark:bg-yellow-600 dark:text-black rounded px-1"
+        >
+          {part}
+        </mark>
+      ) : (
+        part
+      )
+    );
+  };
+
+  // Filter messages based on search query
+  const filteredMessages = messages?.filter(msg => {
+    if (!searchQuery.trim()) return true;
+    return (
+      msg.content.toLowerCase().includes(searchQuery?.toLowerCase()) ||
+      msg.senderName?.toLowerCase().includes(searchQuery?.toLowerCase())
+    );
+  });
+
+  const displayedMessages = searchQuery.trim()
+    ? filteredMessages || []
+    : messages?.slice(-messagesLimit) || [];
+
+  const hasMoreMessages =
+    !searchQuery.trim() && messages && messages.length > messagesLimit;
 
   useEffect(() => {
     if (displayedMessages.length > 10) return;
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [displayedMessages.length]);
+
+  // Keyboard shortcut for search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "f") {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 dark:bg-gray-900">
@@ -189,10 +241,14 @@ export default function Forum() {
               </div>
               <div className="ml-4">
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Tin nhắn hiển thị
+                  {searchQuery.trim()
+                    ? "Kết quả tìm kiếm"
+                    : "Tin nhắn hiển thị"}
                 </p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {displayedMessages.length}/{messages?.length || 0}
+                  {searchQuery.trim()
+                    ? `${displayedMessages.length}/${messages?.length || 0}`
+                    : `${displayedMessages.length}/${messages?.length || 0}`}
                 </p>
               </div>
             </div>
@@ -232,14 +288,23 @@ export default function Forum() {
                   Cuộc trò chuyện chung
                 </h2>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Đang tham gia với tư cách:{" "}
-                  <span className="font-medium text-blue-600 dark:text-blue-400">
-                    {username}
-                  </span>
-                  {hasMoreMessages && (
-                    <span className="ml-2 px-2 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-xs rounded-full">
-                      {(messages?.length || 0) - messagesLimit} tin nhắn bị ẩn
+                  {!id ? (
+                    <span className="text-yellow-600 dark:text-yellow-400">
+                      Vui lòng đăng nhập để tham gia trò chuyện
                     </span>
+                  ) : (
+                    <>
+                      Đang tham gia với tư cách:{" "}
+                      <span className="font-medium text-blue-600 dark:text-blue-400">
+                        {username}
+                      </span>
+                      {hasMoreMessages && (
+                        <span className="ml-2 px-2 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-xs rounded-full">
+                          {(messages?.length || 0) - messagesLimit} tin nhắn bị
+                          ẩn
+                        </span>
+                      )}
+                    </>
                   )}
                 </p>
               </div>
@@ -252,10 +317,44 @@ export default function Forum() {
             </div>
           </div>
 
+          {/* Search Bar */}
+          <div className="px-6 py-3 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+              </div>
+              <input
+                type="text"
+                ref={searchInputRef}
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="block w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                placeholder="Tìm kiếm tin nhắn theo nội dung hoặc tên người gửi... (Ctrl+F)"
+              />
+              {searchQuery && (
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  >
+                    <XCircle className="h-4 w-4" />
+                  </button>
+                </div>
+              )}
+            </div>
+            {searchQuery && (
+              <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                {displayedMessages.length > 0
+                  ? `Tìm thấy ${displayedMessages.length} tin nhắn khớp với "${searchQuery}"`
+                  : `Không tìm thấy tin nhắn nào khớp với "${searchQuery}"`}
+              </div>
+            )}
+          </div>
+
           {/* Messages Container */}
           <div className="h-96 overflow-y-auto p-6 space-y-4 bg-gray-50 dark:bg-gray-900/50">
-            {/* Load More Button */}
-            {hasMoreMessages && (
+            {/* Load More Button - Only show when not searching */}
+            {hasMoreMessages && !searchQuery.trim() && (
               <div className="text-center">
                 <button
                   onClick={handleLoadMore}
@@ -290,13 +389,29 @@ export default function Forum() {
               </div>
             ) : displayedMessages.length === 0 ? (
               <div className="text-center py-12">
-                <MessageCircle className="h-16 w-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                  Chưa có tin nhắn nào
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Hãy bắt đầu cuộc trò chuyện bằng cách gửi tin nhắn đầu tiên!
-                </p>
+                {searchQuery.trim() ? (
+                  <>
+                    <Search className="h-16 w-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                      Không tìm thấy tin nhắn
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      Không có tin nhắn nào khớp với từ khóa "{searchQuery}".
+                      Thử tìm kiếm với từ khóa khác.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <MessageCircle className="h-16 w-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                      Chưa có tin nhắn nào
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      Hãy bắt đầu cuộc trò chuyện bằng cách gửi tin nhắn đầu
+                      tiên!
+                    </p>
+                  </>
+                )}
               </div>
             ) : (
               displayedMessages?.map(msg => {
@@ -382,7 +497,7 @@ export default function Forum() {
                           {/* Message Content for others */}
                           <div className="p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
                             <p className="text-sm text-gray-900 dark:text-white">
-                              {msg.content}
+                              {highlightSearchTerm(msg.content, searchQuery)}
                             </p>
                           </div>
                         </div>
@@ -510,7 +625,7 @@ export default function Forum() {
                               </div>
                             ) : (
                               <p className="text-sm text-white">
-                                {msg.content}
+                                {highlightSearchTerm(msg.content, searchQuery)}
                               </p>
                             )}
                           </div>
@@ -532,35 +647,66 @@ export default function Forum() {
           </div>
 
           {/* Input Area */}
-          <form
-            onSubmit={handleSend}
-            className="px-6 py-4 border-t border-gray-200 dark:border-gray-700"
-          >
-            <div className="flex space-x-3">
-              <div className="flex-1">
-                <div className="relative">
-                  <input
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
-                    value={input}
-                    onChange={e => setInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Nhập tin nhắn của bạn..."
-                  />
+          {!id ? (
+            /* Login Required Message */
+            <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-yellow-50 dark:bg-yellow-900/20">
+              <div className="flex items-center justify-center space-x-3 py-4">
+                <div className="flex-shrink-0">
+                  <div className="w-10 h-10 bg-yellow-100 dark:bg-yellow-900/50 rounded-full flex items-center justify-center">
+                    <MessageCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+                  </div>
                 </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                    Bạn cần đăng nhập để tham gia trò chuyện
+                  </p>
+                  <p className="text-xs text-yellow-600 dark:text-yellow-300 mt-1">
+                    Vui lòng đăng nhập để gửi tin nhắn và tham gia thảo luận với
+                    cộng đồng
+                  </p>
+                </div>
+                <button
+                  onClick={() =>
+                    (window.location.href = `/auth?redirect=/forum`)
+                  }
+                  className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-medium rounded-lg transition-colors"
+                >
+                  Đăng nhập
+                </button>
               </div>
-              <button
-                type="submit"
-                disabled={!input.trim()}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2 font-medium"
-              >
-                <Send className="h-4 w-4" />
-                <span>Gửi</span>
-              </button>
             </div>
-            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-              Nhấn Enter để gửi tin nhắn
-            </p>
-          </form>
+          ) : (
+            /* Normal Input Form */
+            <form
+              onSubmit={handleSend}
+              className="px-6 py-4 border-t border-gray-200 dark:border-gray-700"
+            >
+              <div className="flex space-x-3">
+                <div className="flex-1">
+                  <div className="relative">
+                    <input
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
+                      value={input}
+                      onChange={e => setInput(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      placeholder="Nhập tin nhắn của bạn..."
+                    />
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  disabled={!input.trim()}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2 font-medium"
+                >
+                  <Send className="h-4 w-4" />
+                  <span>Gửi</span>
+                </button>
+              </div>
+              <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                Nhấn Enter để gửi tin nhắn
+              </p>
+            </form>
+          )}
         </div>
       </div>
 

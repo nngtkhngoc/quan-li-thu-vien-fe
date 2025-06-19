@@ -171,7 +171,7 @@ export default function Dashboard() {
         </div>
 
         {/* Category Distribution */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 overflow-visible">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-gray-800">
               Book Categories
@@ -187,14 +187,13 @@ export default function Dashboard() {
                 data={dashboard?.categoryDistribution}
                 cx="50%"
                 cy="50%"
-                outerRadius={100}
+                outerRadius={80}
                 fill="#8884d8"
                 dataKey="value"
                 label={({ name, percent }) =>
                   `${name} ${(percent * 100).toFixed(0)}%`
                 }
               >
-                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 {dashboard?.categoryDistribution.map(
                   (_entry: any, index: number) => (
                     <Cell

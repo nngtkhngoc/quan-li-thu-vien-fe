@@ -37,7 +37,7 @@ export default function FilterBar({
           >
             {ratings.map((rating) => (
               <option key={rating} value={rating}>
-                {rating === "All" ? "All Ratings" : `${rating} Stars`}
+                {rating === "All" ? "Tất cả" : `${rating} sao`}
               </option>
             ))}
           </select>
