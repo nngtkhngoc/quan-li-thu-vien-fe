@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
@@ -9,22 +11,22 @@ import {
   Filter,
   BookOpen,
 } from "lucide-react";
-import { mockBooks } from "../../data/mockData";
-import { useBook } from "../../hooks/useBook";
-import type { BookResponse } from "../../types/Book";
+import { mockBooks } from "../../../data/mockData";
+import { useBook } from "../../../hooks/useBook";
+import type { BookResponse } from "../../../types/Book";
 import { toast } from "react-toastify";
 import { Pagination } from "antd";
-import BookItems from "./BookItems";
-import { useBookItem } from "../../hooks/useBookItem";
+import BookItems from "../BookItems";
+import { useBookItem } from "../../../hooks/useBookItem";
+import BookSkeleton from "./BookSkeleton";
 const size = 8;
 export default function Books() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterCategory, setFilterCategory] = useState("All");
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingBook, setEditingBook] = useState<BookResponse | null>(null);
   const [page, setPage] = useState(0);
   const [, setCurrentParams] = useSearchParams();
-  const [viewingBook, setViewingBook] = useState<any>(null);
+  const [viewingBook, setViewingBook] = useState<BookResponse | null>(null);
   const [showBookItemsModal, setShowBookItemsModal] = useState(false);
   const { getBookItemsByBookIdQuery } = useBookItem(
     viewingBook ? viewingBook.id || 0 : 0
@@ -51,7 +53,7 @@ export default function Books() {
     getCatalogsQuery?.isLoading ||
     getBookItemsByBookIdQuery?.isLoading
   ) {
-    return <div className="text-center py-12">Loading books...</div>;
+    return <BookSkeleton />;
   }
 
   const categories = getCatalogsQuery.data;
@@ -69,7 +71,7 @@ export default function Books() {
     return matchesSearch && matchesCategory;
   });
 
-  const handleDelete = async (id: Number) => {
+  const handleDelete = async (id: number) => {
     if (window.confirm("Are you sure you want to delete this book?")) {
       try {
         await deleteBookMutation.mutateAsync(id);
@@ -217,13 +219,13 @@ export default function Books() {
               <button
                 type="button"
                 onClick={onCancel}
-                className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
               >
                 Hủy
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors cursor-pointer disabled:cursor-not-allowed"
                 disabled={
                   updateBookMutation.isPending || createBookMutation.isPending
                 }
@@ -288,25 +290,11 @@ export default function Books() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
             <input
               type="text"
-              placeholder="Search books by title, author, or ISBN..."
+              placeholder="Tìm kiếm sách theo tiêu đề, tên tác giả,..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             />
-          </div>
-          <div className="flex items-center space-x-2">
-            <Filter className="h-5 w-5 text-gray-400" />
-            <select
-              value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            >
-              {/* {categories?.map((category) => (
-                <option key={category.id} value={category.name}>
-                  {category.name}
-                </option>
-              ))} */}
-            </select>
           </div>
         </div>
       </div>
@@ -326,7 +314,7 @@ export default function Books() {
               />
             </div>
             <div className="p-4">
-              <h3 className="font-semibold text-gray-900 line-clamp-2 mb-2">
+              <h3 className="font-semibold text-gray-900 line-clamp-2 mb-2 h-[55px]">
                 {book.title}
               </h3>
               <p className="text-sm text-gray-600 mb-2">Bởi {book.author}</p>
@@ -338,7 +326,7 @@ export default function Books() {
               </div>
               <div className="flex items-center justify-between text-sm mb-4">
                 <span className="text-gray-600">
-                  Thể loại: {book.catalog?.name || "N/A"}
+                  {book.catalog?.name || "N/A"}
                 </span>
                 <span
                   className={`px-2 py-1 rounded text-xs ${
@@ -356,20 +344,20 @@ export default function Books() {
                     setShowBookItemsModal(true);
                     setViewingBook(book);
                   }}
-                  className="flex-1 flex items-center justify-center px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg transition-colors text-sm"
+                  className="cursor-pointer flex-1 flex items-center justify-center px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg transition-colors text-sm"
                 >
                   <Eye className="h-4 w-4 mr-1" />
                   Xem chi tiết
                 </button>
                 <button
                   onClick={() => setEditingBook(book)}
-                  className="flex items-center justify-center px-3 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-lg transition-colors"
+                  className="cursor-pointer flex items-center justify-center px-3 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-lg transition-colors"
                 >
                   <Edit className="h-4 w-4" />
                 </button>
                 <button
                   onClick={() => handleDelete(book.id)}
-                  className="flex items-center justify-center px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors"
+                  className=" cursor-pointer flex items-center justify-center px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>

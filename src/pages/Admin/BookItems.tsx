@@ -1,4 +1,4 @@
-import { X } from "lucide-react";
+import { Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { useBookItem } from "../../hooks/useBookItem";
 import { toast } from "react-toastify";
@@ -44,7 +44,10 @@ export default function BookItems({ setModal, bookItems, query }: any) {
       <div className="bg-white p-6 rounded shadow-lg max-w-3xl mx-auto mt-20">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold">Các bản sao của sách</h1>
-          <X onClick={setModal} className="w-[50px] h-[30px]" />
+          <X
+            onClick={setModal}
+            className="w-[50px] h-[30px] cursor-pointer hover:text-red-400 transition-all duration-300"
+          />
         </div>
 
         <button
@@ -58,7 +61,7 @@ export default function BookItems({ setModal, bookItems, query }: any) {
               toast.error("Thêm bản sao sách thất bại");
             }
           }}
-          className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer"
         >
           Thêm bản sao sách
         </button>
@@ -104,14 +107,14 @@ export default function BookItems({ setModal, bookItems, query }: any) {
                     <option value="Borrowed">Đã mượn</option>
                   </select>
                 </td>
-                <td className="px-4 py-2 border-b">
+                <td className="px-4 py-2 border-b text-center">
                   <button
                     onClick={() => {
                       setModalDelete(item.id);
                     }}
-                    className="ml-2 text-red-500 hover:text-red-700"
+                    className="ml-2 text-red-500 hover:text-red-700 cursor-pointer"
                   >
-                    Xóa
+                    <Trash2 />
                   </button>
                 </td>
               </tr>

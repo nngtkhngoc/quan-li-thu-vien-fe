@@ -14,7 +14,7 @@ import Auth from "./pages/Client/Auth.tsx";
 import Layout from "./components/Admin/Layout.tsx";
 import Dashboard from "./pages/Admin/Dashboard/Dashboard.tsx";
 import Users from "./pages/Admin/Users.tsx";
-import Books from "./pages/Admin/Books.tsx";
+import Books from "./pages/Admin/Books/Books.tsx";
 import BookItems from "./pages/Admin/BookItems.tsx";
 import Borrows from "./pages/Admin/Borrows.tsx";
 import Notifications from "./pages/Admin/Notifications/Notifications.tsx";
