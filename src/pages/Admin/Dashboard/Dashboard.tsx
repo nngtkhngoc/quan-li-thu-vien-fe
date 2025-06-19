@@ -73,6 +73,30 @@ export default function Dashboard() {
   });
   // const overdueBooks = borrows?.filter(borrow => borrow.status === "OVERDUE");
 
+  // Mapping tháng tiếng Anh sang tiếng Việt
+  const monthTranslation: Record<string, string> = {
+    Jan: "Th1",
+    Feb: "Th2",
+    Mar: "Th3",
+    Apr: "Th4",
+    May: "Th5",
+    Jun: "Th6",
+    Jul: "Th7",
+    Aug: "Th8",
+    Sep: "Th9",
+    Oct: "Th10",
+    Nov: "Th11",
+    Dec: "Th12",
+  };
+
+  // Việt hóa dữ liệu monthlyBorrows
+  const vietnameseMonthlyBorrows = dashboard?.monthlyBorrows?.map(
+    (item: { month: string; borrows: number }) => ({
+      ...item,
+      month: monthTranslation[item.month] || item.month,
+    })
+  );
+
   // Array of colors for pie chart cells
   const pieColors = [
     "#8884d8",
@@ -97,44 +121,45 @@ export default function Dashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Bảng điều khiển</h1>
           <p className="text-gray-600 mt-1">
-            Welcome back! Here's what's happening at your library.
+            Chào mừng trở lại! Đây là những gì đang diễn ra tại thư viện của
+            bạn.
           </p>
         </div>
         <div className="text-sm text-gray-500">
-          Last updated: {new Date().toLocaleString()}
+          Cập nhật lần cuối: {new Date().toLocaleString()}
         </div>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
-          title="Total Books"
+          title="Tổng số sách"
           value={dashboard?.totalBooks.toLocaleString()}
           icon={BookOpen}
-          change="+12 this month"
+          change="+12 trong tháng này"
           changeType="positive"
         />
         <StatCard
-          title="Active Users"
+          title="Người dùng hoạt động"
           value={users?.length || 0}
           icon={Users}
-          change="+5.2% from last month"
+          change="+5.2% so với tháng trước"
           changeType="positive"
         />
         <StatCard
-          title="Active Borrows"
+          title="Sách đang cho mượn"
           value={dashboard?.activeBorrows}
           icon={ArrowRightLeft}
-          change="+5 from yesterday"
+          change="+5 từ hôm qua"
           changeType="positive"
         />
         <StatCard
-          title="Overdue Books"
+          title="Sách quá hạn"
           value={dashboard?.overdueBooks}
           icon={AlertTriangle}
-          change="2 returned today"
+          change="2 đã trả hôm nay"
           changeType="positive"
         />
       </div>
@@ -145,18 +170,17 @@ export default function Dashboard() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-gray-800">
-              Monthly Borrows
+              Mượn sách theo tháng
             </h2>
             <div className="flex items-center text-sm text-gray-500">
-              <Calendar className="h-4 w-4 mr-1" />
-              Last 6 months
+              <Calendar className="h-4 w-4 mr-1" />6 tháng gần đây
             </div>
           </div>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={dashboard?.monthlyBorrows}>
+            <BarChart data={vietnameseMonthlyBorrows}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="month" stroke="#6b7280" />
-              <YAxis stroke="#6b7280" />
+              <YAxis dataKey="borrows" stroke="#6b7280" />
               <Tooltip
                 contentStyle={{
                   backgroundColor: "#fff",
@@ -174,11 +198,11 @@ export default function Dashboard() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 overflow-visible">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-gray-800">
-              Book Categories
+              Danh mục sách
             </h2>
             <div className="flex items-center text-sm text-gray-500">
               <Star className="h-4 w-4 mr-1" />
-              Distribution
+              Phân bố
             </div>
           </div>
           <ResponsiveContainer width="100%" height={300}>
@@ -195,7 +219,7 @@ export default function Dashboard() {
                 }
               >
                 {dashboard?.categoryDistribution.map(
-                  (_entry: any, index: number) => (
+                  (_entry: { name: string; value: number }, index: number) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={pieColors[index % pieColors.length]}

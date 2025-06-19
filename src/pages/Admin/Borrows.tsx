@@ -105,10 +105,10 @@ export default function Borrows() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            Borrow Management
+            Quản lý mượn sách
           </h1>
           <p className="text-gray-600 mt-1">
-            Track and manage book borrowing transactions
+            Theo dõi và quản lý các giao dịch mượn sách
           </p>
         </div>
         {/* <button
@@ -170,7 +170,7 @@ export default function Borrows() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
             <input
               type="text"
-              placeholder="Search by user name or book title..."
+              placeholder="Tìm kiếm theo tên người dùng hoặc tên sách..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
@@ -200,17 +200,17 @@ export default function Borrows() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  User & Book
+                  Người dùng & Sách
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Dates
+                  Ngày tháng
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
+                  Trạng thái
                 </th>
 
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  Hành động
                 </th>
               </tr>
             </thead>
@@ -230,7 +230,7 @@ export default function Borrows() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <div>
                       <div>
-                        Borrowed:{" "}
+                        Ngày mượn:{" "}
                         {new Date(borrow.borrow_date).toLocaleDateString()}
                       </div>
                       <div
@@ -238,11 +238,11 @@ export default function Borrows() {
                           borrow.status === "OVERDUE" ? "text-red-600" : ""
                         }
                       >
-                        Due: {new Date(borrow.due_date).toLocaleDateString()}
+                        Hạn trả: {new Date(borrow.due_date).toLocaleDateString()}
                       </div>
                       {borrow.return_date && borrow.status === "RETURNED" && (
                         <div className="text-emerald-600">
-                          Returned:{" "}
+                          Ngày trả:{" "}
                           {new Date(borrow.return_date).toLocaleDateString()}
                         </div>
                       )}
@@ -254,7 +254,7 @@ export default function Borrows() {
                         statusColors[borrow.status]
                       }`}
                     >
-                      {borrow.status}
+                      {vnStatus.get(borrow.status) || borrow.status}
                     </span>
                   </td>
 
@@ -306,9 +306,9 @@ export default function Borrows() {
         {filteredBorrows?.length === 0 && (
           <div className="text-center py-12">
             <ArrowRightLeft className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500 text-lg">No borrow records found</p>
+            <p className="text-gray-500 text-lg">Không tìm thấy bản ghi mượn sách</p>
             <p className="text-gray-400">
-              Try adjusting your search or filters
+              Hãy thử điều chỉnh tìm kiếm hoặc bộ lọc
             </p>
           </div>
         )}
