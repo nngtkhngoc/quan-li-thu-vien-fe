@@ -74,7 +74,6 @@ export default function Reviews() {
       <ReviewList
         filteredReviews={filteredReviews}
         handleDelete={(id: BigInteger) => setIdToDelete(id)}
-        isPending={deleteMutation.isPending}
         setShowDeleteModal={setShowDeleteModal}
       />
 

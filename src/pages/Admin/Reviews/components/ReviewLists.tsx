@@ -8,12 +8,10 @@ import ReviewDetailsModal from "./ReviewDetails";
 export default function ReviewList({
   filteredReviews,
   handleDelete,
-  isPending,
   setShowDeleteModal,
 }: {
   filteredReviews: any;
   handleDelete: any;
-  isPending: boolean;
   setShowDeleteModal: any;
 }) {
   const [viewingReview, setViewingReview] = useState<Review | null>(null);
