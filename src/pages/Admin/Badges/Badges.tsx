@@ -9,6 +9,7 @@ import BadgeGrid from "./components/BadgeGrid";
 import { toast } from "react-toastify";
 
 import DeleteConfirmModal from "./components/DeleteModal";
+import CreateModal from "./components/CreateModal";
 
 export type Category = {
   name: string;
@@ -26,7 +27,7 @@ export default function Badges() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("All");
   const [showAddModal, setShowAddModal] = useState(false);
-  const [editingBadge, setEditingBadge] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedBadgeId, setSelectedBadgeId] = useState<number | null>(null);
 
@@ -90,9 +91,9 @@ export default function Badges() {
 
       <BadgeGrid
         filteredBadges={filteredBadges ?? []}
-        setEditingBadge={setEditingBadge}
         setDeleteBadge={setShowDeleteModal}
         setSelectedBadgeId={setSelectedBadgeId}
+        setShowEditModal={setShowEditModal}
       />
 
       <DeleteConfirmModal
@@ -105,6 +106,21 @@ export default function Badges() {
         }}
         isPending={deleteMutation.isPending}
       />
+
+      {showAddModal && (
+        <CreateModal
+          onCancel={() => setShowAddModal(false)}
+          setShowCreateModal={setShowAddModal}
+        />
+      )}
+
+      {showEditModal && (
+        <CreateModal
+          badge={showEditModal}
+          onCancel={() => setShowEditModal(null)}
+          setShowCreateModal={setShowAddModal}
+        />
+      )}
     </div>
   );
 }
