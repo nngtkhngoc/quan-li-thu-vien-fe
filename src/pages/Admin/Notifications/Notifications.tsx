@@ -75,10 +75,10 @@ export default function Notifications() {
     onSuccess: () => {
       toast.success("Tạo thông báo thành công!");
       queryClient.invalidateQueries({ queryKey: ["getAllNotifications"] });
-      setShowCreateModal(false);
       queryClient.invalidateQueries({ queryKey: ["getAllNotifications"] });
       queryClient.invalidateQueries({ queryKey: ["getReadNotifications"] });
       queryClient.invalidateQueries({ queryKey: ["getUnreadNotifications"] });
+      setShowCreateModal(false);
     },
     onError: (err) => {
       toast.error("Tạo thông báo thất bại!");
@@ -138,16 +138,19 @@ export default function Notifications() {
         setShowDeleteModal={setShowDeleteModal}
       />
 
-      <DeleteConfirmModal
-        isOpen={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onConfirm={() => {
-          if (selectedIdToDelete !== null) {
-            deleteMutation.mutate(selectedIdToDelete);
-          }
-        }}
-        isPending={deleteMutation.isPending}
-      />
+      {showDeleteModal && (
+        <DeleteConfirmModal
+          // isSuccess={deleteMutation.isSuccess}
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          onConfirm={() => {
+            if (selectedIdToDelete !== null) {
+              deleteMutation.mutate(selectedIdToDelete);
+            }
+          }}
+          isPending={deleteMutation.isPending}
+        />
+      )}
       <CreateNotificationModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}

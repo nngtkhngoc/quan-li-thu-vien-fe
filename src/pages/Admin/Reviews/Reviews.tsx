@@ -6,6 +6,7 @@ import FilterBar from "./components/FilterBar";
 import ReviewList from "./components/ReviewLists";
 import LoadingSpinner from "../../../components/ui/LoadingSpinner";
 import DeleteConfirmModal from "./components/DeleteModal";
+import { toast } from "react-toastify";
 
 export default function Reviews() {
   const { data: totalReviews, isLoading: isTotalLoading } = useQuery({
@@ -38,8 +39,11 @@ export default function Reviews() {
     mutationFn: deleteReviews,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["getAllReviews"] });
+      toast.success("Xóa đánh giá thành công!");
+      setShowDeleteModal(false);
     },
     onError: (err) => {
+      toast.error("Xóa đánh giá thất bại!");
       console.error("Delete error", err);
     },
   });
@@ -70,19 +74,21 @@ export default function Reviews() {
       <ReviewList
         filteredReviews={filteredReviews}
         handleDelete={(id: BigInteger) => setIdToDelete(id)}
-        isPending={deleteMutation.isPending}
+        setShowDeleteModal={setShowDeleteModal}
       />
 
-      <DeleteConfirmModal
-        isOpen={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onConfirm={() => {
-          if (idToDelete !== null) {
-            deleteMutation.mutate({ ids: [idToDelete] });
-          }
-        }}
-        isPending={deleteMutation.isPending}
-      />
+      {showDeleteModal && (
+        <DeleteConfirmModal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          onConfirm={() => {
+            if (idToDelete !== null) {
+              deleteMutation.mutate({ ids: [idToDelete] });
+            }
+          }}
+          isPending={deleteMutation.isPending}
+        />
+      )}
     </div>
   );
 }
