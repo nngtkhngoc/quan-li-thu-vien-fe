@@ -10,7 +10,6 @@ export type UserResponse = {
   id: number;
   name: string;
   email: string;
-  password_hash: string;
   created_at: Date;
   role: ROLE;
   lendings: any[];
