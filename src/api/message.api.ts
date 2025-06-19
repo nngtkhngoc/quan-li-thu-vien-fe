@@ -8,6 +8,8 @@ export interface CreateMessageRequest {
 export interface MessageResponse {
   id: number;
   senderName: string;
+  image: string;
+  senderId: number;
   content: string;
   timestamp: string;
 }
