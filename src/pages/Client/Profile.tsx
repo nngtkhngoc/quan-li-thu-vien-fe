@@ -367,7 +367,10 @@ export default function Profile() {
               </h2>
               <div className="grid grid-cols-2 gap-4">
                 {totalBadges?.data.map((badge: any) => (
-                  <div className="relative rounded-full  bg-gray-50 dark:bg-gray-800 rounded-3xl p-4 overflow-hidden group hover:scale-105 transition-all duration-300 shadow-lg">
+                  <div
+                    title={badge.description}
+                    className="relative rounded-full  bg-gray-50 dark:bg-gray-800 rounded-3xl p-4 overflow-hidden group hover:scale-105 transition-all duration-300 shadow-lg"
+                  >
                     <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-purple-600 opacity-0 group-hover:opacity-10 dark:group-hover:opacity-30 transition-opacity duration-500"></div>
                     <div className="">
                       <div className="text-center mb-4 h-[100px]">
