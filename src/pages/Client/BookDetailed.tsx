@@ -8,8 +8,13 @@ import { createReview, getReviewByBookId } from "../../api/review.api";
 import { useUser } from "../../hooks/useUser";
 import { toast } from "react-toastify";
 import { createBorrowedBook } from "../../api/borrow.api";
+import { createReservation } from "../../api/reservation.api";
 import axios, { AxiosError } from "axios";
-import { addToWishlist, getWishlist } from "../../api/wishlist.api";
+import {
+  addToWishlist,
+  getWishlist,
+  deleteWishlist,
+} from "../../api/wishlist.api";
 import BookDetailSkeleton from "../../components/Client/BookDetailedSkeleton";
 const BookDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -29,6 +34,7 @@ const BookDetail = () => {
     (item: any) => item?.book.id === parseInt(id || "0")
   );
   console.log("isLiked:", getWishListQuery.data);
+  const [isWishlistLoading, setIsWishlistLoading] = useState(false);
   const addToWishlistMutation = useMutation({
     mutationFn: async (data: any) => {
       return await addToWishlist({
@@ -38,6 +44,7 @@ const BookDetail = () => {
     },
     onSuccess: () => {
       toast.success("Đã thêm vào danh sách yêu thích!");
+
       queryClient.invalidateQueries({
         queryKey: ["wishlist", user.userProfile?.id],
       });
@@ -104,6 +111,24 @@ const BookDetail = () => {
       }
     },
   });
+  const createReservationMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return await createReservation(data);
+    },
+    onSuccess: () => {
+      toast.success("Đặt trước thành công!");
+      queryClient.invalidateQueries({
+        queryKey: ["book", id],
+      });
+    },
+    onError: (error: any) => {
+      if (error?.response?.data?.message?.includes("already exists ")) {
+        toast.error("Bạn đã đặt trước rồi");
+      } else {
+        toast.error("Đặt trước thất bại. Vui lòng thử lại sau.");
+      }
+    },
+  });
   const isAuthenticated = user.userProfile;
 
   if (getBookByIdQuery.isLoading || getReviewsQuery.isLoading) {
@@ -136,6 +161,56 @@ const BookDetail = () => {
       console.error("Error reserving book:", error);
     }
     setIsReserving(false);
+  };
+
+  const handleReservation = async () => {
+    if (!isAuthenticated) return;
+    if (!book.bookItems || book.bookItems.length === 0) {
+      toast.error("Không có bản sách nào để đặt trước.");
+      return;
+    }
+    try {
+      await createReservationMutation.mutateAsync({
+        user_id: user.userProfile?.id,
+        book_item_id: book.bookItems[0].id, // lấy bản đầu tiên, có thể cải tiến chọn bản phù hợp
+      });
+    } catch (error) {
+      console.error("Error reserving book:", error);
+    }
+  };
+
+  const handleAddToWishlist = async () => {
+    if (!isAuthenticated) {
+      toast.error("Bạn cần đăng nhập để thêm vào yêu thích.");
+      return;
+    }
+    setIsWishlistLoading(true);
+    await addToWishlistMutation.mutateAsync({
+      book_id: book.id,
+      user_id: user.userProfile?.id || 0,
+    });
+    setIsWishlistLoading(false);
+  };
+
+  const handleRemoveFromWishlist = async () => {
+    if (!isAuthenticated) {
+      toast.error("Bạn cần đăng nhập để bỏ yêu thích.");
+      return;
+    }
+    setIsWishlistLoading(true);
+    try {
+      await deleteWishlist({
+        book_id: book.id,
+        user_id: user.userProfile?.id || 0,
+      });
+      toast.success("Đã bỏ khỏi danh sách yêu thích!");
+      queryClient.invalidateQueries({
+        queryKey: ["wishlist", user.userProfile?.id],
+      });
+    } catch {
+      toast.error("Bỏ yêu thích thất bại. Vui lòng thử lại sau.");
+    }
+    setIsWishlistLoading(false);
   };
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
@@ -261,59 +336,49 @@ const BookDetail = () => {
             <div className="flex flex-wrap gap-4">
               {isAuthenticated ? (
                 <>
-                  <button
-                    onClick={handleReserve}
-                    disabled={availableCopies === 0 || isReserving}
-                    className={`cursor-pointer flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
-                      availableCopies > 0
-                        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:shadow-lg transform hover:-translate-y-1"
-                        : "bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-                    }`}
-                  >
-                    <Clock className="h-5 w-5 mr-2" />
-                    {isReserving
-                      ? "Đang đặt..."
-                      : availableCopies > 0
-                      ? "Đặt sách"
-                      : "Đã hết sách"}
-                  </button>
+                  {availableCopies > 0 ? (
+                    <button
+                      onClick={handleReserve}
+                      disabled={isReserving}
+                      className={`cursor-pointer flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-300 bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:shadow-lg transform hover:-translate-y-1`}
+                    >
+                      <Clock className="h-5 w-5 mr-2" />
+                      {isReserving ? "Đang đặt..." : "Đặt sách"}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleReservation}
+                      disabled={createReservationMutation.isPending}
+                      className={`cursor-pointer flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-300 bg-gradient-to-r from-yellow-500 to-orange-500 text-white hover:shadow-lg transform hover:-translate-y-1`}
+                    >
+                      <Clock className="h-5 w-5 mr-2" />
+                      {createReservationMutation.isPending
+                        ? "Đang đặt trước..."
+                        : "Đặt trước"}
+                    </button>
+                  )}
 
-                  <button
-                    onClick={async () => {
-                      if (!isAuthenticated) {
-                        toast.error("Bạn cần đăng nhập để thêm vào yêu thích.");
-                        return;
-                      }
-                      await addToWishlistMutation.mutateAsync({
-                        book_id: book.id,
-                        user_id: user.userProfile?.id || 0,
-                      });
-                    }}
-                    disabled={isLiked}
-                    className={`
-    group flex items-center justify-center gap-2
-    px-6 py-3 rounded-xl transition-all duration-300 ease-in-out
-    text-sm font-semibold tracking-wide
-    ${
-      isLiked
-        ? "bg-gradient-to-r from-gray-400 to-gray-500 text-white opacity-60 cursor-not-allowed"
-        : "bg-gradient-to-r from-pink-400 via-red-400 to-orange-400 text-white shadow-lg hover:brightness-110 hover:scale-105"
-    }
-    disabled:cursor-not-allowed
-  `}
-                  >
-                    <Heart
-                      className={`
-      h-5 w-5 transition-transform duration-300
-      ${
-        isLiked
-          ? "text-white"
-          : "group-hover:scale-125 group-hover:text-yellow-200"
-      }
-    `}
-                    />
-                    {isLiked ? "Đã thêm vào yêu thích" : "Thêm vào yêu thích"}
-                  </button>
+                  {isLiked ? (
+                    <button
+                      onClick={handleRemoveFromWishlist}
+                      disabled={isWishlistLoading}
+                      className="group flex items-center justify-center gap-2 px-6 py-3 rounded-xl transition-all duration-300 ease-in-out text-sm font-semibold tracking-wide bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow-lg hover:brightness-110 hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      <Heart className="h-5 w-5 text-white" />
+                      {isWishlistLoading ? "Đang xử lý..." : "Bỏ yêu thích"}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleAddToWishlist}
+                      disabled={isWishlistLoading}
+                      className="group flex items-center justify-center gap-2 px-6 py-3 rounded-xl transition-all duration-300 ease-in-out text-sm font-semibold tracking-wide bg-gradient-to-r from-pink-400 via-red-400 to-orange-400 text-white shadow-lg hover:brightness-110 hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      <Heart className="h-5 w-5 group-hover:scale-125 group-hover:text-yellow-200" />
+                      {isWishlistLoading
+                        ? "Đang xử lý..."
+                        : "Thêm vào yêu thích"}
+                    </button>
+                  )}
                 </>
               ) : (
                 <Link
@@ -323,11 +388,6 @@ const BookDetail = () => {
                   Đăng nhập để mượn sách
                 </Link>
               )}
-
-              <button className="flex items-center px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                <Share2 className="h-5 w-5 mr-2" />
-                Chia sẻ
-              </button>
             </div>
           </div>
         </div>
