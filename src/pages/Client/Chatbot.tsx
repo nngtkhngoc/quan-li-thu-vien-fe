@@ -1,4 +1,4 @@
-import { Bot, X } from "lucide-react";
+import { Bot, BotIcon, X } from "lucide-react";
 import { useState } from "react";
 import { useUser } from "../../hooks/useUser";
 import { toast } from "react-toastify";
@@ -59,10 +59,12 @@ export default function Chatbot() {
     <div className="fixed bottom-4 right-4">
       {isOpen ? (
         <div className="w-[300px] h-[400px] lg:w-[500px] z-50 bg-white rounded-2xl shadow-lg flex flex-col overflow-hidden">
-          <div className="dark:bg-gray-800 text-white p-3 flex justify-between items-center">
-            <span>Chatbot</span>
+          <div className="bg-gray-800 text-white p-3 flex justify-between items-center">
+            <div className="flex gap-2 items-center justify-center">
+              <BotIcon /> Chatbot
+            </div>
             <button onClick={toggleChat}>
-              <X className="text-xl" />
+              <X className="text-xl text-white" />
             </button>
           </div>
           <div className="flex-1 p-3 overflow-y-auto space-y-2">
