@@ -267,13 +267,13 @@ export default function BookCatalogue() {
         theme={{
           components: {
             Pagination: {
-              itemActiveBg: "oklch(0.558 0.288 302.321)",
-              colorBorder: "oklch(0.558 0.288 302.321)",
+              itemActiveBg: "oklch(0.585 0.233 277.117)",
+              colorBorder: "oklch(0.585 0.233 277.117)",
               colorPrimary: "white",
               colorPrimaryHover: "white",
-              colorPrimaryBorder: "oklch(0.558 0.288 302.321)",
-              colorText: "oklch(0.558 0.288 302.321)",
-              controlOutline: "oklch(0.558 0.288 302.321)",
+              colorPrimaryBorder: "oklch(0.585 0.233 277.117)",
+              colorText: "oklch(0.585 0.233 277.117)",
+              controlOutline: "oklch(0.585 0.233 277.117)",
               itemSize: 36,
               borderRadius: 8,
               fontSize: 18,
