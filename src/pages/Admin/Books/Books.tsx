@@ -11,7 +11,6 @@ import { ConfigProvider, Pagination } from "antd";
 import BookItems from "../BookItems";
 import { useBookItem } from "../../../hooks/useBookItem";
 import BookSkeleton from "./BookSkeleton";
-import { set } from "date-fns";
 import { ConfirmModal } from "../../../components/Admin/ConfirmModal";
 const size = 8;
 export default function Books() {
@@ -56,6 +55,20 @@ export default function Books() {
   books = books.sort((a: any, b: any) => {
     return a.id - b.id;
   });
+
+  books = books.map((book: any) => {
+    let availableCopies = 0;
+    book.bookItems.forEach((item: any) => {
+      if (item.status === "AVAILABLE") {
+        availableCopies++;
+      }
+    });
+    return {
+      ...book,
+      availableCopies,
+    };
+  });
+  // console.log(books[0].bookItems, "books");
   const filteredBooks = books.filter((book: any) => {
     const matchesSearch =
       book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -68,16 +81,6 @@ export default function Books() {
 
   const handleDelete = async (id: number) => {
     setDeletedBookId(id);
-    console.log("Deleting book with ID:", id);
-    // if (window.confirm("Are you sure you want to delete this book?")) {
-    //   try {
-    //     await deleteBookMutation.mutateAsync(id);
-    //     toast.success("Xóa sách thành công!");
-    //   } catch (error) {
-    //     console.error("Error deleting book:", error);
-    //     toast.error("Xóa sách thất bại!");
-    //   }
-    // }
   };
 
   const BookForm = ({
@@ -305,7 +308,7 @@ export default function Books() {
               <img
                 src={book.image}
                 alt={book.title}
-                className="w-full h-48 object-cover"
+                className="w-full h-60 object-cover"
               />
             </div>
             <div className="p-4">
