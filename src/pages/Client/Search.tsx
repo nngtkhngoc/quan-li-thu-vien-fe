@@ -1,19 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from "react";
-
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { Upload, X, Star, Eye, Heart } from "lucide-react";
 import { getSimilarBooks } from "../../api/book.api";
 import { Link } from "react-router-dom";
 
 export default function SearchPage() {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [books, setBooks] = useState<any[]>([]);
-  // Mock book data - in a real app, this would come from an API
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -29,51 +27,49 @@ export default function SearchPage() {
     e.preventDefault();
     setIsDragging(false);
     const files = e.dataTransfer.files;
-    handleFiles(files);
+    if (files && files.length > 0) {
+      handleFiles(files);
+    }
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (files) {
+    if (files && files.length > 0) {
       handleFiles(files);
     }
   };
 
   const handleFiles = (files: FileList) => {
     const file = files[0];
-    console.log("Selected file:", file);
     if (file) {
-      const Url = URL.createObjectURL(file);
-      setUploadedImage(Url);
-      fetchSimilarBooks();
+      const url = URL.createObjectURL(file);
+      setUploadedImage(url);
+      setSelectedFile(file);
+      fetchSimilarBooks(file);
     }
   };
 
-  const fetchSimilarBooks = async () => {
+  const fetchSimilarBooks = async (file: File) => {
     setIsLoading(true);
     setShowResults(false);
 
-    const file = fileInputRef.current?.files?.[0];
-    if (!file) {
-      console.error("No file selected");
-      return;
-    }
-
     const formData = new FormData();
     formData.append("image", file);
+
     try {
       const response = await getSimilarBooks(formData);
       setBooks(response);
-      console.log("Similar books:", response);
       setShowResults(true);
-      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching similar books:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
+
   const clearImage = () => {
-    console.log("Clearing image");
     setUploadedImage(null);
+    setSelectedFile(null);
     setShowResults(false);
     setIsLoading(false);
     if (fileInputRef.current) {
@@ -173,19 +169,13 @@ export default function SearchPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {books.map((book) => (
                 <Link to={`/books/${book.id}`} key={book.id}>
-                  <div
-                    key={book.id}
-                    className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group"
-                  >
+                  <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group">
                     <div className="relative">
                       <img
                         src={book.image}
                         alt={book.title}
                         className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                       />
-                      <div className="absolute top-4 right-4 bg-green-500 text-white px-2 py-1 rounded-full text-sm font-medium">
-                        {/* {book.similarity}% match */}
-                      </div>
                       <div className="absolute bottom-4 left-4 right-4 bg-black/50 backdrop-blur-sm rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <div className="text-white text-sm">
                           <div className="flex items-center space-x-2">

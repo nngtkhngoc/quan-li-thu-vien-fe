@@ -27,7 +27,7 @@ export default function BookItems({ setModal, bookItems, query }: any) {
     setModalDelete(null);
   };
   return (
-    <div className="bg-gray-500/50 fixed w-[100vw] h-[100vh] top-0 left-0 z-50">
+    <div className="bg-gray-500/50 fixed w-[100vw] h-[100vh] top-0 left-0 z-50 flex items-center">
       {modalDelete && (
         <ConfirmModal
           isOpen={!!modalDelete}
@@ -43,7 +43,7 @@ export default function BookItems({ setModal, bookItems, query }: any) {
           </div>
         </ConfirmModal>
       )}
-      <div className="bg-white p-6 rounded shadow-lg max-w-3xl mx-auto mt-20">
+      <div className="bg-white p-6 rounded shadow-lg max-w-3xl mx-auto w-[60vw] h-[80vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold">Các bản sao của sách</h1>
           <X
@@ -51,22 +51,51 @@ export default function BookItems({ setModal, bookItems, query }: any) {
             className="w-[50px] h-[30px] cursor-pointer hover:text-red-400 transition-all duration-300"
           />
         </div>
+        <div className="flex items-center mb-4 gap-4">
+          <div className="">
+            <input
+              id="quantity"
+              type="number"
+              min={1}
+              defaultValue={1}
+              className="border px-2 py-2 h-full"
+            />
+          </div>
+          <div>
+            <button
+              onClick={async () => {
+                const quantityInput = document.getElementById(
+                  "quantity"
+                ) as HTMLInputElement;
+                const quantity = parseInt(quantityInput.value, 10);
+                if (isNaN(quantity) || quantity < 1) {
+                  toast.error("Số lượng phải là một số nguyên dương");
+                  return;
+                }
 
-        <button
-          onClick={async () => {
-            try {
-              await createBookItemMutation.mutateAsync({
-                book_id: query,
-              });
-              toast.success("Thêm bản sao sách thành công");
-            } catch (error) {
-              toast.error("Thêm bản sao sách thất bại");
-            }
-          }}
-          className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer"
-        >
-          Thêm bản sao sách
-        </button>
+                try {
+                  await Promise.all(
+                    Array.from({ length: quantity }).map(() =>
+                      createBookItemMutation.mutateAsync({
+                        book_id: query,
+                      })
+                    )
+                  );
+                  toast.success("Thêm bản sao sách thành công");
+                  quantityInput.value = "1";
+                } catch (error) {
+                  toast.error("Thêm bản sao sách thất bại");
+                }
+              }}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer"
+              disabled={createBookItemMutation.isPending}
+            >
+              {createBookItemMutation.isPending
+                ? "Đang thêm..."
+                : "Thêm bản sao sách"}
+            </button>
+          </div>
+        </div>
 
         <table className="min-w-full bg-white border border-gray-200">
           <thead>

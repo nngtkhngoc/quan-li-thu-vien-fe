@@ -2,15 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import {
-  Search,
-  Plus,
-  Edit,
-  Trash2,
-  Eye,
-  Filter,
-  BookOpen,
-} from "lucide-react";
+import { Search, Plus, Edit, Trash2, Eye, BookOpen } from "lucide-react";
 import { mockBooks } from "../../../data/mockData";
 import { useBook } from "../../../hooks/useBook";
 import type { BookResponse } from "../../../types/Book";
@@ -19,6 +11,7 @@ import { ConfigProvider, Pagination } from "antd";
 import BookItems from "../BookItems";
 import { useBookItem } from "../../../hooks/useBookItem";
 import BookSkeleton from "./BookSkeleton";
+import { ConfirmModal } from "../../../components/Admin/ConfirmModal";
 const size = 8;
 export default function Books() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -28,6 +21,7 @@ export default function Books() {
   const [, setCurrentParams] = useSearchParams();
   const [viewingBook, setViewingBook] = useState<BookResponse | null>(null);
   const [showBookItemsModal, setShowBookItemsModal] = useState(false);
+  const [deletedBookId, setDeletedBookId] = useState<number | null>(null);
   const { getBookItemsByBookIdQuery } = useBookItem(
     viewingBook ? viewingBook.id || 0 : 0
   );
@@ -61,6 +55,20 @@ export default function Books() {
   books = books.sort((a: any, b: any) => {
     return a.id - b.id;
   });
+
+  books = books.map((book: any) => {
+    let availableCopies = 0;
+    book.bookItems.forEach((item: any) => {
+      if (item.status === "AVAILABLE") {
+        availableCopies++;
+      }
+    });
+    return {
+      ...book,
+      availableCopies,
+    };
+  });
+  // console.log(books[0].bookItems, "books");
   const filteredBooks = books.filter((book: any) => {
     const matchesSearch =
       book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -72,15 +80,7 @@ export default function Books() {
   });
 
   const handleDelete = async (id: number) => {
-    if (window.confirm("Are you sure you want to delete this book?")) {
-      try {
-        await deleteBookMutation.mutateAsync(id);
-        toast.success("Xóa sách thành công!");
-      } catch (error) {
-        console.error("Error deleting book:", error);
-        toast.error("Xóa sách thất bại!");
-      }
-    }
+    setDeletedBookId(id);
   };
 
   const BookForm = ({
@@ -104,7 +104,6 @@ export default function Books() {
           });
           toast.success("Cập nhật sách thành công!");
         } else {
-          console.log("THEM DANH SACH");
           await createBookMutation.mutateAsync(formData);
           toast.success("Thêm sách thành công!");
         }
@@ -243,30 +242,30 @@ export default function Books() {
   };
 
   const handleSave = () => {};
-  // const handleSave = (bookData: Omit<Book, "id">) => {
-  // if (editingBook) {
-  // setBooks(
-  //   books.map((book) =>
-  //     book.id === editingBook.id
-  //       ? { ...bookData, id: editingBook.id }
-  //       : book
-  //   )
-  // );
-  // setEditingBook(null);
-  // } else {
-  // const newBook = {
-  //     ...bookData,
-  //     id: Date.now().toString(),
-  //     availableCopies: bookData.totalCopies,
-  //   };
-  //   setBooks([...books, newBook]);
-  //   setShowAddModal(false);
-  // }
-  // };
 
   return (
     <div className="p-6 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <ConfirmModal
+          isOpen={!!deletedBookId}
+          isPending={deleteBookMutation.isPending}
+          onSave={async () => {
+            try {
+              await deleteBookMutation.mutateAsync(deletedBookId!);
+              setDeletedBookId(null);
+              toast.success("Xóa sách thành công!");
+            } catch (error) {
+              toast.error("Xóa sách thất bại!");
+            }
+          }}
+          onCancel={() => {
+            setDeletedBookId(null);
+          }}
+        >
+          <div className="text-lg font-semibold">
+            Bạn có chắc chắn muốn xóa sách này không?
+          </div>
+        </ConfirmModal>
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Quản lí sách</h1>
           <p className="text-gray-600 mt-1">
@@ -309,7 +308,7 @@ export default function Books() {
               <img
                 src={book.image}
                 alt={book.title}
-                className="w-full h-48 object-cover"
+                className="w-full h-60 object-cover"
               />
             </div>
             <div className="p-4">
