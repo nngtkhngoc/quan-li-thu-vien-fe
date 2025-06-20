@@ -42,7 +42,7 @@ export function AdminConfirmModal({
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onCancel}
-                className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
               >
                 Hủy
               </motion.button>
@@ -51,7 +51,7 @@ export function AdminConfirmModal({
                 whileTap={{ scale: 0.95 }}
                 disabled={isPending}
                 onClick={onSave}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:bg-gray-700 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:bg-gray-700 disabled:cursor-not-allowed cursor-pointer"
               >
                 {isPending ? (
                   <motion.span

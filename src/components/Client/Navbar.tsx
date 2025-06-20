@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Search, Bell, User, Moon, Menu, X, BookOpen } from "lucide-react";
+import { Bell, Moon, Menu, X, BookOpen } from "lucide-react";
 import { useUser } from "../../hooks/useUser";
 import { signOut } from "../../api/user.api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -15,7 +15,6 @@ const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const queryClient = useQueryClient();
 
   const { newNotifications } = useNotification();
@@ -33,14 +32,6 @@ const Header: React.FC = () => {
       toast.error("Đăng xuất thất bại");
     },
   });
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/catalogue?search=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchQuery("");
-    }
-  };
 
   const isActivePage = (path: string) => location.pathname === path;
 
@@ -90,7 +81,7 @@ const Header: React.FC = () => {
                 to={item.path}
                 className={`px-3 py-2 rounded-lg font-medium transition-all duration-200 whitespace-nowrap ${
                   isActivePage(item.path)
-                    ? "bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400"
+                    ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400"
                     : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                 }`}
               >
@@ -262,7 +253,7 @@ const Header: React.FC = () => {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={`block px-3 py-2 rounded-lg font-medium whitespace-nowrap ${
                     isActivePage(item.path)
-                      ? "bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400"
+                      ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400"
                       : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                   }`}
                 >

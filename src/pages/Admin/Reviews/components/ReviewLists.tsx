@@ -1,4 +1,4 @@
-import { Eye, Trash2 } from "lucide-react";
+import { Eye, Star, Trash2 } from "lucide-react";
 import { StarRating } from "./StarRating";
 import type { Review } from "../../../../types/Review";
 import { useState } from "react";
@@ -15,6 +15,15 @@ export default function ReviewList({
   setShowDeleteModal: any;
 }) {
   const [viewingReview, setViewingReview] = useState<Review | null>(null);
+
+  if (!filteredReviews.length) {
+    return (
+      <div className="text-center py-12">
+        <Star className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+        <p className="text-gray-500 text-lg">Không có thông báo nào</p>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
