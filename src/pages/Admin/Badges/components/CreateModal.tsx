@@ -29,18 +29,16 @@ export default function CreateModal({
     xpAwarded: badge?.xpAwarded || 100,
   });
 
-  console.log(formData);
-
   const commonIcons = [
     "🏆",
     "📚",
-    "⭐",
+    "🌳",
     "🎯",
-    "🔥",
-    "💎",
+    "✍",
+    "📝",
     "👑",
-    "🚀",
-    "⚡",
+    "📣",
+    "🌿",
     "🌟",
     "🎖️",
     "🌱",
@@ -73,6 +71,7 @@ export default function CreateModal({
       toast.success("Chỉnh sửa huy hiệu thành công!");
       queryClient.invalidateQueries({ queryKey: ["getAllBadges"] });
       setShowCreateModal(false);
+      onCancel();
     },
     onError: (err) => {
       toast.error("Chỉnh sửa huy hiệu thất bại!");
@@ -289,11 +288,11 @@ export default function CreateModal({
               Hủy
             </button>
             <button
-              disabled={createMutation.isPending}
+              disabled={createMutation.isPending || updateMutation.isPending}
               type="submit"
               className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:bg-gray-500 cursor-pointer disabled:cursor-not-allowed"
             >
-              {createMutation.isPending
+              {createMutation.isPending || updateMutation.isPending
                 ? "Đang xử lý"
                 : `${badge ? "Cập nhật" : "Tạo"} huy hiệu`}
             </button>

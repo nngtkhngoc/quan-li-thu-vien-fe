@@ -14,7 +14,7 @@ import Auth from "./pages/Client/Auth.tsx";
 import Layout from "./components/Admin/Layout.tsx";
 import Dashboard from "./pages/Admin/Dashboard/Dashboard.tsx";
 import Users from "./pages/Admin/Users.tsx";
-import Books from "./pages/Admin/Books.tsx";
+import Books from "./pages/Admin/Books/Books.tsx";
 import BookItems from "./pages/Admin/BookItems.tsx";
 import Borrows from "./pages/Admin/Borrows.tsx";
 import Notifications from "./pages/Admin/Notifications/Notifications.tsx";
@@ -28,6 +28,7 @@ import { NotificationProvider } from "./contexts/notificationContext.tsx";
 import { UserProvider } from "./contexts/userContext.tsx";
 import Badges from "./pages/Admin/Badges/Badges.tsx";
 import Forum from "./pages/Client/Forum.tsx";
+import Wishlist from "./pages/Client/Wishlist";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +52,7 @@ createRoot(document.getElementById("root")!).render(
                 <Route path="search" element={<Search />} />
                 <Route path="/reservations" element={<ClientReservations />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/auth" element={<Auth />} />
               </Route>
 

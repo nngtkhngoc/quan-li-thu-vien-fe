@@ -5,7 +5,6 @@ import {
   CheckCircle,
   Clock,
   BookOpen,
-  XCircle,
   Plus,
   Trash2,
 } from "lucide-react";
@@ -114,7 +113,7 @@ export default function Reservations() {
   const statuses = [
     { value: "ALL", label: "Tất cả" },
     { value: "PENDING", label: "Đang chờ" },
-    { value: "COMPLETED", label: "Hoàn thành" },
+    { value: "COMPLETED", label: "Sẵn sàng để mượn" },
   ];
 
   const statusColors = {
@@ -124,7 +123,7 @@ export default function Reservations() {
 
   const statusLabels = {
     PENDING: "Đang chờ",
-    COMPLETED: "Hoàn thành",
+    COMPLETED: "Sẵn sàng để mượn",
   };
 
   const filteredReservations = reservations
@@ -148,10 +147,6 @@ export default function Reservations() {
         new Date(a.reservationDate).getTime()
       );
     });
-
-  const handleStatusChange = (id: number, returned: boolean) => {
-    setIsConfirmingStatus({ id, returned });
-  };
 
   const confirmStatusChange = () => {
     if (isConfirmingStatus) {
@@ -234,7 +229,7 @@ export default function Reservations() {
                 </div>
                 <div className="ml-3">
                   <p className="text-sm font-medium text-gray-600">
-                    Hoàn thành
+                    Sẵn sàng để mượn
                   </p>
                   <p className="text-xl font-semibold text-gray-900">
                     {reservations?.filter((r) => r.returned).length || 0}
@@ -366,35 +361,6 @@ export default function Reservations() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                         <div className="flex justify-center space-x-2">
-                          {!reservation.returned ? (
-                            <button
-                              onClick={() =>
-                                handleStatusChange(
-                                  reservation.reservation_id,
-                                  true
-                                )
-                              }
-                              className="text-blue-600 hover:text-blue-900 p-1 rounded-full hover:bg-blue-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                              title="Hoàn thành"
-                              disabled={isUpdatingReservation}
-                            >
-                              <CheckCircle className="h-5 w-5" />
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() =>
-                                handleStatusChange(
-                                  reservation.reservation_id,
-                                  false
-                                )
-                              }
-                              className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                              title="Chuyển đang chờ"
-                              disabled={isUpdatingReservation}
-                            >
-                              <XCircle className="h-5 w-5" />
-                            </button>
-                          )}
                           <button
                             onClick={() =>
                               setIsDeleting(reservation.reservation_id)
@@ -505,12 +471,12 @@ export default function Reservations() {
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-gray-900">
               {isConfirmingStatus.returned
-                ? "Xác nhận hoàn thành"
+                ? "Xác nhận sẵn sàng để mượn"
                 : "Xác nhận chuyển đang chờ"}
             </h2>
             <p className="text-gray-600">
               {isConfirmingStatus.returned
-                ? "Bạn có chắc chắn muốn đánh dấu đặt trước này là đã hoàn thành?"
+                ? "Bạn có chắc chắn muốn đánh dấu đặt trước này là đã sẵn sàng để mượn?"
                 : "Bạn có chắc chắn muốn chuyển đặt trước này về trạng thái đang chờ?"}
             </p>
           </div>

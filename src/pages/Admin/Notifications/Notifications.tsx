@@ -14,8 +14,8 @@ import NotificationList from "./components/NotificationList";
 import type { Notification } from "../../../types/Notification";
 import DeleteConfirmModal from "./components/DeleteModal";
 import CreateNotificationModal from "./components/CreateModal";
-import LoadingSpinner from "../../../components/ui/LoadingSpinner";
 import { toast } from "react-toastify";
+import NotificationsSkeleton from "./components/NotificationSkeleton";
 
 export default function Notifications() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -75,10 +75,10 @@ export default function Notifications() {
     onSuccess: () => {
       toast.success("Tạo thông báo thành công!");
       queryClient.invalidateQueries({ queryKey: ["getAllNotifications"] });
-      setShowCreateModal(false);
       queryClient.invalidateQueries({ queryKey: ["getAllNotifications"] });
       queryClient.invalidateQueries({ queryKey: ["getReadNotifications"] });
       queryClient.invalidateQueries({ queryKey: ["getUnreadNotifications"] });
+      setShowCreateModal(false);
     },
     onError: (err) => {
       toast.error("Tạo thông báo thất bại!");
@@ -109,7 +109,7 @@ export default function Notifications() {
   };
 
   const isLoading = isReadLoading || isTotalLoading || isUnreadLoading;
-  if (isLoading) return <LoadingSpinner size="lg" />;
+  if (isLoading) return <NotificationsSkeleton />;
 
   return (
     <div className="space-y-6">
@@ -138,16 +138,19 @@ export default function Notifications() {
         setShowDeleteModal={setShowDeleteModal}
       />
 
-      <DeleteConfirmModal
-        isOpen={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onConfirm={() => {
-          if (selectedIdToDelete !== null) {
-            deleteMutation.mutate(selectedIdToDelete);
-          }
-        }}
-        isPending={deleteMutation.isPending}
-      />
+      {showDeleteModal && (
+        <DeleteConfirmModal
+          // isSuccess={deleteMutation.isSuccess}
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          onConfirm={() => {
+            if (selectedIdToDelete !== null) {
+              deleteMutation.mutate(selectedIdToDelete);
+            }
+          }}
+          isPending={deleteMutation.isPending}
+        />
+      )}
       <CreateNotificationModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}

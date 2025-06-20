@@ -75,7 +75,7 @@ export default function DeleteConfirmModal({
               whileTap={{ scale: 0.95 }}
               onClick={() => {
                 onConfirm();
-                onClose();
+                // onClose();
               }}
               disabled={isPending}
               className={`px-4 py-2 rounded-md text-white transition-colors ${

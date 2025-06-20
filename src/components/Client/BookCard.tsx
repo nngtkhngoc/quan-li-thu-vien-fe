@@ -1,11 +1,8 @@
-import React from "react";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Link } from "react-router-dom";
 import { Star, BookOpen, Clock } from "lucide-react";
-
-interface BookCardProps {
-  book: any;
-  showActions?: boolean;
-}
+import { motion } from "framer-motion";
 
 export default function BookCard({ book, showActions = true }: any) {
   const avaibility =
@@ -20,11 +17,13 @@ export default function BookCard({ book, showActions = true }: any) {
   return (
     <div className="group bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 dark:border-gray-700">
       <div className="relative">
-        <img
-          src={book.image}
-          alt={book.title}
-          className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-        />
+        <div className="h-64 overflow-hidden">
+          <img
+            src={book.image}
+            alt={book.title}
+            className="w-full h-64 object-cover group-hover:scale-130 transition-transform duration-2000"
+          />
+        </div>
         <div className="absolute top-3 right-3">
           <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs font-medium">
             {avaibility > 0 ? (
@@ -68,12 +67,22 @@ export default function BookCard({ book, showActions = true }: any) {
 
         {showActions && (
           <div className="flex space-x-2">
-            <Link
-              to={`/books/${book.id}`}
-              className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-medium py-2 px-4 rounded-lg hover:shadow-lg transition-all duration-300 text-center"
+            <motion.div
+              whileHover={{
+                scale: 1.06,
+                y: -3,
+                boxShadow: "0 4px 16px 0 rgba(80, 63, 205, 0.10)",
+              }}
+              whileTap={{ scale: 0.97 }}
+              className="flex-1"
             >
-              Xem chi tiết
-            </Link>
+              <Link
+                to={`/books/${book.id}`}
+                className="block bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-medium py-2 px-4 rounded-lg hover:shadow-lg transition-all duration-300 text-center"
+              >
+                Xem chi tiết
+              </Link>
+            </motion.div>
             {book.availableCopies > 0 && (
               <button className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium py-2 px-4 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                 <Clock className="h-4 w-4" />
