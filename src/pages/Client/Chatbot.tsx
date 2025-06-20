@@ -7,6 +7,15 @@ import {
   createChatbotResponse,
   getChatbotResponseByUserId,
 } from "../../api/chatbot.api";
+function cleanMessage(text: string) {
+  return text
+    .replace(/\[.*?\]/g, "")
+    .replace(/【.*?】/g, "")
+    .replace(/\*+/g, "")
+    .replace(/[^\w\sÀ-ỹà-ỹ.,!?]/g, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
 
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
@@ -77,7 +86,7 @@ export default function Chatbot() {
                     : "bg-gray-200"
                 }`}
               >
-                {msg.message}
+                {cleanMessage(msg.message)}
               </div>
             ))}
             {createChatbotResponseMutation.isPending && (
@@ -117,7 +126,7 @@ export default function Chatbot() {
             }
             toggleChat();
           }}
-          className="bg-blue-600 text-white p-3 rounded-full shadow-lg cursor-pointer hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center"
+          className="bg-gradient-to-br from-blue-500 to-purple-600 text-white p-3 rounded-full shadow-lg cursor-pointer hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center"
         >
           <Bot />
         </button>

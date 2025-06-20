@@ -26,7 +26,7 @@ export default function HeroSection() {
 
         <div className="flex flex-col sm:flex-row gap-4">
           <Link
-            to="/catalogue"
+            to="/books"
             className="inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
           >
             Mượn sách

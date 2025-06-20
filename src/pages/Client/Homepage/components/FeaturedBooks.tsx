@@ -18,7 +18,7 @@ export default function FeaturedBooks({
           Featured Books
         </h2>
         <Link
-          to="/catalogue"
+          to="/books"
           className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
         >
           View All
