@@ -2,6 +2,7 @@
 
 import { Star } from "lucide-react";
 import type { Review } from "../../../../types/Review";
+import { Link } from "react-router-dom";
 
 export default function RecentReviews({
   recentReviews,
@@ -12,15 +13,16 @@ export default function RecentReviews({
     <section className="py-10">
       <div className="flex items-center justify-between mb-8 ">
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Recent Reviews
+          Đánh giá gần đây
         </h2>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {recentReviews.map((review: Review, index) => (
-          <div
+          <Link
+            to={`/books/${review.book.id}`}
             key={index}
-            className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700"
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg"
           >
             <div className="flex items-start space-x-4">
               <div className="flex-1">
@@ -41,15 +43,18 @@ export default function RecentReviews({
                     ))}
                   </div>
                 </div>
+                <p className="text-purple-600 dark:text-purple-300 mb-2 italic">
+                  {review.book.title}
+                </p>
                 <p className="text-gray-600 dark:text-gray-300 mb-2">
-                  {review.comment}
+                  "{review.comment}"
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   {new Date(review.createdAt).toLocaleDateString()}
                 </p>
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </section>

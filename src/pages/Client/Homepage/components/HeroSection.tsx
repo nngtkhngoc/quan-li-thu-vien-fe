@@ -1,4 +1,4 @@
-import { ArrowRight, Target } from "lucide-react";
+import { ArrowRight, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function HeroSection() {
@@ -34,11 +34,11 @@ export default function HeroSection() {
           </Link>
 
           <Link
-            to="/challenges"
+            to="/forum"
             className="inline-flex items-center justify-center px-8 py-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-semibold rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-500 transition-all duration-300"
           >
-            <Target className="mr-2 h-5 w-5" />
-            Khám phá
+            <MessageCircle className="mr-2 h-5 w-5" />
+            Trò chuyện
           </Link>
         </div>
       </div>

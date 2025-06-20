@@ -15,13 +15,13 @@ export default function BookCard({ book, showActions = true }: any) {
   console.log(book.bookItems, "@@");
 
   return (
-    <div className="group bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 dark:border-gray-700">
+    <div className="group bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-200 dark:border-gray-700">
       <div className="relative">
         <div className="h-64 overflow-hidden">
           <img
             src={book.image}
             alt={book.title}
-            className="w-full h-64 object-cover group-hover:scale-130 transition-transform duration-2000"
+            className="w-full h-64 object-cover group-hover:scale-120 transition-transform duration-3000"
           />
         </div>
         <div className="absolute top-3 right-3">
@@ -37,7 +37,7 @@ export default function BookCard({ book, showActions = true }: any) {
 
       <div className="p-6">
         <div className="mb-3">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-1 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
             {book.title}
           </h3>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">

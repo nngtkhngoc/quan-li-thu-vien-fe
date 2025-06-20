@@ -132,7 +132,7 @@ export default function Chatbot() {
             />
             <button
               onClick={handleSend}
-              className="bg-blue-600 text-white px-3 rounded bg-gradient-to-br from-blue-600 to-purple-600 "
+              className="bg-blue-600 text-white px-3 rounded bg-gradient-to-br from-blue-600 to-purple-600 cursor-pointer"
               disabled={!input.trim() || isWaiting}
             >
               <Send className="w-5 h-5" />

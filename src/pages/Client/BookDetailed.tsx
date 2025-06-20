@@ -93,7 +93,7 @@ const BookDetail = () => {
         queryKey: ["review", id],
       });
     },
-    onError: e => {
+    onError: (e) => {
       console.error("Error creating review:", e);
       if (axios.isAxiosError(e)) {
         toast.error(
@@ -378,12 +378,12 @@ const BookDetail = () => {
                 Đánh giá
               </label>
               <div className="flex items-center space-x-1">
-                {[1, 2, 3, 4, 5].map(star => (
+                {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
                     type="button"
                     onClick={() =>
-                      setNewReview(prev => ({ ...prev, rating: star }))
+                      setNewReview((prev) => ({ ...prev, rating: star }))
                     }
                     className="p-1"
                   >

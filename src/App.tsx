@@ -3,6 +3,7 @@ import Navbar from "./components/Client/Navbar";
 import ScrollToTop from "./components/ScrollToTop";
 import { ToastContainer } from "react-toastify";
 import Chatbot from "./pages/Client/Chatbot";
+import Footer from "./components/Client/Footer";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Chatbot />
       </main>
       <ToastContainer theme="colored" />
+      <Footer />
     </div>
   );
 }
