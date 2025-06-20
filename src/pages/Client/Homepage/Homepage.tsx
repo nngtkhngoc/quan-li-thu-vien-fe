@@ -5,6 +5,7 @@ import HeroSection from "./components/HeroSection";
 import HomepageSkeleton from "./components/HomepageSkeleton";
 import RecentReviews from "./components/RecentReviews";
 import StatsSection from "./components/StatsSection";
+// import { mockBooks } from "../../../data/mockData";
 
 import { useQuery } from "@tanstack/react-query";
 

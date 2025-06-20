@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Bell, Moon, Menu, X, BookOpen } from "lucide-react";
+import { Bell, Moon, Menu, X, BookOpen, Sun } from "lucide-react";
 import { useUser } from "../../hooks/useUser";
 import { signOut } from "../../api/user.api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -11,7 +11,7 @@ const Header: React.FC = () => {
   const { userProfile } = useUser();
   const { setUserChanged } = useUser();
 
-  // const { isDark, toggleTheme } = useTheme();
+  const [isDark, setIsDark] = useState(localStorage.theme);
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -53,9 +53,13 @@ const Header: React.FC = () => {
   const toggleTheme = () => {
     if (localStorage.theme === "dark") {
       localStorage.theme = "light";
+      setIsDark("light");
+
       document.documentElement.classList.remove("dark");
     } else {
       localStorage.theme = "dark";
+      setIsDark("dark");
+
       document.documentElement.classList.add("dark");
     }
   };
@@ -95,13 +99,13 @@ const Header: React.FC = () => {
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="cursor-pointer p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
-              {/* {isDark ? ( */}
-              {/* <Sun className="h-5 w-5" /> */}
-              {/* ) : ( */}
-              <Moon className="h-5 w-5" />
-              {/* )} */}
+              {isDark == "dark" ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
             </button>
 
             {userProfile ? (
