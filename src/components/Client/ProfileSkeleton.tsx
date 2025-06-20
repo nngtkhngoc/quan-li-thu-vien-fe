@@ -35,12 +35,12 @@ const ProfileSkeleton = () => {
                 {Array.from({ length: 4 }).map((_, i) => (
                   <div
                     key={i}
-                    className="bg-gray-100 animate-pulse rounded-full shadow-sm border border-gray-200 p-4"
+                    className="bg-gray-100 dark:bg-gray-800 animate-pulse rounded-full shadow-sm border border-gray-200 dark:border-gray-700 p-4"
                   >
                     <div className="text-center mb-4 h-[100px] flex flex-col justify-center items-center">
-                      <div className="bg-gray-300 h-10 w-10 rounded-full mb-2"></div>
-                      <div className="h-4 bg-gray-300 rounded w-24 mb-1"></div>
-                      <div className="h-3 bg-gray-300 rounded w-16"></div>
+                      <div className="bg-gray-300 dark:bg-gray-700 h-10 w-10 rounded-full mb-2"></div>
+                      <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-24 mb-1"></div>
+                      <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-16"></div>
                     </div>
                   </div>
                 ))}

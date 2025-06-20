@@ -14,7 +14,6 @@ import {
   Bookmark,
   History,
   Star,
-  Trophy,
   AlertCircle,
   Camera,
   X,
@@ -205,10 +204,6 @@ export default function Profile() {
                     <BookOpen className="h-5 w-5 text-purple-500 dark:text-purple-400" />
                     <span>{totalBorrows} lần mượn sách</span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 bg-gray-100/50 dark:bg-gray-800/50 px-4 py-2 rounded-xl">
-                    <Trophy className="h-5 w-5 text-yellow-500 dark:text-yellow-400" />
-                    <span>Độc giả tích cực</span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -369,13 +364,13 @@ export default function Profile() {
                 {totalBadges?.data.map((badge: any) => (
                   <div
                     title={badge.description}
-                    className="relative rounded-full  bg-gray-50 dark:bg-gray-800 rounded-3xl p-4 overflow-hidden group hover:scale-105 transition-all duration-300 shadow-lg"
+                    className="relative rounded-full  bg-gray-50 dark:bg-gray-800 p-4 overflow-hidden group hover:scale-105 transition-all duration-300 shadow-lg"
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-purple-600 opacity-0 group-hover:opacity-10 dark:group-hover:opacity-30 transition-opacity duration-500"></div>
                     <div className="">
                       <div className="text-center mb-4 h-[100px]">
                         <div className="text-4xl mb-2">{badge.iconUrl}</div>
-                        <h3 className="font-semibold text-gray-900 mb-1">
+                        <h3 className="font-semibold dark:text-gray-300 text-gray-900 mb-1">
                           {badge.badgeName}
                         </h3>
                         <span
