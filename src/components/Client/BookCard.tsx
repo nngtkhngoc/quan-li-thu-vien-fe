@@ -78,7 +78,7 @@ export default function BookCard({ book, showActions = true }: any) {
             >
               <Link
                 to={`/books/${book.id}`}
-                className="block bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-medium py-2 px-4 rounded-lg hover:shadow-lg transition-all duration-300 text-center"
+                className="block bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-medium py-2 px-4 rounded-lg hover:shadow-md transition-all duration-300 text-center"
               >
                 Xem chi tiết
               </Link>

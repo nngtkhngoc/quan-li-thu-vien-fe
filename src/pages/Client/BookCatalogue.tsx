@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Search, Filter, Grid, List } from "lucide-react";
 import BookCard from "../../components/Client/BookCard";
 import { useBook } from "../../hooks/useBook";
-import { Pagination } from "antd";
+import { ConfigProvider, Pagination } from "antd";
 import BookCardSkeleton from "../../components/Client/BookCardSkeleton";
 import SearchFilterSkeleton from "../../components/Client/SearchFilterSkeleton";
 
@@ -104,9 +104,9 @@ export default function BookCatalogue() {
         <div className="flex items-center space-x-2">
           <button
             onClick={() => setViewMode("grid")}
-            className={`p-2 rounded-lg ${
+            className={`p-2 rounded-lg cursor-pointer ${
               viewMode === "grid"
-                ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 "
                 : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             }`}
           >
@@ -114,13 +114,13 @@ export default function BookCatalogue() {
           </button>
           <button
             onClick={() => setViewMode("list")}
-            className={`p-2 rounded-lg ${
+            className={`p-2 rounded-lg cursor-pointer ${
               viewMode === "list"
-                ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 "
                 : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             }`}
           >
-            <List className="h-5 w-5" />
+            <List className="h-5 w-5 " />
           </button>
         </div>
       </div>
@@ -144,7 +144,7 @@ export default function BookCatalogue() {
           {/* Filter Toggle */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center space-x-2 px-4 py-3 bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+            className="cursor-pointer flex items-center space-x-2 px-4 py-3 bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
           >
             <Filter className="h-5 w-5" />
             <span>Bộ lọc</span>
@@ -174,8 +174,8 @@ export default function BookCatalogue() {
                 </select>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <div className="ml-5">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 ">
                   Chỉ hiển thị sách có sẵn
                 </label>
                 <label className="flex items-center">
@@ -187,7 +187,7 @@ export default function BookCatalogue() {
                     }
                     className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                  <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 py-2">
                     Có sẵn
                   </span>
                 </label>
@@ -213,7 +213,7 @@ export default function BookCatalogue() {
               <div className="flex items-end">
                 <button
                   onClick={clearFilters}
-                  className="w-full px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  className="w-full px-4 cursor-pointer py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   Làm mới bộ lọc
                 </button>
@@ -233,7 +233,7 @@ export default function BookCatalogue() {
 
         {filteredBooks.length > 0 ? (
           <div
-            className={`grid gap-6 ${
+            className={`grid gap-6 pb-5 ${
               viewMode === "grid"
                 ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
                 : "grid-cols-1"
@@ -263,16 +263,35 @@ export default function BookCatalogue() {
           </div>
         )}
       </div>
-      <Pagination
-        current={page + 1}
-        className="flex justify-center"
-        total={getBookQuery.data?.totalElements || 0}
-        pageSize={size}
-        onChange={(currentPage) => {
-          setPage(currentPage - 1);
-          newSearchParams.set("page", String(currentPage - 1));
+      <ConfigProvider
+        theme={{
+          components: {
+            Pagination: {
+              itemActiveBg: "oklch(0.558 0.288 302.321)",
+              colorBorder: "oklch(0.558 0.288 302.321)",
+              colorPrimary: "white",
+              colorPrimaryHover: "white",
+              colorPrimaryBorder: "oklch(0.558 0.288 302.321)",
+              colorText: "oklch(0.558 0.288 302.321)",
+              controlOutline: "oklch(0.558 0.288 302.321)",
+              itemSize: 36,
+              borderRadius: 8,
+              fontSize: 18,
+            },
+          },
         }}
-      />
+      >
+        <Pagination
+          current={page + 1}
+          className="flex justify-center custom-pagination"
+          total={getBookQuery.data?.totalElements || 0}
+          pageSize={size}
+          onChange={(currentPage) => {
+            setPage(currentPage - 1);
+            newSearchParams.set("page", String(currentPage - 1));
+          }}
+        />
+      </ConfigProvider>
     </div>
   );
 }
