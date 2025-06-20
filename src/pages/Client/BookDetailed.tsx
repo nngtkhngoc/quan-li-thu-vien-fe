@@ -16,6 +16,7 @@ import {
   deleteWishlist,
 } from "../../api/wishlist.api";
 import BookDetailSkeleton from "../../components/Client/BookDetailedSkeleton";
+
 const BookDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [isReserving, setIsReserving] = useState(false);
@@ -44,7 +45,6 @@ const BookDetail = () => {
     },
     onSuccess: () => {
       toast.success("Đã thêm vào danh sách yêu thích!");
-
       queryClient.invalidateQueries({
         queryKey: ["wishlist", user.userProfile?.id],
       });
@@ -123,7 +123,7 @@ const BookDetail = () => {
       });
     },
     onError: (error: any) => {
-      if (error?.response?.data?.message?.includes("already exists ")) {
+      if (error?.response?.data?.message?.includes("already exists")) {
         toast.error("Bạn đã đặt trước rồi");
       } else {
         toast.error("Đặt trước thất bại. Vui lòng thử lại sau.");
@@ -260,8 +260,6 @@ const BookDetail = () => {
       </div>
     );
   }
-
-  // const bookReviews = mockReviews.filter((review) => review.bookId === book.id);
 
   return (
     <div className="space-y-8 max-w-screen-xl">
@@ -410,24 +408,10 @@ const BookDetail = () => {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
             {/* Reviews ({bookReviews.length}) */}
           </h2>
-          {
-            <button
-              onClick={() => {
-                if (!isAuthenticated) {
-                  toast.error("Bạn cần đăng nhập để viết đánh giá.");
-                  return;
-                }
-                setShowReviewForm(!showReviewForm);
-              }}
-              className="px-4 py-2 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
-            >
-              Viết đánh giá
-            </button>
-          }
         </div>
 
         {/* Review Form */}
-        {showReviewForm && (
+        {isAuthenticated && (
           <form
             id="review-form"
             onSubmit={handleReviewSubmit}
@@ -472,7 +456,7 @@ const BookDetail = () => {
               />
             </div>
 
-            <div className="flex space-x-3 ">
+            <div className="flex gap-4">
               <button
                 type="submit"
                 className="px-4 py-2 cursor-pointer bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg hover:bg-gradient-to-bl transition-colors"
@@ -492,55 +476,65 @@ const BookDetail = () => {
 
         {/* Reviews List */}
         <div className="space-y-6">
-          {reviews.map((review: any) => (
-            <div
-              key={review.id}
-              className="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-b-0"
-            >
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 p-1 animate-gradient-x">
-                  <div className=" w-full h-full rounded-full bg-white dark:bg-gray-900 flex items-center justify-center overflow-hidden">
-                    {review.user.image ? (
-                      <img
-                        src={review.user.image}
-                        alt={review.user.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-4xl font-bold text-gray-900 dark:text-white">
-                        {review.user.name.charAt(0).toUpperCase()}
-                      </span>
-                    )}
+          {reviews.length === 0 ? (
+            <div className="text-center text-gray-400 italic py-8">
+              Chưa có đánh giá nào cho quyển sách này.
+            </div>
+          ) : (
+            reviews.map((review: any) => (
+              <div
+                key={review.id}
+                className="flex flex-col sm:flex-row items-start gap-4 p-5 bg-white dark:bg-gray-900 rounded-xl shadow border border-gray-100 dark:border-gray-800"
+              >
+                {/* Avatar + User */}
+                <div className="flex-shrink-0 flex flex-col items-center w-16">
+                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 p-1 shadow-md">
+                    <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 flex items-center justify-center overflow-hidden">
+                      {review.user.image ? (
+                        <img
+                          src={review.user.image}
+                          alt={review.user.name}
+                          className="w-full h-full object-cover rounded-full"
+                        />
+                      ) : (
+                        <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                          {review.user.name.charAt(0).toUpperCase()}
+                        </span>
+                      )}
+                    </div>
                   </div>
+                  <span className="mt-2 text-xs text-gray-500 dark:text-gray-400 text-center">
+                    {new Date(
+                      review.createdAt || review.created_at
+                    ).toLocaleDateString()}
+                  </span>
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <h4 className="font-semibold text-gray-900 dark:text-white">
+                {/* Nội dung đánh giá */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-1">
+                    <span className="font-semibold text-gray-900 dark:text-white text-base">
                       {review.user.name}
-                    </h4>
-                    <div className="flex items-center">
-                      {[...Array(5)].map((_, i) => (
+                    </span>
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
                         <Star
-                          key={i}
-                          className={`h-4 w-4 ${
-                            i < review.rating
+                          key={star}
+                          className={`h-5 w-5 ${
+                            star <= review.rating
                               ? "text-yellow-400 fill-current"
                               : "text-gray-300 dark:text-gray-600"
                           }`}
                         />
                       ))}
                     </div>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {new Date(review.createdAt).toLocaleDateString()}
-                    </span>
                   </div>
-                  <p className="text-gray-600 dark:text-gray-300 mb-3">
+                  <div className="text-gray-700 dark:text-gray-200 text-sm leading-relaxed break-words">
                     {review.comment}
-                  </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>
