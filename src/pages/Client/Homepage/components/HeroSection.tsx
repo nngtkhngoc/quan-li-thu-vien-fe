@@ -7,7 +7,7 @@ export default function HeroSection() {
       <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
       <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-indigo-400/20 to-pink-400/20 rounded-full blur-3xl"></div>
 
-      <div className="relative z-10 max-w-4xl">
+      <div className="relative max-w-4xl">
         <h1 className="text-4xl md:text-6xl font-bold mb-6">
           <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
             Hãy khám phá

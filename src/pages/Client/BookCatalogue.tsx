@@ -106,7 +106,7 @@ export default function BookCatalogue() {
             onClick={() => setViewMode("grid")}
             className={`p-2 rounded-lg cursor-pointer ${
               viewMode === "grid"
-                ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 "
+                ? "bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 "
                 : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             }`}
           >
@@ -116,7 +116,7 @@ export default function BookCatalogue() {
             onClick={() => setViewMode("list")}
             className={`p-2 rounded-lg cursor-pointer ${
               viewMode === "list"
-                ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 "
+                ? "bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 "
                 : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             }`}
           >
