@@ -46,3 +46,9 @@ export const deleteMessage = async (id: number): Promise<void> => {
   const response = await axiosClient.delete(`/chat/messages/${id}`);
   return response.data;
 };
+
+// Get active user
+export const getActiveUsers = async () => {
+  const response = await axiosClient.get(`/chat/active-users`);
+  return response.data;
+};

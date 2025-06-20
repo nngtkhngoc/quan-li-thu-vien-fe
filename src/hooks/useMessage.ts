@@ -4,6 +4,7 @@ import {
   getAllMessages,
   updateMessage,
   deleteMessage,
+  getActiveUsers,
 } from "../api/message.api";
 import type { UpdateMessageRequest, MessageResponse } from "../api/message.api";
 
@@ -13,6 +14,12 @@ export const useMessage = () => {
   const getMessagesQuery = useQuery({
     queryKey: ["messages"],
     queryFn: getAllMessages,
+  });
+
+  const { data: numActiveUsers } = useQuery({
+    queryKey: ["active-users"],
+    queryFn: getActiveUsers,
+    refetchInterval: 1000,
   });
 
   const updateMessageMutation = useMutation({
@@ -112,6 +119,8 @@ export const useMessage = () => {
 
     updateMessage: updateMessageMutation.mutate,
     deleteMessage: deleteMessageMutation.mutate,
+
+    numActiveUsers,
   };
 };
 
