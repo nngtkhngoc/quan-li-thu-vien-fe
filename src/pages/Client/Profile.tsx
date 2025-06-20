@@ -81,7 +81,7 @@ export default function Profile() {
         toast.error("Kích thước ảnh không được vượt quá 5MB");
         return;
       }
-      console.log("Selected file:", file);
+
       setSelectedImage(file);
       const Url = URL.createObjectURL(file);
       setImagePreview(Url);

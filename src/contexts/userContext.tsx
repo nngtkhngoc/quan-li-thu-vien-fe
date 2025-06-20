@@ -14,7 +14,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       try {
         setIsLoading(true);
         const response = await getProfile();
-        console.log("user", response);
+
         if (response) {
           setUserProfile(response);
         } else {
