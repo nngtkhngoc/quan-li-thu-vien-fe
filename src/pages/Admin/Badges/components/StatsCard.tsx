@@ -35,7 +35,7 @@ export default function StatsCard({ badges }: { badges: Badge[] }) {
             <div className="flex items-center">
               <div className={`p-2 rounded-lg ${cat.bg}`}>{cat.icon}</div>
               <div className="ml-3">
-                <p className="text-md font-medium text-gray-600">{cat.label}</p>
+                <p className="text-sm font-medium text-gray-600">{cat.label}</p>
                 <p className="text-xl font-semibold text-gray-900">{count}</p>
               </div>
             </div>

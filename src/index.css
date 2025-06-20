@@ -6,3 +6,8 @@
 @theme {
   --font-primary: "Lexend", sans-serif;
 }
+
+.custom-pagination .ant-pagination-item {
+  border: 1px solid oklch(0.585 0.233 277.117) !important;
+  font-family: "Lexend", sans-serif !important;
+}

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Edit, Trash2 } from "lucide-react";
+import { Award, Edit, Trash2 } from "lucide-react";
 import type { Badge } from "../../../../types/Badge";
 
 export default function BadgeGrid({
@@ -18,6 +18,15 @@ export default function BadgeGrid({
     COMMUNITY: "bg-emerald-100 text-emerald-800",
     ACHIEVEMENT: "bg-purple-100 text-purple-800",
   };
+
+  if (!filteredBadges.length) {
+    return (
+      <div className="text-center py-12">
+        <Award className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+        <p className="text-gray-500 text-lg">Không có huy hiệu nào</p>
+      </div>
+    );
+  }
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {filteredBadges.map((badge) => (

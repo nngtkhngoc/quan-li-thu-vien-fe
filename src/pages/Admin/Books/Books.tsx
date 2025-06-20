@@ -15,7 +15,7 @@ import { mockBooks } from "../../../data/mockData";
 import { useBook } from "../../../hooks/useBook";
 import type { BookResponse } from "../../../types/Book";
 import { toast } from "react-toastify";
-import { Pagination } from "antd";
+import { ConfigProvider, Pagination } from "antd";
 import BookItems from "../BookItems";
 import { useBookItem } from "../../../hooks/useBookItem";
 import BookSkeleton from "./BookSkeleton";
@@ -119,7 +119,6 @@ export default function Books() {
         }
       }
     };
-    console.log(book, "!@#!@#");
     return (
       <div className="fixed inset-0 bg-gray-500/50 bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -276,7 +275,7 @@ export default function Books() {
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
+          className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors cursor-pointer"
         >
           <Plus className="h-5 w-5 mr-2" />
           Thêm sách mới
@@ -335,7 +334,7 @@ export default function Books() {
                       : "bg-red-100 text-red-800"
                   }`}
                 >
-                  {book.availableCopies > 0 ? "Available" : "Out of stock"}
+                  {book.availableCopies > 0 ? "Có sẵn" : "Tạm hết"}
                 </span>
               </div>
               <div className="flex space-x-2">
@@ -377,17 +376,36 @@ export default function Books() {
         </div>
       )}
       {/* Pagination */}
-      <Pagination
-        className="flex align-items-center justify-center mt-6"
-        pageSize={size}
-        total={getBookQuery.data.totalElements}
-        current={page + 1}
-        onChange={(currentPage: any) => {
-          setPage(currentPage - 1);
-          params.set("page", (currentPage - 1).toString());
-          setCurrentParams(params);
+      <ConfigProvider
+        theme={{
+          components: {
+            Pagination: {
+              itemActiveBg: "oklch(0.585 0.233 277.117)",
+              colorBorder: "oklch(0.585 0.233 277.117)",
+              colorPrimary: "white",
+              colorPrimaryHover: "white",
+              colorPrimaryBorder: "oklch(0.585 0.233 277.117)",
+              colorText: "oklch(0.585 0.233 277.117)",
+              controlOutline: "oklch(0.585 0.233 277.117)",
+              itemSize: 36,
+              borderRadius: 8,
+              fontSize: 18,
+            },
+          },
         }}
-      />
+      >
+        <Pagination
+          className="flex align-items-center justify-center mt-6 custom-pagination  "
+          pageSize={size}
+          total={getBookQuery.data.totalElements}
+          current={page + 1}
+          onChange={(currentPage: any) => {
+            setPage(currentPage - 1);
+            params.set("page", (currentPage - 1).toString());
+            setCurrentParams(params);
+          }}
+        />
+      </ConfigProvider>
       {/* Modals */}
       {showBookItemsModal && (
         <BookItems

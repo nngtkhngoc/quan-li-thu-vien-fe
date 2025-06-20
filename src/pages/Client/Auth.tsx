@@ -87,7 +87,7 @@ const Auth: React.FC = () => {
     await signUp(signUpData);
     toast.success("Đăng ký thành công! Vui lòng đăng nhập.");
     setIsLogin(true);
-    setFormData(prev => ({ ...prev, password: "", confirmPassword: "" }));
+    setFormData((prev) => ({ ...prev, password: "", confirmPassword: "" }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -106,7 +106,7 @@ const Auth: React.FC = () => {
       if (axios.isAxiosError(error) && error.response?.data?.message) {
         const errorMessage = error.response.data.message;
         if (errorMessage.toLowerCase().includes("email already ")) {
-          setErrors(prev => ({
+          setErrors((prev) => ({
             ...prev,
             email: "Email đã được sử dụng",
           }));
@@ -124,13 +124,13 @@ const Auth: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
     // Clear error when user starts typing
     if (errors[name as keyof FormErrors]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
         [name]: undefined,
       }));
@@ -264,7 +264,7 @@ const Auth: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer"
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5" />
@@ -325,7 +325,7 @@ const Auth: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-lg"
+              className="cursor-pointer w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-lg"
             >
               {loading ? (
                 <div className="flex items-center">
@@ -375,7 +375,7 @@ const Auth: React.FC = () => {
               <button
                 type="button"
                 onClick={toggleAuthMode}
-                className="w-full text-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
+                className="w-full text-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium cursor-pointer"
               >
                 {isLogin ? "Tạo tài khoản mới" : "Đăng nhập"}
               </button>

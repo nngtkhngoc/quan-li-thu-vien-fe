@@ -68,7 +68,7 @@ export default function Borrows() {
     },
   });
 
-  const filteredBorrows = borrows?.filter(borrow => {
+  const filteredBorrows = borrows?.filter((borrow) => {
     const matchesSearch =
       borrow.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       borrow.book_item.book.title
@@ -130,7 +130,7 @@ export default function Borrows() {
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Đang cho mượn</p>
               <p className="text-xl font-semibold text-gray-900">
-                {borrows?.filter(b => b.status === "BORROWED").length}
+                {borrows?.filter((b) => b.status === "BORROWED").length}
               </p>
             </div>
           </div>
@@ -143,7 +143,7 @@ export default function Borrows() {
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Quá hạn</p>
               <p className="text-xl font-semibold text-gray-900">
-                {borrows?.filter(b => b.status === "OVERDUE").length}
+                {borrows?.filter((b) => b.status === "OVERDUE").length}
               </p>
             </div>
           </div>
@@ -156,7 +156,7 @@ export default function Borrows() {
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Đã trả</p>
               <p className="text-xl font-semibold text-gray-900">
-                {borrows?.filter(b => b.status === "RETURNED").length}
+                {borrows?.filter((b) => b.status === "RETURNED").length}
               </p>
             </div>
           </div>
@@ -172,7 +172,7 @@ export default function Borrows() {
               type="text"
               placeholder="Tìm kiếm theo tên người dùng hoặc tên sách..."
               value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
@@ -180,10 +180,10 @@ export default function Borrows() {
             <Filter className="h-5 w-5 text-gray-400" />
             <select
               value={filterStatus}
-              onChange={e => setFilterStatus(e.target.value)}
+              onChange={(e) => setFilterStatus(e.target.value)}
               className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             >
-              {statuses.map(status => (
+              {statuses.map((status) => (
                 <option key={status} value={status}>
                   {vnStatus.get(status)}
                 </option>
@@ -215,90 +215,107 @@ export default function Borrows() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredBorrows?.map(borrow => (
-                <tr key={borrow.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">
-                        {borrow.user.name}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {borrow.book_item.book.title}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <div>
-                      <div>
-                        Ngày mượn:{" "}
-                        {new Date(borrow.borrow_date).toLocaleDateString()}
-                      </div>
-                      <div
-                        className={
-                          borrow.status === "OVERDUE" ? "text-red-600" : ""
-                        }
-                      >
-                        Hạn trả: {new Date(borrow.due_date).toLocaleDateString()}
-                      </div>
-                      {borrow.return_date && borrow.status === "RETURNED" && (
-                        <div className="text-emerald-600">
-                          Ngày trả:{" "}
-                          {new Date(borrow.return_date).toLocaleDateString()}
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        statusColors[borrow.status]
-                      }`}
-                    >
-                      {vnStatus.get(borrow.status) || borrow.status}
-                    </span>
-                  </td>
-
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex justify-end space-x-2">
-                      {borrow.status === "BORROWED" && (
-                        <button
-                          onClick={() =>
-                            setIsChangingStatus({
-                              id: borrow.id,
-                              status: "RETURNED",
-                            })
-                          }
-                          className="text-emerald-600 hover:text-emerald-900"
-                          title="Đánh dấu là đã trả"
-                        >
-                          <CheckCircle className="h-4 w-4" />
-                        </button>
-                      )}
-                      {borrow.status === "RETURNED" && (
-                        <button
-                          onClick={() =>
-                            setIsChangingStatus({
-                              id: borrow.id,
-                              status: "BORROWED",
-                            })
-                          }
-                          className="text-blue-600 hover:text-blue-900"
-                          title="Đánh dấu là đã mượn"
-                        >
-                          <ArrowRightLeft className="h-4 w-4" />
-                        </button>
-                      )}
-                      <button
-                        className="text-red-600 hover:text-red-800"
-                        title="Xóa lần mượn này"
-                        onClick={() => setIsDeleting(borrow.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
+              {(filteredBorrows?.length ?? 0) === 0 ? (
+                <tr>
+                  <td
+                    colSpan={4}
+                    className="px-6 py-4 text-center text-gray-500 italic"
+                  >
+                    Không có lượt mượn nào.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                (filteredBorrows ?? []).map((borrow) => (
+                  <tr key={borrow.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {borrow.user.name}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {borrow.book_item.book.title}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <div>
+                        <div>
+                          Ngày mượn:{" "}
+                          {new Date(borrow.borrow_date).toLocaleDateString(
+                            "vi-VN"
+                          )}
+                        </div>
+                        <div
+                          className={
+                            borrow.status === "OVERDUE" ? "text-red-600" : ""
+                          }
+                        >
+                          Hạn trả:{" "}
+                          {new Date(borrow.due_date).toLocaleDateString(
+                            "vi-VN"
+                          )}
+                        </div>
+                        {borrow.return_date && borrow.status === "RETURNED" && (
+                          <div className="text-emerald-600">
+                            Ngày trả:{" "}
+                            {new Date(borrow.return_date).toLocaleDateString(
+                              "vi-VN"
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          statusColors[borrow.status]
+                        }`}
+                      >
+                        {vnStatus.get(borrow.status) || borrow.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex justify-end space-x-2">
+                        {borrow.status === "BORROWED" && (
+                          <button
+                            onClick={() =>
+                              setIsChangingStatus({
+                                id: borrow.id,
+                                status: "RETURNED",
+                              })
+                            }
+                            className="text-emerald-600 hover:text-emerald-900"
+                            title="Đánh dấu là đã trả"
+                          >
+                            <CheckCircle className="h-4 w-4" />
+                          </button>
+                        )}
+                        {borrow.status === "RETURNED" && (
+                          <button
+                            onClick={() =>
+                              setIsChangingStatus({
+                                id: borrow.id,
+                                status: "BORROWED",
+                              })
+                            }
+                            className="text-blue-600 hover:text-blue-900"
+                            title="Đánh dấu là đã mượn"
+                          >
+                            <ArrowRightLeft className="h-4 w-4" />
+                          </button>
+                        )}
+                        <button
+                          className="text-red-600 hover:text-red-800"
+                          title="Xóa lần mượn này"
+                          onClick={() => setIsDeleting(borrow.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -306,7 +323,9 @@ export default function Borrows() {
         {filteredBorrows?.length === 0 && (
           <div className="text-center py-12">
             <ArrowRightLeft className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500 text-lg">Không tìm thấy bản ghi mượn sách</p>
+            <p className="text-gray-500 text-lg">
+              Không tìm thấy bản ghi mượn sách
+            </p>
             <p className="text-gray-400">
               Hãy thử điều chỉnh tìm kiếm hoặc bộ lọc
             </p>
@@ -393,7 +412,7 @@ const BorrowsSkeleton = () => {
 
       {/* Stats Cards Skeleton */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {[1, 2, 3].map(index => (
+        {[1, 2, 3].map((index) => (
           <div
             key={index}
             className="bg-white rounded-lg border border-gray-200 p-4"
@@ -438,7 +457,7 @@ const BorrowsSkeleton = () => {
           </div>
 
           {/* Table Rows */}
-          {[1, 2, 3, 4, 5, 6, 7, 8].map(index => (
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
             <div key={index} className="px-6 py-4 border-b border-gray-200">
               <div className="grid grid-cols-4 gap-4 items-center">
                 {/* User & Book Column */}

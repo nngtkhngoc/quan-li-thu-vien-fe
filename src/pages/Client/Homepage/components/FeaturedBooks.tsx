@@ -15,13 +15,13 @@ export default function FeaturedBooks({
     <section>
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Featured Books
+          Sách nổi bật
         </h2>
         <Link
           to="/books"
-          className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
+          className="inline-flex items-center text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 font-medium"
         >
-          View All
+          Xem tất cả
           <ArrowRight className="ml-1 h-4 w-4" />
         </Link>
       </div>

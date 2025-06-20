@@ -7,6 +7,7 @@ import {
   BookOpen,
   Plus,
   Trash2,
+  ArrowRightLeft,
 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -177,7 +178,7 @@ export default function Reservations() {
         </div>
         <button
           onClick={() => setIsCreating(true)}
-          className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          className="mt-4 sm:mt-0 inline-flex cursor-pointer items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
           <Plus className="h-5 w-5 mr-2" />
           Tạo đặt trước
@@ -292,104 +293,104 @@ export default function Reservations() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {isLoading
-                ? Array.from({ length: 5 }).map((_, i) => (
-                    <tr key={i} className="animate-pulse">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-full"></div>
-                          <div className="ml-4 space-y-2">
-                            <div className="h-4 bg-gray-200 rounded w-32"></div>
-                            <div className="h-4 bg-gray-200 rounded w-24"></div>
+              {isLoading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i} className="animate-pulse">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-full"></div>
+                        <div className="ml-4 space-y-2">
+                          <div className="h-4 bg-gray-200 rounded w-32"></div>
+                          <div className="h-4 bg-gray-200 rounded w-24"></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="h-4 bg-gray-200 rounded w-24"></div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="h-6 bg-gray-200 rounded-full w-20"></div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                      <div className="h-8 bg-gray-200 rounded w-24 mx-auto"></div>
+                    </td>
+                  </tr>
+                ))
+              ) : (filteredReservations?.length ?? 0) === 0 ? (
+                <tr>
+                  <td
+                    colSpan={4}
+                    className="px-6 py-4 text-center text-gray-500 italic"
+                  >
+                    Không có đặt trước nào.
+                  </td>
+                </tr>
+              ) : (
+                (filteredReservations ?? []).map((reservation) => (
+                  <tr
+                    key={reservation.reservation_id}
+                    className="hover:bg-gray-50"
+                  >
+                    <td className="px-6 py-4">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center">
+                          <BookOpen className="h-6 w-6 text-gray-500" />
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">
+                            {reservation.user.name}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {reservation.bookItem.book.title}
                           </div>
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="h-4 bg-gray-200 rounded w-24"></div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="h-6 bg-gray-200 rounded-full w-20"></div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-center">
-                        <div className="h-8 bg-gray-200 rounded w-24 mx-auto"></div>
-                      </td>
-                    </tr>
-                  ))
-                : filteredReservations?.map((reservation) => (
-                    <tr
-                      key={reservation.reservation_id}
-                      className="hover:bg-gray-50"
-                    >
-                      <td className="px-6 py-4">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center">
-                            <BookOpen className="h-6 w-6 text-gray-500" />
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">
-                              {reservation.user.name}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              {reservation.bookItem.book.title}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(
-                          reservation.reservationDate
-                        ).toLocaleDateString("vi-VN", {
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {new Date(reservation.reservationDate).toLocaleDateString(
+                        "vi-VN",
+                        {
                           year: "numeric",
                           month: "2-digit",
                           day: "2-digit",
                           hour: "2-digit",
                           minute: "2-digit",
-                        })}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                            reservation.returned
-                              ? statusColors.COMPLETED
-                              : statusColors.PENDING
-                          }`}
+                        }
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                          reservation.returned
+                            ? statusColors.COMPLETED
+                            : statusColors.PENDING
+                        }`}
+                      >
+                        {reservation.returned
+                          ? statusLabels.COMPLETED
+                          : statusLabels.PENDING}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                      <div className="flex justify-center space-x-2">
+                        <button
+                          onClick={() =>
+                            setIsDeleting(reservation.reservation_id)
+                          }
+                          className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          title="Xóa"
+                          disabled={isDeletingReservation}
                         >
-                          {reservation.returned
-                            ? statusLabels.COMPLETED
-                            : statusLabels.PENDING}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                        <div className="flex justify-center space-x-2">
-                          <button
-                            onClick={() =>
-                              setIsDeleting(reservation.reservation_id)
-                            }
-                            className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            title="Xóa"
-                            disabled={isDeletingReservation}
-                          >
-                            <Trash2 className="h-5 w-5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                          <Trash2 className="h-5 w-5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
-
-        {!isLoading && filteredReservations?.length === 0 && (
-          <div className="text-center py-12">
-            <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500 text-lg">
-              Không tìm thấy đặt trước nào
-            </p>
-            <p className="text-gray-400">
-              Hãy thử điều chỉnh tìm kiếm hoặc bộ lọc của bạn
-            </p>
-          </div>
-        )}
       </div>
 
       {/* Add Create Modal */}

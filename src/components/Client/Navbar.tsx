@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Search, Bell, User, Moon, Menu, X, BookOpen } from "lucide-react";
+import { Bell, Moon, Menu, X, BookOpen } from "lucide-react";
 import { useUser } from "../../hooks/useUser";
 import { signOut } from "../../api/user.api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -15,7 +15,6 @@ const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const queryClient = useQueryClient();
 
   const { newNotifications } = useNotification();
@@ -33,14 +32,6 @@ const Header: React.FC = () => {
       toast.error("Đăng xuất thất bại");
     },
   });
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/catalogue?search=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchQuery("");
-    }
-  };
 
   const isActivePage = (path: string) => location.pathname === path;
 
@@ -88,9 +79,9 @@ const Header: React.FC = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
+                className={`px-3 py-2 rounded-lg font-medium transition-all duration-200 whitespace-nowrap ${
                   isActivePage(item.path)
-                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                    ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400"
                     : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                 }`}
               >
@@ -232,7 +223,7 @@ const Header: React.FC = () => {
                 to="/auth"
                 className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-300"
               >
-                <User className="h-4 w-4" />
+                {/* <User className="h-4 w-4" /> */}
                 <span>Đăng nhập</span>
               </Link>
             )}
@@ -260,29 +251,15 @@ const Header: React.FC = () => {
                   key={item.path}
                   to={item.path}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`block px-3 py-2 rounded-lg font-medium ${
+                  className={`block px-3 py-2 rounded-lg font-medium whitespace-nowrap ${
                     isActivePage(item.path)
-                      ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                      ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400"
                       : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                   }`}
                 >
                   {item.label}
                 </Link>
               ))}
-
-              {/* Mobile Search */}
-              <form onSubmit={handleSearch} className="pt-2">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                  <input
-                    type="text"
-                    placeholder="Tìm sách hoặc tác giả."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </form>
             </div>
           </div>
         )}

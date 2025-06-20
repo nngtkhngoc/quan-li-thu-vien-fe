@@ -1,4 +1,5 @@
-import { Bot, X } from "lucide-react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Bot, BotIcon, Send, X } from "lucide-react";
 import { useState } from "react";
 import { useUser } from "../../hooks/useUser";
 import { toast } from "react-toastify";
@@ -67,51 +68,74 @@ export default function Chatbot() {
   return (
     <div className="fixed bottom-4 right-4">
       {isOpen ? (
-        <div className="w-[300px] h-[400px] lg:w-[500px] z-50 bg-white rounded-2xl shadow-lg flex flex-col overflow-hidden">
-          <div className="dark:bg-gray-800 text-white p-3 flex justify-between items-center">
-            <span>Chatbot</span>
+        <div className="w-[300px] h-[400px] lg:w-[400px] lg:h-[450px] z-50 bg-white rounded-2xl shadow-lg flex flex-col overflow-hidden">
+          <div className="bg-gradient-to-br from-blue-600 to-purple-600 text-white px-3 py-4 flex justify-between items-center">
+            <div className="flex gap-2 items-center justify-center font-bold">
+              <BotIcon className="w-7 h-7" /> Bibot
+            </div>
             <button onClick={toggleChat}>
-              <X className="text-xl" />
+              <X className="text-xl text-white" />
             </button>
           </div>
-          <div className="flex-1 p-3 overflow-y-auto space-y-2">
+          <div className="flex-1 p-3 overflow-y-auto space-y-3">
             {messages.map((msg: any, idx: any) => (
-              <div
-                key={idx}
-                className={`p-2 rounded-md max-w-[75%] ${
-                  msg._bot === false
-                    ? "bg-blue-100 self-end ml-auto"
-                    : "bg-gray-200"
-                }`}
-              >
-                {cleanMessage(msg.message)}
+              <div className="flex flex-row gap-2">
+                {msg._bot && (
+                  <div className=" text-white w-10 h-10  flex items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-purple-600">
+                    <BotIcon className="w-6 h-6" />
+                  </div>
+                )}
+
+                <div
+                  key={idx}
+                  className={`p-2 rounded-md max-w-[60%] text-[14px] ${
+                    msg._bot === false
+                      ? "bg-purple-200 self-end ml-auto "
+                      : "bg-gray-100"
+                  }`}
+                >
+                  {cleanMessage(msg.message)}
+                </div>
+
+                {!msg._bot &&
+                  (user.userProfile?.image ? (
+                    <img
+                      src={user.userProfile.image}
+                      alt={user.userProfile.name}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-300 text-2xl font-bold text-gray-900 dark:text-white">
+                      {user.userProfile?.name?.charAt(0).toUpperCase()}
+                    </span>
+                  ))}
               </div>
             ))}
             {createChatbotResponseMutation.isPending && (
-              <div className="p-2 bg-gray-200 rounded-md">
+              <div className="p-2 ">
                 <span className="inline-flex space-x-1">
-                  <span className="animate-bounce delay-0">.</span>
-                  <span className="animate-bounce delay-150">.</span>
-                  <span className="animate-bounce delay-300">.</span>
+                  <span className="animate-bounce delay-0 w-2 h-2 bg-purple-400 rounded-full"></span>
+                  <span className="animate-bounce delay-1000 w-2 h-2 bg-purple-500 rounded-full"></span>
+                  <span className="animate-bounce delay-1500 w-2 h-2 bg-purple-700 rounded-full"></span>
                 </span>
               </div>
             )}
           </div>
-          <div className="p-3 border-t flex gap-2">
+          <div className="p-3 border-t flex gap-2 border-zinc-200">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
-              className="flex-1 border rounded px-2 py-1"
+              className="flex-1 border border-zinc-400 focus:outline-purple-500 rounded px-2 py-2 text-sm"
               placeholder="Nhập tin nhắn..."
             />
             <button
               onClick={handleSend}
-              className="bg-blue-600 text-white px-3 rounded"
+              className="bg-blue-600 text-white px-3 rounded bg-gradient-to-br from-blue-600 to-purple-600 cursor-pointer"
               disabled={!input.trim() || isWaiting}
             >
-              Gửi
+              <Send className="w-5 h-5" />
             </button>
           </div>
         </div>
