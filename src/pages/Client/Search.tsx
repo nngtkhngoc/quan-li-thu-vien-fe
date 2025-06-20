@@ -117,7 +117,7 @@ export default function SearchPage() {
                 />
                 <button
                   onClick={clearImage}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white dark:text-gray-900 rounded-full p-1 hover:bg-red-600 transition-colors"
+                  className="absolute -top-2 -right-2 bg-red-500 text-white dark:text-gray-900 rounded-full p-1 hover:bg-red-600 transition-colors cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -133,7 +133,7 @@ export default function SearchPage() {
                 </p>
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105"
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 cursor-pointer"
                 >
                   Tải ảnh lên
                 </button>
