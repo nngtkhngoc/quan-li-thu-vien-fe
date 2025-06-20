@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 
 import { useState, useRef } from "react";
@@ -81,10 +82,10 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 rounded-lg">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
             Tìm kiếm sách theo ảnh
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -98,10 +99,10 @@ export default function SearchPage() {
           <div
             className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all duration-300 ${
               isDragging
-                ? "border-purple-500 bg-purple-50 scale-105"
+                ? "border-purple-500 bg-purple-50 scale-105 dark:bg-purple-900"
                 : uploadedImage
-                ? "border-green-500 bg-green-50"
-                : "border-gray-300 bg-white hover:border-purple-400 hover:bg-purple-50"
+                ? "border-green-500 dark:bg-green-900 bg-green-50"
+                : "border-gray-300 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-purple-600 dark:hover:bg-purple-900 bg-white hover:border-purple-400 hover:bg-purple-50"
             }`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -116,18 +117,18 @@ export default function SearchPage() {
                 />
                 <button
                   onClick={clearImage}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                  className="absolute -top-2 -right-2 bg-red-500 text-white dark:text-gray-900 rounded-full p-1 hover:bg-red-600 transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
             ) : (
               <div>
-                <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4 dark:text-gray-600" />
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
                   Tải ảnh bìa sách hoặc ảnh liên quan
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
                   Kéo và thả ảnh vào đây hoặc nhấn nút bên dưới để tải ảnh lên.
                 </p>
                 <button
