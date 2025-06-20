@@ -22,9 +22,11 @@ export default function CreateModal({
     name: badge?.name || "",
     description: badge?.description || "",
     icon: badge?.icon_url || "🏆",
-    xpRequired: badge?.xpRequired || 100,
-    borrowedBookRequired: badge?.borrowedBooksRequired || 100,
-    reviewsRequired: badge?.reviewsRequired || 100,
+    xpRequired: badge?.xpRequired != null ? badge?.xpRequired : 100,
+    borrowedBookRequired:
+      badge?.borrowedBooksRequired != null ? badge?.borrowedBooksRequired : 100,
+    reviewsRequired:
+      badge?.reviewsRequired != null ? badge?.reviewsRequired : 100,
     category: badge?.category || "BOOK",
     xpAwarded: badge?.xpAwarded || 100,
   });

@@ -12,6 +12,7 @@ export type updateUserRequest = {
 };
 
 export type UserResponse = {
+  xp: number;
   id: number;
   name: string;
   email: string;

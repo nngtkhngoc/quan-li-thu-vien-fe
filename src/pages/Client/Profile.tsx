@@ -187,9 +187,14 @@ export default function Profile() {
                 </button>
               </div>
               <div className="flex-1 text-center md:text-left">
-                <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-                  {user.name}
-                </h1>
+                <div className="flex flex-row items-center gap-3">
+                  <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2 ">
+                    {user.name}
+                  </h1>
+                  <span className="text-sm italic text-green-400">
+                    ({user.xp}xP)
+                  </span>
+                </div>
                 <p className="text-gray-600 dark:text-gray-400 mb-6">
                   {user.email}
                 </p>

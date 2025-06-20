@@ -48,8 +48,7 @@ export default function BookCard({ book, showActions = true }: any) {
         <div className="flex items-center space-x-4 mb-4 text-sm text-gray-500 dark:text-gray-400">
           <div className="flex items-center">
             <Star className="h-4 w-4 text-yellow-400 fill-current mr-1" />
-            <span>{book.rating}</span>
-            <span className="ml-1">({book.reviewCount})</span>
+            <span>{book.avg_rating}</span>
           </div>
           <div className="flex items-center">
             <BookOpen className="h-4 w-4 mr-1" />

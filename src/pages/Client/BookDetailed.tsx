@@ -89,9 +89,8 @@ const BookDetail = () => {
     },
     onSuccess: () => {
       toast.success("Đánh giá đã được gửi thành công!");
-      queryClient.invalidateQueries({
-        queryKey: ["review", id],
-      });
+      queryClient.invalidateQueries({ queryKey: ["review", id] });
+      queryClient.invalidateQueries({ queryKey: ["book", id] });
     },
     onError: (e) => {
       console.error("Error creating review:", e);
@@ -228,7 +227,7 @@ const BookDetail = () => {
                       <Star
                         key={i}
                         className={`h-5 w-5 ${
-                          i < Math.floor(book.rating)
+                          i < Math.floor(book.avg_rating)
                             ? "text-yellow-400 fill-current"
                             : "text-gray-300 dark:text-gray-600"
                         }`}
@@ -385,10 +384,10 @@ const BookDetail = () => {
                     onClick={() =>
                       setNewReview((prev) => ({ ...prev, rating: star }))
                     }
-                    className="p-1"
+                    className="p-1 "
                   >
                     <Star
-                      className={`h-6 w-6 ${
+                      className={`h-6 w-6 cursor-pointer ${
                         star <= newReview.rating
                           ? "text-yellow-400 fill-current"
                           : "text-gray-300 dark:text-gray-600"
@@ -415,9 +414,10 @@ const BookDetail = () => {
             <div className="flex space-x-3 ">
               <button
                 type="submit"
-                className="px-4 py-2 cursor-pointer bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg hover:bg-gradient-to-bl transition-colors"
+                disabled={createReviewMutation.isPending}
+                className="px-4 py-2 cursor-pointer bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg hover:bg-gradient-to-bl transition-colors disabled:cursor-not-allowed disabled:bg-gray-500"
               >
-                Đánh giá
+                {createReviewMutation.isPending ? "Đang xử lý..." : "Đánh giá"}
               </button>
               <button
                 type="button"
