@@ -61,7 +61,7 @@ const BookDetail = () => {
   const borrowedBookRecord = getUserBorrowedBooksQuery?.data?.find(
     (borrow: any) =>
       borrow.book_item?.book?.id === parseInt(id || "0") &&
-      borrow.status === "BORROWED"
+      (borrow.status === "BORROWED" || borrow.status === "PENDING")
   );
 
   // Get the specific reservation record for this book
@@ -279,18 +279,15 @@ const BookDetail = () => {
 
   const handleCancelBorrow = async () => {
     if (!borrowedBookRecord) return;
-    if (confirm("Bạn có chắc chắn muốn hủy mượn sách này không?")) {
-      await cancelBorrowMutation.mutateAsync(borrowedBookRecord.id);
-    }
+
+    await cancelBorrowMutation.mutateAsync(borrowedBookRecord.id);
   };
 
   const handleCancelReservation = async () => {
     if (!reservationRecord) return;
-    if (confirm("Bạn có chắc chắn muốn hủy đặt trước sách này không?")) {
-      await cancelReservationMutation.mutateAsync(
-        reservationRecord.reservation_id
-      );
-    }
+    await cancelReservationMutation.mutateAsync(
+      reservationRecord.reservation_id
+    );
   };
 
   const handleAddToWishlist = async () => {
