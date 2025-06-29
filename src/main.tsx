@@ -29,6 +29,7 @@ import { UserProvider } from "./contexts/userContext.tsx";
 import Badges from "./pages/Admin/Badges/Badges.tsx";
 import Forum from "./pages/Client/Forum.tsx";
 import Wishlist from "./pages/Client/Wishlist";
+import Leaderboard from "./pages/Client/Leaderboard/Leaderboard.tsx";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +55,7 @@ createRoot(document.getElementById("root")!).render(
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/leaderboard" element={<Leaderboard />} />
               </Route>
 
               <Route path="/admin" element={<Layout />}>
