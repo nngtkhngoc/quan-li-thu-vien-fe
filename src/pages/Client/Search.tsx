@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 
 export default function SearchPage() {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [, setSelectedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
