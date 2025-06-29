@@ -31,7 +31,7 @@ interface Lending {
     };
   };
   borrow_date: Date;
-  status: "BORROWED" | "RETURNED" | "OVERDUE";
+  status: "BORROWED" | "RETURNED" | "OVERDUE" | "PENDING";
 }
 
 export default function Profile() {
