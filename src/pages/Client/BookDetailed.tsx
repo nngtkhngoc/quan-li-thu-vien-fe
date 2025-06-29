@@ -1,14 +1,29 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Star, BookOpen, Heart, Clock } from "lucide-react";
+import {
+  ArrowLeft,
+  Star,
+  BookOpen,
+  Heart,
+  Clock,
+  CheckCircle,
+} from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getBookById } from "../../api/book.api";
 import { createReview, getReviewByBookId } from "../../api/review.api";
 import { useUser } from "../../hooks/useUser";
 import { toast } from "react-toastify";
-import { createBorrowedBook } from "../../api/borrow.api";
-import { createReservation } from "../../api/reservation.api";
+import {
+  createBorrowedBook,
+  getAllBorrowedBooks,
+  deleteBorrowedBook,
+} from "../../api/borrow.api";
+import {
+  createReservation,
+  getMyReservation,
+  deleteReservation,
+} from "../../api/reservation.api";
 import axios, { AxiosError } from "axios";
 import {
   addToWishlist,
@@ -21,9 +36,46 @@ const BookDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [isReserving, setIsReserving] = useState(false);
   const [newReview, setNewReview] = useState({ rating: 5, comment: "" });
-  const [showReviewForm, setShowReviewForm] = useState(false);
   const user = useUser();
   const queryClient = useQueryClient();
+
+  // Query to get user's borrowed books
+  const getUserBorrowedBooksQuery = useQuery({
+    queryKey: ["user-borrowed-books", user.userProfile?.id],
+    queryFn: async () => {
+      return await getAllBorrowedBooks();
+    },
+    enabled: !!user.userProfile?.id,
+  });
+
+  // Query to get user's reservations
+  const getUserReservationsQuery = useQuery({
+    queryKey: ["user-reservations", user.userProfile?.id],
+    queryFn: async () => {
+      return await getMyReservation();
+    },
+    enabled: !!user.userProfile?.id,
+  });
+
+  // Get the specific borrowed book record for this book
+  const borrowedBookRecord = getUserBorrowedBooksQuery?.data?.find(
+    (borrow: any) =>
+      borrow.book_item?.book?.id === parseInt(id || "0") &&
+      borrow.status === "BORROWED"
+  );
+
+  // Get the specific reservation record for this book
+  const reservationRecord = getUserReservationsQuery?.data?.find(
+    (reservation: any) =>
+      reservation.book?.id === parseInt(id || "0") && !reservation.returned
+  );
+
+  // Check if user has borrowed this book
+  const hasBorrowed = !!borrowedBookRecord;
+
+  // Check if user has reserved this book
+  const hasReserved = !!reservationRecord;
+
   const getWishListQuery = useQuery({
     queryKey: ["wishlist", user.userProfile?.id],
     queryFn: async () => {
@@ -56,6 +108,45 @@ const BookDetail = () => {
       );
     },
   });
+
+  // Mutation to cancel borrowed book
+  const cancelBorrowMutation = useMutation({
+    mutationFn: async (borrowId: number) => {
+      return await deleteBorrowedBook(borrowId);
+    },
+    onSuccess: () => {
+      toast.success("Đã hủy mượn sách thành công!");
+      queryClient.invalidateQueries({
+        queryKey: ["user-borrowed-books", user.userProfile?.id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["book", id],
+      });
+    },
+    onError: () => {
+      toast.error("Hủy mượn sách thất bại. Vui lòng thử lại sau.");
+    },
+  });
+
+  // Mutation to cancel reservation
+  const cancelReservationMutation = useMutation({
+    mutationFn: async (reservationId: number) => {
+      return await deleteReservation(reservationId);
+    },
+    onSuccess: () => {
+      toast.success("Đã hủy đặt trước thành công!");
+      queryClient.invalidateQueries({
+        queryKey: ["user-reservations", user.userProfile?.id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["book", id],
+      });
+    },
+    onError: () => {
+      toast.error("Hủy đặt trước thất bại. Vui lòng thử lại sau.");
+    },
+  });
+
   const getBookByIdQuery = useQuery({
     queryKey: ["book", id],
     queryFn: async () => {
@@ -79,6 +170,9 @@ const BookDetail = () => {
       toast.success("Đặt sách thành công!");
       queryClient.invalidateQueries({
         queryKey: ["book", id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["user-borrowed-books", user.userProfile?.id],
       });
     },
     onError: () => {
@@ -120,6 +214,9 @@ const BookDetail = () => {
       queryClient.invalidateQueries({
         queryKey: ["book", id],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["user-reservations", user.userProfile?.id],
+      });
     },
     onError: (error: any) => {
       if (error?.response?.data?.message?.includes("already exists")) {
@@ -141,6 +238,7 @@ const BookDetail = () => {
     book?.bookItems.reduce((count: number, item: any) => {
       return count + (item.status === "AVAILABLE" ? 1 : 0);
     }, 0) || 0;
+
   const handleReserve = async () => {
     if (!isAuthenticated) return;
     console.log("Reserving book:@");
@@ -176,6 +274,22 @@ const BookDetail = () => {
       });
     } catch (error) {
       console.error("Error reserving book:", error);
+    }
+  };
+
+  const handleCancelBorrow = async () => {
+    if (!borrowedBookRecord) return;
+    if (confirm("Bạn có chắc chắn muốn hủy mượn sách này không?")) {
+      await cancelBorrowMutation.mutateAsync(borrowedBookRecord.id);
+    }
+  };
+
+  const handleCancelReservation = async () => {
+    if (!reservationRecord) return;
+    if (confirm("Bạn có chắc chắn muốn hủy đặt trước sách này không?")) {
+      await cancelReservationMutation.mutateAsync(
+        reservationRecord.reservation_id
+      );
     }
   };
 
@@ -233,7 +347,6 @@ const BookDetail = () => {
 
     const form = document.querySelector("#review-form") as HTMLFormElement;
     form?.reset();
-    setShowReviewForm(false);
     setNewReview({ rating: 5, comment: "" });
   };
 
@@ -334,7 +447,29 @@ const BookDetail = () => {
             <div className="flex flex-wrap gap-4">
               {isAuthenticated ? (
                 <>
-                  {availableCopies > 0 ? (
+                  {hasBorrowed ? (
+                    <button
+                      onClick={handleCancelBorrow}
+                      disabled={cancelBorrowMutation.isPending}
+                      className="cursor-pointer flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-300 bg-gradient-to-r from-red-500 to-pink-600 text-white hover:shadow-lg transform hover:-translate-y-1 disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      <CheckCircle className="h-5 w-5 mr-2" />
+                      {cancelBorrowMutation.isPending
+                        ? "Đang hủy..."
+                        : "Hủy mượn sách"}
+                    </button>
+                  ) : hasReserved ? (
+                    <button
+                      onClick={handleCancelReservation}
+                      disabled={cancelReservationMutation.isPending}
+                      className="cursor-pointer flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-300 bg-gradient-to-r from-red-500 to-pink-600 text-white hover:shadow-lg transform hover:-translate-y-1 disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      <Clock className="h-5 w-5 mr-2" />
+                      {cancelReservationMutation.isPending
+                        ? "Đang hủy..."
+                        : "Hủy đặt trước"}
+                    </button>
+                  ) : availableCopies > 0 ? (
                     <button
                       onClick={handleReserve}
                       disabled={isReserving}
@@ -465,7 +600,7 @@ const BookDetail = () => {
               </button>
               <button
                 type="button"
-                onClick={() => setShowReviewForm(false)}
+                onClick={() => setNewReview({ rating: 5, comment: "" })}
                 className="px-4 py-2 cursor-pointer bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-400/60  dark:hover:bg-gray-500 transition-colors duration-500"
               >
                 Hủy bỏ

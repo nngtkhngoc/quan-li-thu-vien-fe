@@ -26,6 +26,27 @@ export const signOut = async (): Promise<string> => {
 
   return response.data.message;
 };
+
+// Send reset password code
+export const sendResetCode = async (email: string): Promise<string> => {
+  const response = await axiosClient.post("/auth/send-reset-code", { email });
+  return response.data;
+};
+
+// Reset password with code
+export const resetPassword = async (
+  email: string,
+  code: string,
+  newPassword: string
+): Promise<string> => {
+  const response = await axiosClient.post("/auth/reset-password", {
+    email,
+    code,
+    newPassword,
+  });
+  return response.data;
+};
+
 // Get all users
 export const getAllUsers = async (): Promise<UserResponse[]> => {
   const response = await axiosClient.get("/users");
