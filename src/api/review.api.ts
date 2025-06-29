@@ -1,4 +1,4 @@
-import { data } from "react-router-dom";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { axiosClient } from "../lib/axios";
 import type {
   DeleteReviewsRequest,

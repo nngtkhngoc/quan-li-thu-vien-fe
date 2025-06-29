@@ -21,7 +21,7 @@ export default function NotificationsList({
   };
 
   return (
-    <div className="space-y-3 py-5">
+    <div className="space-y-3 py-5  ">
       {filteredNotifications.length > 0 ? (
         filteredNotifications.map((notification: Notification) => (
           <div
@@ -46,8 +46,8 @@ export default function NotificationsList({
                     <p
                       className={`text-md font-medium mt-1 ${
                         notification.seen
-                          ? "text-gray-700 dark:text-gray-400"
-                          : "text-red-600 dark:text-gray-300"
+                          ? "text-gray-700 dark:text-gray-300"
+                          : "text-red-600 dark:text-gray-800"
                       }`}
                     >
                       {notification.message}
@@ -82,7 +82,7 @@ export default function NotificationsList({
                             onToggleSeen(notification.id, notification.seen);
                             setOpenMenuId(null);
                           }}
-                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer whitespace-nowrap"
+                          className="w-full text-left px-4 py-2 text-sm dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer whitespace-nowrap"
                         >
                           {notification.seen
                             ? "Đánh dấu chưa đọc"

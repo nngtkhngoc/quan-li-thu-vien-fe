@@ -36,6 +36,7 @@ const BookDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [isReserving, setIsReserving] = useState(false);
   const [newReview, setNewReview] = useState({ rating: 5, comment: "" });
+  const [, setShowReviewForm] = useState(false);
   const user = useUser();
   const queryClient = useQueryClient();
 

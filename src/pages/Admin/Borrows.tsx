@@ -13,6 +13,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteBorrowedBook, updateBorrowedBook } from "../../api/borrow.api";
 import useBorrow from "../../hooks/useBorrow";
 import { toast } from "react-toastify";
+import AdminDeleteModal from "../../components/Admin/AdminDeleteModal";
+import { AdminConfirmModal } from "../../components/Admin/AdminConfirmModal";
 
 // Loading Skeleton Component
 
@@ -349,69 +351,27 @@ export default function Borrows() {
       </div>
 
       {/* Add Borrow Modal */}
-      {isChangingStatus.id && (
-        <ConfirmModal
-          onSave={() => handleStatusChange(isChangingStatus)}
-          onCancel={() => setIsChangingStatus({} as unknown as ChangeStatus)}
-          isPending={isPending}
-        >
-          <h3 className="text-xl font-semibold text-gray-800">
-            Bạn chắc chắn muốn cập nhật trạng thái sang{" "}
-            {isChangingStatus.status === "BORROWED" && "Đang mượn"}
-            {isChangingStatus.status === "PENDING" && "Đang chờ"}
-            {isChangingStatus.status === "RETURNED" && "Đã trả"}?
-          </h3>
-        </ConfirmModal>
-      )}
 
-      {isDeleting && (
-        <ConfirmModal
-          onSave={handleDelete}
-          onCancel={() => setIsDeleting(null)}
-          isPending={isPendingDelete}
-        >
-          <h3 className="text-xl font-semibold text-gray-800">
-            Bạn chắc chắn muốn xóa lần mượn sách này?
-          </h3>
-        </ConfirmModal>
-      )}
-    </div>
-  );
-}
+      <AdminConfirmModal
+        onSave={() => handleStatusChange(isChangingStatus)}
+        onCancel={() => setIsChangingStatus({} as unknown as ChangeStatus)}
+        isPending={isPending}
+        isOpen={isChangingStatus.id != null}
+      >
+        <h3 className="text-xl font-semibold text-gray-800">
+          Bạn chắc chắn muốn cập nhật trạng thái sang{" "}
+          {isChangingStatus.status === "BORROWED" && "Đang mượn"}
+          {isChangingStatus.status === "PENDING" && "Đang chờ"}
+          {isChangingStatus.status === "RETURNED" && "Đã trả"}?
+        </h3>
+      </AdminConfirmModal>
 
-function ConfirmModal({
-  onSave,
-  onCancel,
-  isPending,
-  children,
-}: {
-  onSave: () => void;
-  onCancel: () => void;
-  isPending: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl max-w-md w-full">
-        <div className="p-6 border-b border-gray-200">
-          {children}
-          <div className="flex justify-end space-x-3 pt-4">
-            <button
-              onClick={onCancel}
-              className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-            >
-              Hủy
-            </button>
-            <button
-              disabled={isPending}
-              onClick={onSave}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:bg-gray-700"
-            >
-              {isPending ? "Đang cập nhật..." : "Xác nhận"}
-            </button>
-          </div>
-        </div>
-      </div>
+      <AdminDeleteModal
+        isOpen={isDeleting != null}
+        onConfirm={handleDelete}
+        onClose={() => setIsDeleting(null)}
+        isPending={isPendingDelete}
+      ></AdminDeleteModal>
     </div>
   );
 }

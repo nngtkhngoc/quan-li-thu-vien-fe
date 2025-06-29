@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-wrapper-object-types */
 import {
   createBookItem,
   deleteBookItem,
   getBookItemByBookId,
-  getBookItems,
   updateBookItem,
 } from "../api/bookitem.api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
