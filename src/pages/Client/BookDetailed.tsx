@@ -242,12 +242,7 @@ const BookDetail = () => {
 
   const handleReserve = async () => {
     if (!isAuthenticated) return;
-    console.log("Reserving book:@");
-    if (availableCopies === 0) {
-      toast.error("Không còn bản sách nào có sẵn để đặt.");
-      return;
-    }
-    console.log(availableCopies);
+
     setIsReserving(true);
     try {
       await createBorrowMutation.mutateAsync({
@@ -264,10 +259,7 @@ const BookDetail = () => {
 
   const handleReservation = async () => {
     if (!isAuthenticated) return;
-    if (!book.bookItems || book.bookItems.length === 0) {
-      toast.error("Không có bản sách nào để đặt trước.");
-      return;
-    }
+
     try {
       await createReservationMutation.mutateAsync({
         user_id: user.userProfile?.id,
@@ -474,7 +466,7 @@ const BookDetail = () => {
                       className={`cursor-pointer flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-300 bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:shadow-lg transform hover:-translate-y-1`}
                     >
                       <Clock className="h-5 w-5 mr-2" />
-                      {isReserving ? "Đang đặt..." : "Đặt sách"}
+                      {isReserving ? "Đang đặt..." : "Mượn sách"}
                     </button>
                   ) : (
                     <button
