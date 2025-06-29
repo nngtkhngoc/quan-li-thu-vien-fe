@@ -8,12 +8,14 @@ import {
   Bell,
   Library,
   Award,
+  HomeIcon,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
 const navigation = [
-  { name: "Trang chủ", href: "/admin", icon: LayoutDashboard },
+  { name: "Trang chủ", href: "/", icon: HomeIcon },
+  { name: "Thống kê", href: "/admin", icon: LayoutDashboard },
   { name: "Sách", href: "/admin/books", icon: BookOpen },
   { name: "Người dùng", href: "/admin/users", icon: Users },
   { name: "Sách đã mượn", href: "/admin/borrows", icon: ArrowRightLeft },
@@ -38,7 +40,7 @@ export default function Sidebar() {
           </div>
         </div>
         <nav className="flex-1 space-y-1 px-4 py-6">
-          {navigation.map((item) => {
+          {navigation.map(item => {
             const Icon = item.icon;
             const isActive = location.pathname === item.href;
             {
