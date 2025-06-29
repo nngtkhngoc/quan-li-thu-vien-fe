@@ -243,10 +243,8 @@ const Reservations: React.FC = () => {
                   {/* Book Cover */}
                   <div className="flex-shrink-0">
                     <img
-                      src={
-                        reservation.bookItem.book?.image || "/placeholder.png"
-                      }
-                      alt={reservation.bookItem.book.title}
+                      src={reservation.book?.image || "/placeholder.png"}
+                      alt={reservation.book.title}
                       className="w-24 h-32 object-cover rounded-lg shadow-md"
                     />
                   </div>
@@ -255,10 +253,10 @@ const Reservations: React.FC = () => {
                   <div className="flex-1 space-y-4">
                     <div>
                       <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">
-                        {reservation.bookItem.book.title}
+                        {reservation.book.title}
                       </h3>
                       <p className="text-gray-600 dark:text-gray-400">
-                        Tác giả: {reservation.bookItem.book.author}
+                        Tác giả: {reservation.book.author}
                       </p>
                     </div>
 
@@ -283,8 +281,7 @@ const Reservations: React.FC = () => {
                           Thể loại
                         </p>
                         <span className="inline-block bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-1 rounded-full text-xs font-medium">
-                          {reservation.bookItem.book.catalog?.name ||
-                            "Chưa phân loại"}
+                          {reservation.book?.catalog?.name || "Chưa phân loại"}
                         </span>
                       </div>
                     </div>
@@ -318,7 +315,7 @@ const Reservations: React.FC = () => {
                       {reservation.returned && (
                         <button
                           onClick={() =>
-                            navigate(`/books/${reservation.bookItem.book.id}`)
+                            navigate(`/books/${reservation.book.id}`)
                           }
                           className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors w-33 disabled:opacity-50 disabled:cursor-not-allowed"
                         >

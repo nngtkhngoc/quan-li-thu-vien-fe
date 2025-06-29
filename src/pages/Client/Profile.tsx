@@ -483,7 +483,7 @@ export default function Profile() {
                       </div>
                       <div>
                         <p className="text-gray-900 dark:text-white font-medium">
-                          {reservation.bookItem.book.title}
+                          {reservation.book?.title}
                         </p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           Đặt trước:{" "}
