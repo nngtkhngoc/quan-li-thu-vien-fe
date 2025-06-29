@@ -13,6 +13,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteBorrowedBook, updateBorrowedBook } from "../../api/borrow.api";
 import useBorrow from "../../hooks/useBorrow";
 import { toast } from "react-toastify";
+import AdminDeleteModal from "../../components/Admin/AdminDeleteModal";
+import { AdminConfirmModal } from "../../components/Admin/AdminConfirmModal";
 
 // Loading Skeleton Component
 
@@ -349,32 +351,27 @@ export default function Borrows() {
       </div>
 
       {/* Add Borrow Modal */}
-      {isChangingStatus.id && (
-        <ConfirmModal
-          onSave={() => handleStatusChange(isChangingStatus)}
-          onCancel={() => setIsChangingStatus({} as unknown as ChangeStatus)}
-          isPending={isPending}
-        >
-          <h3 className="text-xl font-semibold text-gray-800">
-            Bạn chắc chắn muốn cập nhật trạng thái sang{" "}
-            {isChangingStatus.status === "BORROWED" && "Đang mượn"}
-            {isChangingStatus.status === "PENDING" && "Đang chờ"}
-            {isChangingStatus.status === "RETURNED" && "Đã trả"}?
-          </h3>
-        </ConfirmModal>
-      )}
 
-      {isDeleting && (
-        <ConfirmModal
-          onSave={handleDelete}
-          onCancel={() => setIsDeleting(null)}
-          isPending={isPendingDelete}
-        >
-          <h3 className="text-xl font-semibold text-gray-800">
-            Bạn chắc chắn muốn xóa lần mượn sách này?
-          </h3>
-        </ConfirmModal>
-      )}
+      <AdminConfirmModal
+        onSave={() => handleStatusChange(isChangingStatus)}
+        onCancel={() => setIsChangingStatus({} as unknown as ChangeStatus)}
+        isPending={isPending}
+        isOpen={isChangingStatus.id != null}
+      >
+        <h3 className="text-xl font-semibold text-gray-800">
+          Bạn chắc chắn muốn cập nhật trạng thái sang{" "}
+          {isChangingStatus.status === "BORROWED" && "Đang mượn"}
+          {isChangingStatus.status === "PENDING" && "Đang chờ"}
+          {isChangingStatus.status === "RETURNED" && "Đã trả"}?
+        </h3>
+      </AdminConfirmModal>
+
+      <AdminDeleteModal
+        isOpen={isDeleting != null}
+        onConfirm={handleDelete}
+        onClose={() => setIsDeleting(null)}
+        isPending={isPendingDelete}
+      ></AdminDeleteModal>
     </div>
   );
 }
