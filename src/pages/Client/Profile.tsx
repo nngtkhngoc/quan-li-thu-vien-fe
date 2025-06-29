@@ -31,7 +31,7 @@ interface Lending {
     };
   };
   borrow_date: Date;
-  status: "BORROWED" | "RETURNED" | "OVERDUE";
+  status: "BORROWED" | "RETURNED" | "OVERDUE" | "PENDING";
 }
 
 export default function Profile() {
@@ -550,6 +550,8 @@ export default function Profile() {
                               ? "bg-yellow-100 dark:bg-yellow-500/20 text-yellow-600 dark:text-yellow-400"
                               : lending.status === "RETURNED"
                               ? "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                              : lending.status === "PENDING"
+                              ? "bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400"
                               : "bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400"
                           }`}
                         >
@@ -557,6 +559,8 @@ export default function Profile() {
                             ? "Đang mượn"
                             : lending.status === "RETURNED"
                             ? "Đã trả"
+                            : lending.status === "PENDING"
+                            ? "Đang chờ duyệt"
                             : "Quá hạn"}
                         </span>
                       </div>
