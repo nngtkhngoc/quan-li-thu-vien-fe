@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { AlertCircle, CheckCircle, BookOpen } from "lucide-react";
+import { AlertCircle, CheckCircle, BookOpen, Clock } from "lucide-react";
 import { format, differenceInDays } from "date-fns";
 // import { borrows? } from "../data/mockData";
 import type { BorrowBookResponse } from "../../types/Borrow";
 import useBorrow from "../../hooks/useBorrow";
 import { useUser } from "../../hooks/useUser";
 
-type FilterType = "ALL" | "BORROWED" | "RETURNED" | "OVERDUE";
+type FilterType = "ALL" | "PENDING" | "BORROWED" | "RETURNED" | "OVERDUE";
 
 const BorrowedBooks = () => {
   const [filter, setFilter] = useState<FilterType>("ALL");
@@ -62,6 +62,10 @@ const BorrowedBooks = () => {
       (b: BorrowBookResponse) =>
         b.status === "RETURNED" && b.user.id === userProfile?.id
     ).length,
+    pending: borrows?.filter(
+      (b: BorrowBookResponse) =>
+        b.status === "PENDING" && b.user.id === userProfile?.id
+    ).length,
   };
 
   return (
@@ -78,7 +82,22 @@ const BorrowedBooks = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center">
+              <div className="p-2 bg-yellow-100 dark:bg-blue-900/30 rounded-lg">
+                <Clock className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Đang Chờ Duyệt
+                </p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {statusCounts.pending}
+                </p>
+              </div>
+            </div>
+          </div>
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center">
               <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
@@ -132,6 +151,7 @@ const BorrowedBooks = () => {
         <div className="flex space-x-1 bg-gray-100 dark:bg-gray-800 rounded-xl p-1">
           {[
             { key: "ALL" as const, label: "Tất Cả Sách" },
+            { key: "PENDING" as const, label: "Đang chờ duyệt" },
             { key: "BORROWED" as const, label: "Đang Mượn" },
             { key: "OVERDUE" as const, label: "Quá Hạn" },
             { key: "RETURNED" as const, label: "Đã Trả" },
@@ -304,6 +324,8 @@ const BorrowedBooks = () => {
                         ? "đã trả"
                         : filter === "OVERDUE"
                         ? "quá hạn"
+                        : filter === "PENDING"
+                        ? "đang chờ duyệt"
                         : filter
                     }.`}
               </p>
