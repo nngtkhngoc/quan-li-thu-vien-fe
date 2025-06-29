@@ -181,7 +181,10 @@ export default function Forum() {
 
   useEffect(() => {
     if (displayedMessages.length > 10) return;
+    const { scrollX, scrollY } = window;
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    window.scroll(scrollX, scrollY);
+    console.log(messagesEndRef.current);
   }, [displayedMessages.length]);
 
   // Keyboard shortcut for search
@@ -436,7 +439,8 @@ export default function Forum() {
                           <div className="flex items-center justify-between mb-1">
                             <div className="flex items-center space-x-2">
                               <p className="text-sm font-medium text-gray-900 dark:text-white">
-                                {msg.senderName}
+                                {msg.senderName}{" "}
+                                {msg.edited && "(đã chỉnh sửa)"}
                               </p>
                               <p className="text-xs text-gray-500 dark:text-gray-400">
                                 {new Date(msg.timestamp).toLocaleTimeString(
@@ -526,7 +530,7 @@ export default function Forum() {
                               )}
                             </p>
                             <p className="text-sm font-medium text-gray-900 dark:text-white">
-                              Bạn
+                              Bạn {msg.edited && "(đã chỉnh sửa)"}
                             </p>
 
                             {/* Message Actions - Only show for own messages */}
@@ -644,7 +648,7 @@ export default function Forum() {
             )}
 
             {/* Scroll anchor for auto-scroll to bottom */}
-            <div ref={messagesEndRef} />
+            <div className="endRef" ref={messagesEndRef} />
           </div>
 
           {/* Input Area */}

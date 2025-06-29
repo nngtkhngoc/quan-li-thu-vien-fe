@@ -11,6 +11,7 @@ export interface MessageResponse {
   image: string;
   senderId: number;
   content: string;
+  edited: boolean;
   timestamp: string;
 }
 

@@ -9,11 +9,13 @@ type StatCardProps = {
 
 function StatItem({ icon, label, value, iconBgColor }: StatCardProps) {
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6 flex items-center space-x-4">
+    <div className="bg-white rounded-lg border border-gray-200 p-6 flex items-center space-x-4 dark:bg-gray-900 dark:border-gray-800 ">
       <div className={`p-2 rounded-lg ${iconBgColor}`}>{icon}</div>
       <div>
-        <p className="text-sm text-gray-600">{label}</p>
-        <p className="text-xl font-semibold text-gray-900">{value}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">{label}</p>
+        <p className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          {value}
+        </p>
       </div>
     </div>
   );
