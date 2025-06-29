@@ -23,7 +23,7 @@ export function useChat(userId: number) {
   useEffect(() => {
     if (!userId) return;
 
-    const socket = new SockJS("http://localhost:5002/ws-chat");
+    const socket = new SockJS(import.meta.env.VITE_SOCKET_URL);
     const stompClient = Stomp.over(socket);
     client.current = stompClient;
 
