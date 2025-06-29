@@ -7,7 +7,6 @@ import {
   BookOpen,
   Plus,
   Trash2,
-  ArrowRightLeft,
 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -133,9 +132,7 @@ export default function Reservations() {
         reservation.user.name
           .toLowerCase()
           .includes(searchTerm.toLowerCase()) ||
-        reservation.bookItem.book.title
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase());
+        reservation.book.title.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus =
         filterStatus === "ALL" ||
         (filterStatus === "PENDING" && !reservation.returned) ||
@@ -341,7 +338,7 @@ export default function Reservations() {
                             {reservation.user.name}
                           </div>
                           <div className="text-sm text-gray-500">
-                            {reservation.bookItem.book.title}
+                            {reservation.book.title}
                           </div>
                         </div>
                       </div>
@@ -404,7 +401,7 @@ export default function Reservations() {
               const formData = new FormData(form);
               createReservationMutation({
                 user_id: Number(formData.get("userId")),
-                book_item_id: Number(formData.get("bookItemId")),
+                book_id: Number(formData.get("bookId")),
               });
             }
           }}
@@ -437,19 +434,15 @@ export default function Reservations() {
                   Sách *
                 </label>
                 <select
-                  name="bookItemId"
+                  name="bookId"
                   required
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 >
                   <option value="">Chọn sách</option>
                   {books?.content?.map(
                     (book: BookResponse) =>
-                      book.bookItems &&
-                      book.bookItems.length > 0 && (
-                        <option
-                          key={Number(book.id)}
-                          value={Number(book?.bookItems[0]?.id)}
-                        >
+                      book && (
+                        <option key={Number(book.id)} value={Number(book?.id)}>
                           {book.title}
                         </option>
                       )

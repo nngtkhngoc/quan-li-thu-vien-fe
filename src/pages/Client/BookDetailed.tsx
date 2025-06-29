@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Star, BookOpen, Heart, Share2, Clock } from "lucide-react";
+import { ArrowLeft, Star, BookOpen, Heart, Clock } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getBookById } from "../../api/book.api";
 import { createReview, getReviewByBookId } from "../../api/review.api";
@@ -172,7 +172,7 @@ const BookDetail = () => {
     try {
       await createReservationMutation.mutateAsync({
         user_id: user.userProfile?.id,
-        book_item_id: book.bookItems[0].id, // lấy bản đầu tiên, có thể cải tiến chọn bản phù hợp
+        book_id: book.id, // lấy bản đầu tiên, có thể cải tiến chọn bản phù hợp
       });
     } catch (error) {
       console.error("Error reserving book:", error);
