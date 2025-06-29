@@ -244,7 +244,7 @@ const Reservations: React.FC = () => {
                   <div className="flex-shrink-0">
                     <img
                       src={reservation.book?.image || "/placeholder.png"}
-                      alt={reservation.book.title}
+                      alt={reservation.book?.title}
                       className="w-24 h-32 object-cover rounded-lg shadow-md"
                     />
                   </div>
@@ -253,10 +253,10 @@ const Reservations: React.FC = () => {
                   <div className="flex-1 space-y-4">
                     <div>
                       <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">
-                        {reservation.book.title}
+                        {reservation.book?.title}
                       </h3>
                       <p className="text-gray-600 dark:text-gray-400">
-                        Tác giả: {reservation.book.author}
+                        Tác giả: {reservation.book?.author}
                       </p>
                     </div>
 
