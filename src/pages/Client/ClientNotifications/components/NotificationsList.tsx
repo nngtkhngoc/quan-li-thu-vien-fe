@@ -82,7 +82,7 @@ export default function NotificationsList({
                             onToggleSeen(notification.id, notification.seen);
                             setOpenMenuId(null);
                           }}
-                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer whitespace-nowrap"
+                          className="w-full text-left px-4 py-2 text-sm dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer whitespace-nowrap"
                         >
                           {notification.seen
                             ? "Đánh dấu chưa đọc"
