@@ -21,7 +21,7 @@ export default function NotificationsList({
   };
 
   return (
-    <div className="space-y-3 py-5">
+    <div className="space-y-3 py-5  ">
       {filteredNotifications.length > 0 ? (
         filteredNotifications.map((notification: Notification) => (
           <div
@@ -46,8 +46,8 @@ export default function NotificationsList({
                     <p
                       className={`text-md font-medium mt-1 ${
                         notification.seen
-                          ? "text-gray-700 dark:text-gray-400"
-                          : "text-red-600 dark:text-gray-300"
+                          ? "text-gray-700 dark:text-gray-300"
+                          : "text-red-600 dark:text-gray-800"
                       }`}
                     >
                       {notification.message}
