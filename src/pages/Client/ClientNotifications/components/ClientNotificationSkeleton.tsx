@@ -1,5 +1,3 @@
-import React from "react";
-
 export function NotificationSkeleton() {
   return (
     <div className="rounded-xl py-5 px-4 border border-gray-200 dark:border-gray-700 shadow-sm animate-pulse">

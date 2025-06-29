@@ -1,3 +1,5 @@
+import type { UserResponse } from "./User";
+
 export type CreateReservationRequest = {
   user_id: number;
   book_id: number;
@@ -29,6 +31,7 @@ export interface ReservationResponse {
   book: Book;
   reservationDate: string;
   returned: boolean;
+  user: UserResponse;
 }
 
 export type UpdateReservationRequest = {
