@@ -53,6 +53,11 @@ export const getAllUsers = async (): Promise<UserResponse[]> => {
   return response.data.data;
 };
 
+export const getAllUsersByXpDesc = async (): Promise<UserResponse[]> => {
+  const response = await axiosClient.get("users/by-xp-desc");
+  return response.data.data;
+};
+
 // Get user by ID
 export const getUserById = async (id: number): Promise<UserResponse> => {
   const response = await axiosClient.get(`/users/${id}`);

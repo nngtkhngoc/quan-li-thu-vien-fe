@@ -40,6 +40,10 @@ const Header: React.FC = () => {
     { path: "/books", label: "Sách" },
     { path: "/forum", label: "Diễn đàn" },
     { path: "/search", label: "Tìm kiếm" },
+    {
+      path: "/leaderboard",
+      label: "Bảng xếp hạng",
+    },
   ];
   useEffect(() => {
     if (localStorage.theme === "dark") {
