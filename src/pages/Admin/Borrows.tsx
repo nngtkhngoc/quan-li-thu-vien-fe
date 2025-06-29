@@ -6,6 +6,7 @@ import {
   ArrowRightLeft,
   CheckCircle,
   Trash2,
+  Hourglass,
 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -68,7 +69,7 @@ export default function Borrows() {
     },
   });
 
-  const filteredBorrows = borrows?.filter((borrow) => {
+  const filteredBorrows = borrows?.filter(borrow => {
     const matchesSearch =
       borrow.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       borrow.book_item.book.title
@@ -130,7 +131,7 @@ export default function Borrows() {
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Đang cho mượn</p>
               <p className="text-xl font-semibold text-gray-900">
-                {borrows?.filter((b) => b.status === "BORROWED").length}
+                {borrows?.filter(b => b.status === "BORROWED").length}
               </p>
             </div>
           </div>
@@ -143,7 +144,7 @@ export default function Borrows() {
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Quá hạn</p>
               <p className="text-xl font-semibold text-gray-900">
-                {borrows?.filter((b) => b.status === "OVERDUE").length}
+                {borrows?.filter(b => b.status === "OVERDUE").length}
               </p>
             </div>
           </div>
@@ -156,7 +157,7 @@ export default function Borrows() {
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Đã trả</p>
               <p className="text-xl font-semibold text-gray-900">
-                {borrows?.filter((b) => b.status === "RETURNED").length}
+                {borrows?.filter(b => b.status === "RETURNED").length}
               </p>
             </div>
           </div>
@@ -172,7 +173,7 @@ export default function Borrows() {
               type="text"
               placeholder="Tìm kiếm theo tên người dùng hoặc tên sách..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
@@ -180,10 +181,10 @@ export default function Borrows() {
             <Filter className="h-5 w-5 text-gray-400" />
             <select
               value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
+              onChange={e => setFilterStatus(e.target.value)}
               className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             >
-              {statuses.map((status) => (
+              {statuses.map(status => (
                 <option key={status} value={status}>
                   {vnStatus.get(status)}
                 </option>
@@ -225,7 +226,7 @@ export default function Borrows() {
                   </td>
                 </tr>
               ) : (
-                (filteredBorrows ?? []).map((borrow) => (
+                (filteredBorrows ?? []).map(borrow => (
                   <tr key={borrow.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
@@ -276,7 +277,21 @@ export default function Borrows() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end space-x-2">
-                        {borrow.status === "BORROWED" && (
+                        {borrow.status !== "PENDING" && (
+                          <button
+                            onClick={() =>
+                              setIsChangingStatus({
+                                id: borrow.id,
+                                status: "PENDING",
+                              })
+                            }
+                            className="text-gray-600 hover:text-gray-900"
+                            title="Đánh dấu là đang chờ"
+                          >
+                            <Hourglass className="h-4 w-4" />
+                          </button>
+                        )}
+                        {borrow.status !== "RETURNED" && (
                           <button
                             onClick={() =>
                               setIsChangingStatus({
@@ -290,7 +305,7 @@ export default function Borrows() {
                             <CheckCircle className="h-4 w-4" />
                           </button>
                         )}
-                        {borrow.status === "RETURNED" && (
+                        {borrow.status !== "BORROWED" && (
                           <button
                             onClick={() =>
                               setIsChangingStatus({
@@ -342,7 +357,9 @@ export default function Borrows() {
         >
           <h3 className="text-xl font-semibold text-gray-800">
             Bạn chắc chắn muốn cập nhật trạng thái sang{" "}
-            {isChangingStatus.status === "BORROWED" ? "Đã mượn" : "Đã trả"}?
+            {isChangingStatus.status === "BORROWED" && "Đang mượn"}
+            {isChangingStatus.status === "PENDING" && "Đang chờ"}
+            {isChangingStatus.status === "RETURNED" && "Đã trả"}?
           </h3>
         </ConfirmModal>
       )}
@@ -412,7 +429,7 @@ const BorrowsSkeleton = () => {
 
       {/* Stats Cards Skeleton */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {[1, 2, 3].map((index) => (
+        {[1, 2, 3].map(index => (
           <div
             key={index}
             className="bg-white rounded-lg border border-gray-200 p-4"
@@ -457,7 +474,7 @@ const BorrowsSkeleton = () => {
           </div>
 
           {/* Table Rows */}
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
+          {[1, 2, 3, 4, 5, 6, 7, 8].map(index => (
             <div key={index} className="px-6 py-4 border-b border-gray-200">
               <div className="grid grid-cols-4 gap-4 items-center">
                 {/* User & Book Column */}
