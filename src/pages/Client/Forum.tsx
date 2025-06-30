@@ -77,7 +77,7 @@ export default function Forum() {
   };
 
   const handleLoadMore = () => {
-    setMessagesLimit(prev => prev + 10); // Tải thêm 10 tin nhắn
+    setMessagesLimit((prev) => prev + 10); // Tải thêm 10 tin nhắn
   };
 
   const handleEditMessage = (messageId: number, currentContent: string) => {
@@ -164,7 +164,7 @@ export default function Forum() {
   };
 
   // Filter messages based on search query
-  const filteredMessages = messages?.filter(msg => {
+  const filteredMessages = messages?.filter((msg) => {
     if (!searchQuery.trim()) return true;
     return (
       msg.content.toLowerCase().includes(searchQuery?.toLowerCase()) ||
@@ -331,7 +331,7 @@ export default function Forum() {
                 type="text"
                 ref={searchInputRef}
                 value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="block w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 placeholder="Tìm kiếm tin nhắn theo nội dung hoặc tên người gửi... (Ctrl+F)"
               />
@@ -418,7 +418,7 @@ export default function Forum() {
                 )}
               </div>
             ) : (
-              displayedMessages?.map(msg => {
+              displayedMessages?.map((msg) => {
                 const isOwn = isOwnMessage(msg.senderId);
                 return (
                   <div
@@ -467,7 +467,7 @@ export default function Forum() {
                                 {/* Admin Dropdown Menu */}
                                 {showMenuForMessage === msg.id && (
                                   <div
-                                    onClick={e => e.stopPropagation()}
+                                    onClick={(e) => e.stopPropagation()}
                                     className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 z-10 min-w-[140px]"
                                   >
                                     <button
@@ -546,7 +546,7 @@ export default function Forum() {
                                 {/* Dropdown Menu */}
                                 {showMenuForMessage === msg.id && (
                                   <div
-                                    onClick={e => e.stopPropagation()}
+                                    onClick={(e) => e.stopPropagation()}
                                     className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 z-10 min-w-[120px]"
                                   >
                                     <button
@@ -589,7 +589,7 @@ export default function Forum() {
                               <div className="space-y-2">
                                 <textarea
                                   value={editingContent}
-                                  onChange={e =>
+                                  onChange={(e) =>
                                     setEditingContent(e.target.value)
                                   }
                                   className="w-full px-3 py-2 border border-blue-300 rounded-md focus:ring-2 focus:ring-blue-200 focus:border-transparent bg-white text-gray-900 text-sm resize-none"
@@ -636,7 +636,7 @@ export default function Forum() {
                           </div>
                         </div>
                         <div className="flex-shrink-0">
-                          <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                          <div className="w-8 h-8 bg-gradient-to-r from-green-500 overflow-hidden to-emerald-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
                             {msg.image && <img src={msg.image} alt="" />}
                           </div>
                         </div>
@@ -692,7 +692,7 @@ export default function Forum() {
                     <input
                       className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
                       value={input}
-                      onChange={e => setInput(e.target.value)}
+                      onChange={(e) => setInput(e.target.value)}
                       onKeyDown={handleKeyDown}
                       placeholder="Nhập tin nhắn của bạn..."
                     />
