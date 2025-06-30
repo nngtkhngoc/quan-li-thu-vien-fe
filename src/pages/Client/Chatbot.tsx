@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Bot, BotIcon, Send, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useUser } from "../../hooks/useUser";
 import { toast } from "react-toastify";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -22,7 +22,7 @@ export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [isWaiting, setIsWaiting] = useState(false);
-
+  const [messages, setMessages] = useState<any[]>([]);
   const user = useUser();
   const userId = user.userProfile?.id;
 
@@ -35,8 +35,12 @@ export default function Chatbot() {
     },
     enabled: !!userId,
   });
-  const messages = getChatbotResponseQuery.data || [];
-  console.log(messages);
+
+  const res = getChatbotResponseQuery.data || [];
+  useEffect(() => {
+    setMessages(res);
+  }, [res]);
+  // console.log(messages);
   const queryClient = useQueryClient();
   const createChatbotResponseMutation = useMutation({
     mutationFn: async (message: string) => {
@@ -61,6 +65,10 @@ export default function Chatbot() {
       const userMessage = input;
       setInput("");
       setIsWaiting(true);
+      setMessages((prev) => [
+        ...prev,
+        { message: userMessage, _bot: false, createdAt: new Date() },
+      ]);
       await createChatbotResponseMutation.mutateAsync(userMessage);
     }
   };
