@@ -122,6 +122,9 @@ const BookDetail = () => {
       queryClient.invalidateQueries({
         queryKey: ["book", id],
       });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.invalidateQueries({ queryKey: ["userProfile"] });
+      setUserChanged(true);
     },
     onError: () => {
       toast.error("Hủy mượn sách thất bại. Vui lòng thử lại sau.");
@@ -159,6 +162,8 @@ const BookDetail = () => {
       return await getReviewByBookId(id ? parseInt(id) : 0);
     },
   });
+  const { setUserChanged } = useUser();
+
   const createBorrowMutation = useMutation({
     mutationFn: async (data: any) => {
       return createBorrowedBook({
@@ -174,6 +179,12 @@ const BookDetail = () => {
       queryClient.invalidateQueries({
         queryKey: ["user-borrowed-books", user.userProfile?.id],
       });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.invalidateQueries({ queryKey: ["userProfile"] });
+      queryClient.invalidateQueries({ queryKey: ["getAllNotifications"] });
+      queryClient.invalidateQueries({ queryKey: ["getUnreadNotifications"] });
+      queryClient.invalidateQueries({ queryKey: ["getReadNotifications"] });
+      setUserChanged(true);
     },
     onError: () => {
       toast.error("Đặt sách thất bại. Vui lòng thử lại sau.");
@@ -192,6 +203,9 @@ const BookDetail = () => {
       toast.success("Đánh giá đã được gửi thành công!");
       queryClient.invalidateQueries({ queryKey: ["review", id] });
       queryClient.invalidateQueries({ queryKey: ["book", id] });
+      queryClient.invalidateQueries({ queryKey: ["getAllNotifications"] });
+      queryClient.invalidateQueries({ queryKey: ["getUnreadNotifications"] });
+      queryClient.invalidateQueries({ queryKey: ["getReadNotifications"] });
     },
     onError: (e) => {
       console.error("Error creating review:", e);

@@ -28,8 +28,8 @@ export default function NotificationsList({
             key={notification.id.toString()}
             className={`rounded-xl py-5 px-4 transition-all duration-300 border shadow-sm hover:shadow-md ${
               notification.seen
-                ? "border-gray-100"
-                : "bg-red-50 border-green-100"
+                ? "border-gray-100 bg-gray-50 dark:bg-gray-100"
+                : "bg-red-50  dark:red-100  border-green-100"
             }`}
           >
             <div className="flex items-start space-x-4 relative">
@@ -46,8 +46,8 @@ export default function NotificationsList({
                     <p
                       className={`text-md font-medium mt-1 ${
                         notification.seen
-                          ? "text-gray-700 dark:text-gray-300"
-                          : "text-red-600 dark:text-gray-800"
+                          ? "text-gray-700 dark:text-gray-800"
+                          : "text-red-600 dark:text-red-700"
                       }`}
                     >
                       {notification.message}

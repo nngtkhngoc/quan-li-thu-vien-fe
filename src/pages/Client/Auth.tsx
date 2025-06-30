@@ -11,6 +11,7 @@ import type { SignInData, CreateUserRequest } from "../../types/User";
 import { useUser } from "../../hooks/useUser";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface AuthFormData {
   name: string;
@@ -108,12 +109,17 @@ const Auth: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const queryClient = useQueryClient();
   const handleLogin = async () => {
     const signInData: SignInData = {
       email: formData.email,
       password_hash: formData.password,
     };
     await signIn(signInData);
+    queryClient.invalidateQueries({ queryKey: ["getAllNotifications"] });
+    queryClient.invalidateQueries({ queryKey: ["getUnreadNotifications"] });
+    queryClient.invalidateQueries({ queryKey: ["getReadNotifications"] });
+
     toast.success("Đăng nhập thành công!");
     navigate(redirect || "/");
   };

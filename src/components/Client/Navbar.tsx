@@ -1,6 +1,15 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Bell, Moon, Menu, X, BookOpen, Sun } from "lucide-react";
+import {
+  Bell,
+  Moon,
+  Menu,
+  X,
+  BookOpen,
+  Sun,
+  Heart,
+  UserCircle,
+} from "lucide-react";
 import { useUser } from "../../hooks/useUser";
 import { signOut } from "../../api/user.api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -105,7 +114,7 @@ const Header: React.FC = () => {
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="cursor-pointer p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="cursor-pointer p-2 text-gray-500 hover:text-purple-500 dark:text-gray-400 dark:hover:text-amber-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
               {theme == "dark" ? (
                 <Sun className="h-5 w-5" />
@@ -119,7 +128,8 @@ const Header: React.FC = () => {
                 {/* Notifications */}
                 <Link
                   to="/notifications"
-                  className="relative p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  className="relative p-2 text-gray-500 hover:text-yellow-600 dark:text-gray-400 dark:hover:text-yellow-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  title="Thông báo"
                 >
                   <Bell className="h-5 w-5" />
                   {newNotifications && newNotifications.length > 0 && (
@@ -135,51 +145,23 @@ const Header: React.FC = () => {
                   className="p-2 text-gray-500 hover:text-pink-600 dark:text-gray-400 dark:hover:text-pink-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                   title="Yêu thích"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-5 h-5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M21.435 6.304a5.373 5.373 0 0 0-7.6 0l-.835.834-.835-.834a5.373 5.373 0 0 0-7.6 7.6l.834.835 7.601 7.6 7.601-7.6.834-.835a5.373 5.373 0 0 0 0-7.6z"
-                    />
-                  </svg>
+                  <Heart className="h-5 w-5" />
                 </Link>
 
                 {/* User Menu */}
-                <div className="relative group">
-                  <button className="flex items-center space-x-3 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                <div className="relative group ">
+                  <button className="flex items-center space-x-3 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 cursor-pointer">
                     {userProfile?.image ? (
                       <img
                         src={userProfile.image}
                         alt={userProfile.name}
-                        className="w-8 h-8 rounded-full object-cover"
+                        className="w-6 h-6 rounded-full object-cover"
                       />
                     ) : (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="0.75"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        className="lucide lucide-circle-user-icon lucide-circle-user"
-                      >
-                        <circle cx="12" cy="12" r="10" />
-                        <circle cx="12" cy="10" r="3" />
-                        <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662" />
-                      </svg>
+                      <UserCircle className="h-6 w-6" />
                     )}
                     <div className="hidden lg:block text-left">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors dark:group-hover:text-blue-400">
                         {userProfile?.name}
                       </p>
                     </div>
@@ -218,7 +200,7 @@ const Header: React.FC = () => {
                       <button
                         onClick={() => signOutMutation.mutate()}
                         disabled={signOutMutation.isPending}
-                        className="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="cursor-pointer disabled:cursor-not-allowed block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {signOutMutation.isPending
                           ? "Đang đăng xuất..."

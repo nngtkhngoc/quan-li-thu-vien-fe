@@ -25,13 +25,13 @@ const LeaderboardRow: React.FC<LeaderboardRowProps> = ({ player, index }) => {
   const getRowStyle = (order: number) => {
     switch (order) {
       case 1:
-        return "bg-gradient-to-r from-yellow-50 to-amber-50 border-l-4 border-yellow-400 shadow-lg";
+        return "bg-gradient-to-r from-yellow-50 to-amber-100 border-l-4 border-yellow-400 shadow-lg dark:from-yellow-100 dark:to-amber-200";
       case 2:
-        return "bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-400 shadow-lg";
+        return "bg-gradient-to-r from-green-50 to-emerald-100 border-l-4 border-green-400 shadow-lg dark:from-green-100 dark:to-emerald-200";
       case 3:
-        return "bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-amber-400 shadow-lg";
+        return "bg-gradient-to-r from-indigo-50 to-blue-100 border-l-4 border-indigo-400 shadow-lg dark:from-indigo-100 dark:to-blue-200";
       default:
-        return "bg-white border-l-4 border-transparent hover:border-indigo-200 shadow-sm";
+        return "bg-white border-l-4 border-transparent hover:border-indigo-200 shadow-sm dark:bg-gray-100";
     }
   };
 

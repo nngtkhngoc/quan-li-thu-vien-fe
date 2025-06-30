@@ -33,22 +33,24 @@ export default function StatsCard({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
       <StatItem
-        icon={<Bell className="h-5 w-5 text-blue-600" />}
+        icon={<Bell className="h-5 w-5 text-blue-600 dark:text-blue-200" />}
         label="Tổng số"
         value={totalLength}
-        iconBgColor="bg-blue-100"
+        iconBgColor="bg-blue-100 dark:bg-blue-500"
       />
       <StatItem
-        icon={<CheckCircle className="h-5 w-5 text-green-600" />}
+        icon={
+          <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-200" />
+        }
         label="Đã đọc"
         value={totalReadLength}
-        iconBgColor="bg-green-100"
+        iconBgColor="bg-green-100 dark:bg-green-500"
       />
       <StatItem
-        icon={<EyeOff className="h-5 w-5 text-amber-600" />}
+        icon={<EyeOff className="h-5 w-5 text-amber-600 dark:text-amber-200" />}
         label="Chưa đọc"
         value={totalUnreadLength}
-        iconBgColor="bg-amber-100"
+        iconBgColor="bg-amber-100 dark:bg-amber-500"
       />
     </div>
   );
