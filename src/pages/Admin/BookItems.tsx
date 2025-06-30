@@ -87,7 +87,7 @@ export default function BookItems({ setModal, bookItems, query }: any) {
                   toast.error("Thêm bản sao sách thất bại");
                 }
               }}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer"
+              className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 cursor-pointer"
               disabled={createBookItemMutation.isPending}
             >
               {createBookItemMutation.isPending

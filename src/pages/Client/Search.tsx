@@ -76,7 +76,7 @@ export default function SearchPage() {
       fileInputRef.current.value = "";
     }
   };
-
+  console.log("books", books);
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 rounded-lg">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -189,16 +189,16 @@ export default function SearchPage() {
                       <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
                         {book.title}
                       </h3>
-                      <p className="text-gray-600 mb-3">by {book.author}</p>
+                      <p className="text-gray-600 mb-3">bởi {book.author}</p>
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-1">
                           <Star className="w-4 h-4 text-yellow-400 fill-current" />
                           <span className="text-sm text-gray-600">
-                            {book.rating}
+                            {book.avg_rating}
                           </span>
                         </div>
                         <span className="text-sm text-purple-600 bg-purple-100 px-2 py-1 rounded-full">
-                          {book.genre}
+                          {book?.catalog.name || "Chua có danh mục"}
                         </span>
                       </div>
                       <div className="flex space-x-2">

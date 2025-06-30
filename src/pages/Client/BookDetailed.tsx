@@ -274,6 +274,7 @@ const BookDetail = () => {
     if (!isAuthenticated) return;
 
     try {
+      // console.log(book)
       await createReservationMutation.mutateAsync({
         user_id: user.userProfile?.id,
         book_id: book.id, // lấy bản đầu tiên, có thể cải tiến chọn bản phù hợp
