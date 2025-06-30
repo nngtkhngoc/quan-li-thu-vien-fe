@@ -5,7 +5,6 @@ import { format } from "date-fns";
 
 export default function NotificationsList({
   filteredNotifications,
-  filter,
   onToggleSeen,
   onDelete,
 }: {
@@ -111,11 +110,6 @@ export default function NotificationsList({
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
             Không có thông báo nào
           </h3>
-          <p className="text-gray-600 dark:text-gray-400">
-            {filter === "all"
-              ? "You're all caught up! No notifications to show."
-              : `No ${filter} notifications at the moment.`}
-          </p>
         </div>
       )}
     </div>
