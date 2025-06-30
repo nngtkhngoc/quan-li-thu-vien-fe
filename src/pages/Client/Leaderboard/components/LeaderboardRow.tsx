@@ -50,12 +50,20 @@ const LeaderboardRow: React.FC<LeaderboardRowProps> = ({ player, index }) => {
           <div
             className={`w-12 h-12 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 via-indigo-400 ${player.image} flex items-center justify-center shadow-lg`}
           >
-            <span className="text-white font-bold text-lg">
-              {player.name
-                .split(" ")
-                .map((n) => n[0])
-                .join("")}
-            </span>
+            {player.image ? (
+              <img
+                src={player.image}
+                alt="avt"
+                className="w-full aspect-square object-cover rounded-full"
+              />
+            ) : (
+              <span className="text-white font-bold text-lg">
+                {player.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")}
+              </span>
+            )}
           </div>
 
           <div>
