@@ -12,7 +12,7 @@ export default function BookCard({ book, showActions = true }: any) {
       }
       return acc;
     }, 0) || 0;
-  console.log(book.bookItems, "@@");
+  // console.log(book.bookItems, "@@");
 
   return (
     <div className="group bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-200 dark:border-gray-700">
@@ -47,8 +47,12 @@ export default function BookCard({ book, showActions = true }: any) {
 
         <div className="flex items-center space-x-4 mb-4 text-sm text-gray-500 dark:text-gray-400">
           <div className="flex items-center">
-            <Star className="h-4 w-4 text-yellow-400 fill-current mr-1" />
-            <span>{book.avg_rating}</span>
+            {
+              <>
+                <Star className="h-4 w-4 text-yellow-400 fill-current mr-1" />
+                <span>{book.avg_rating || "Chưa có đánh giá"}</span>
+              </>
+            }
           </div>
           <div className="flex items-center">
             <BookOpen className="h-4 w-4 mr-1" />

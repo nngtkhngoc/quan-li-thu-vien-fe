@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
-import { Search, Filter, Grid, List } from "lucide-react";
+import { Search, Filter, Grid, List, ArrowUp, ArrowDown } from "lucide-react";
 import BookCard from "../../components/Client/BookCard";
 import { useBook } from "../../hooks/useBook";
 import { ConfigProvider, Pagination } from "antd";
@@ -16,7 +16,11 @@ export default function BookCatalogue() {
     author: "",
     availableOnly: false,
     minRating: 0,
+    sortBy: "title",
+    sort: 0,
   });
+
+  console.log(filters, "filters");
 
   const [page, setPage] = useState(0);
   const size = 8;
@@ -26,7 +30,6 @@ export default function BookCatalogue() {
   const { getBookQuery, getCatalogsQuery } = useBook(
     newSearchParams.toString()
   );
-
   if (getBookQuery.isLoading || getCatalogsQuery.isLoading) {
     return (
       <div className="space-y-6 max-w-screen-xl mx-auto p-6">
@@ -43,7 +46,7 @@ export default function BookCatalogue() {
   const books = getBookQuery.data?.content || [];
   const categories = getCatalogsQuery.data || [];
 
-  const filteredBooks = books.filter((book: any) => {
+  let filteredBooks = books.filter((book: any) => {
     let match = true;
 
     if (filters.query) {
@@ -65,13 +68,34 @@ export default function BookCatalogue() {
     }
 
     if (filters.minRating) {
-      match = match && book.rating >= filters.minRating;
+      match = match && book.avg_rating >= filters.minRating;
     }
-
     return match;
   });
-
+  if (filters.sortBy) {
+    if (filters.sortBy === "title") {
+      filteredBooks = [...filteredBooks].sort((a: any, b: any) =>
+        a.title.localeCompare(b.title)
+      );
+    } else if (filters.sortBy === "rating") {
+      filteredBooks = [...filteredBooks].sort(
+        (a: any, b: any) => b.avg_rating - a.avg_rating
+      );
+    } else if (filters.sortBy === "quantity") {
+      filteredBooks = [...filteredBooks].sort(
+        (a: any, b: any) =>
+          (b.bookItems?.filter((item: any) => item.status === "AVAILABLE")
+            .length || 0) -
+          (a.bookItems?.filter((item: any) => item.status === "AVAILABLE")
+            .length || 0)
+      );
+    }
+  }
+  if (filters.sort > 0) {
+    filteredBooks = [...filteredBooks].reverse();
+  }
   const handleFilterChange = (key: any, value: any) => {
+    console.log(key, value, "key value");
     setFilters((prev: any) => ({
       ...prev,
       [key]: value,
@@ -153,7 +177,7 @@ export default function BookCatalogue() {
 
         {showFilters && (
           <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Thể loại
@@ -209,7 +233,32 @@ export default function BookCatalogue() {
                   <option value={4.5}>4.5+ ⭐</option>
                 </select>
               </div>
-
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-4">
+                  Sắp xếp theo
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleFilterChange("sort", filters.sort > 0 ? 0 : 1);
+                    }}
+                  >
+                    {filters.sort ? (
+                      <ArrowUp className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    ) : (
+                      <ArrowDown className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    )}
+                  </button>
+                </label>
+                <select
+                  value={filters.sortBy}
+                  onChange={(e) => handleFilterChange("sortBy", e.target.value)}
+                  className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value={"title"}>Tiêu đề </option>
+                  <option value={"rating"}>Đánh giá</option>
+                  <option value={"quantity"}>Số lượng</option>
+                </select>
+              </div>
               <div className="flex items-end">
                 <button
                   onClick={clearFilters}
