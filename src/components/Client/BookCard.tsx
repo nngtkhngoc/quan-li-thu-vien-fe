@@ -40,7 +40,7 @@ export default function BookCard({ book, showActions = true }: any) {
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-1 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
             {book.title}
           </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-1">
             bởi {book.author}
           </p>
         </div>
