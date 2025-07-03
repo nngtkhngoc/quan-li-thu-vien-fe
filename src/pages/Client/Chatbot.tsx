@@ -37,9 +37,13 @@ export default function Chatbot() {
   });
 
   const res = getChatbotResponseQuery.data || [];
+
   useEffect(() => {
-    setMessages(res);
+    if (res?.length > 0) {
+      setMessages(res);
+    }
   }, [res]);
+
   // console.log(messages);
   const queryClient = useQueryClient();
   const createChatbotResponseMutation = useMutation({
@@ -87,7 +91,7 @@ export default function Chatbot() {
           </div>
           <div className="flex-1 p-3 overflow-y-auto space-y-3">
             {messages.map((msg: any, idx: any) => (
-              <div className="flex flex-row gap-2">
+              <div className="flex flex-row gap-2" key={idx}>
                 {msg._bot && (
                   <div className=" text-white w-10 h-10  flex items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-purple-600">
                     <BotIcon className="w-6 h-6" />
